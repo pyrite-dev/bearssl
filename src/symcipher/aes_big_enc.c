@@ -72,7 +72,7 @@ static const br_ssl_u32 Ssm0[] = {
 	0x7BB0B0CB, 0xA85454FC, 0x6DBBBBD6, 0x2C16163A
 };
 
-static inline br_ssl_u32
+static br_ssl_u32
 rotr(br_ssl_u32 x, int n)
 {
 	return (x << (32 - n)) | (x >> n);

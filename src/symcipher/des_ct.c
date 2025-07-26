@@ -60,7 +60,7 @@ static const unsigned char QR1[] = {
  * 32-bit rotation. The C compiler is supposed to recognize it as a
  * rotation and use the local architecture rotation opcode (if available).
  */
-static inline br_ssl_u32
+static br_ssl_u32
 rotl(br_ssl_u32 x, int n)
 {
 	return (x << n) | (x >> (32 - n));
@@ -180,7 +180,7 @@ br_des_ct_keysched(br_ssl_u32 *skey, const void *key, size_t key_len)
  * DES confusion function. This function performs expansion E (32 to
  * 48 bits), XOR with subkey, S-boxes, and permutation P.
  */
-static inline br_ssl_u32
+static br_ssl_u32
 Fconf(br_ssl_u32 r0, const br_ssl_u32 *sk)
 {
 	/*

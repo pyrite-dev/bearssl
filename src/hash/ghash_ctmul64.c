@@ -29,7 +29,7 @@
  * and bit reversal of 64-bit words.
  */
 
-static inline br_ssl_u64
+static br_ssl_u64
 bmul64(br_ssl_u64 x, br_ssl_u64 y)
 {
 	br_ssl_u64 x0, x1, x2, x3;

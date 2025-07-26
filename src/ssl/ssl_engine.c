@@ -912,7 +912,7 @@ sendrec_ack(br_ssl_engine_context *rc, size_t len)
  * Test whether there is some buffered outgoing record that still must
  * sent.
  */
-static inline int
+static int
 has_rec_tosend(const br_ssl_engine_context *rc)
 {
 	return rc->oxa == rc->oxb && rc->oxa != rc->oxc;

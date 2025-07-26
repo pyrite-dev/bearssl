@@ -201,7 +201,7 @@ static const br_ssl_u32 S8[] = {
 	0x00000820, 0x00020020, 0x08000000, 0x08020800
 };
 
-static inline br_ssl_u32
+static br_ssl_u32
 Fconf(br_ssl_u32 r0, br_ssl_u32 skl, br_ssl_u32 skr)
 {
 	br_ssl_u32 r1;

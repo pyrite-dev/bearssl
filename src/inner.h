@@ -455,7 +455,7 @@
  * Encoding/decoding functions.
  *
  * 32-bit and 64-bit decoding, both little-endian and big-endian, is
- * implemented with the inline functions below.
+ * implemented with the functions below.
  *
  * When allowed by some compile-time options (autodetected or provided),
  * optimised code is used, to perform direct memory access when the
@@ -484,7 +484,7 @@ typedef union {
 	unsigned char b[sizeof(br_ssl_u64)];
 } br_union_u64;
 
-static inline void
+static void
 br_enc16le(void *dst, unsigned x)
 {
 #if BR_LE_UNALIGNED
@@ -498,7 +498,7 @@ br_enc16le(void *dst, unsigned x)
 #endif
 }
 
-static inline void
+static void
 br_enc16be(void *dst, unsigned x)
 {
 #if BR_BE_UNALIGNED
@@ -512,7 +512,7 @@ br_enc16be(void *dst, unsigned x)
 #endif
 }
 
-static inline unsigned
+static unsigned
 br_dec16le(const void *src)
 {
 #if BR_LE_UNALIGNED
@@ -525,7 +525,7 @@ br_dec16le(const void *src)
 #endif
 }
 
-static inline unsigned
+static unsigned
 br_dec16be(const void *src)
 {
 #if BR_BE_UNALIGNED
@@ -538,7 +538,7 @@ br_dec16be(const void *src)
 #endif
 }
 
-static inline void
+static void
 br_enc32le(void *dst, br_ssl_u32 x)
 {
 #if BR_LE_UNALIGNED
@@ -554,7 +554,7 @@ br_enc32le(void *dst, br_ssl_u32 x)
 #endif
 }
 
-static inline void
+static void
 br_enc32be(void *dst, br_ssl_u32 x)
 {
 #if BR_BE_UNALIGNED
@@ -570,7 +570,7 @@ br_enc32be(void *dst, br_ssl_u32 x)
 #endif
 }
 
-static inline br_ssl_u32
+static br_ssl_u32
 br_dec32le(const void *src)
 {
 #if BR_LE_UNALIGNED
@@ -586,7 +586,7 @@ br_dec32le(const void *src)
 #endif
 }
 
-static inline br_ssl_u32
+static br_ssl_u32
 br_dec32be(const void *src)
 {
 #if BR_BE_UNALIGNED
@@ -602,7 +602,7 @@ br_dec32be(const void *src)
 #endif
 }
 
-static inline void
+static void
 br_enc64le(void *dst, br_ssl_u64 x)
 {
 #if BR_LE_UNALIGNED
@@ -616,7 +616,7 @@ br_enc64le(void *dst, br_ssl_u64 x)
 #endif
 }
 
-static inline void
+static void
 br_enc64be(void *dst, br_ssl_u64 x)
 {
 #if BR_BE_UNALIGNED
@@ -630,7 +630,7 @@ br_enc64be(void *dst, br_ssl_u64 x)
 #endif
 }
 
-static inline br_ssl_u64
+static br_ssl_u64
 br_dec64le(const void *src)
 {
 #if BR_LE_UNALIGNED
@@ -644,7 +644,7 @@ br_dec64le(const void *src)
 #endif
 }
 
-static inline br_ssl_u64
+static br_ssl_u64
 br_dec64be(const void *src)
 {
 #if BR_BE_UNALIGNED
@@ -679,7 +679,7 @@ void br_range_enc64be(void *dst, const br_ssl_u64 *v, size_t num);
 /*
  * Byte-swap a 32-bit integer.
  */
-static inline br_ssl_u32
+static br_ssl_u32
 br_swap32(br_ssl_u32 x)
 {
 	x = ((x & (br_ssl_u32)0x00FF00FF) << 8)
@@ -721,7 +721,7 @@ void br_tls_phash(void *dst, size_t len,
  * Copy all configured hash implementations from a multihash context
  * to another.
  */
-static inline void
+static void
 br_multihash_copyimpl(br_multihash_context *dst,
 	const br_multihash_context *src)
 {
@@ -757,7 +757,7 @@ br_multihash_copyimpl(br_multihash_context *dst,
 /*
  * Negate a boolean.
  */
-static inline br_ssl_u32
+static br_ssl_u32
 NOT(br_ssl_u32 ctl)
 {
 	return ctl ^ 1;
@@ -766,7 +766,7 @@ NOT(br_ssl_u32 ctl)
 /*
  * Multiplexer: returns x if ctl == 1, y if ctl == 0.
  */
-static inline br_ssl_u32
+static br_ssl_u32
 MUX(br_ssl_u32 ctl, br_ssl_u32 x, br_ssl_u32 y)
 {
 	return y ^ (-ctl & (x ^ y));
@@ -775,7 +775,7 @@ MUX(br_ssl_u32 ctl, br_ssl_u32 x, br_ssl_u32 y)
 /*
  * Equality check: returns 1 if x == y, 0 otherwise.
  */
-static inline br_ssl_u32
+static br_ssl_u32
 EQ(br_ssl_u32 x, br_ssl_u32 y)
 {
 	br_ssl_u32 q;
@@ -787,7 +787,7 @@ EQ(br_ssl_u32 x, br_ssl_u32 y)
 /*
  * Inequality check: returns 1 if x != y, 0 otherwise.
  */
-static inline br_ssl_u32
+static br_ssl_u32
 NEQ(br_ssl_u32 x, br_ssl_u32 y)
 {
 	br_ssl_u32 q;
@@ -799,7 +799,7 @@ NEQ(br_ssl_u32 x, br_ssl_u32 y)
 /*
  * Comparison: returns 1 if x > y, 0 otherwise.
  */
-static inline br_ssl_u32
+static br_ssl_u32
 GT(br_ssl_u32 x, br_ssl_u32 y)
 {
 	/*
@@ -831,7 +831,7 @@ GT(br_ssl_u32 x, br_ssl_u32 y)
  * General comparison: returned value is -1, 0 or 1, depending on
  * whether x is lower than, equal to, or greater than y.
  */
-static inline br_ssl_i32
+static br_ssl_i32
 CMP(br_ssl_u32 x, br_ssl_u32 y)
 {
 	return (br_ssl_i32)GT(x, y) | -(br_ssl_i32)GT(y, x);
@@ -840,7 +840,7 @@ CMP(br_ssl_u32 x, br_ssl_u32 y)
 /*
  * Returns 1 if x == 0, 0 otherwise. Take care that the operand is signed.
  */
-static inline br_ssl_u32
+static br_ssl_u32
 EQ0(br_ssl_i32 x)
 {
 	br_ssl_u32 q;
@@ -852,7 +852,7 @@ EQ0(br_ssl_i32 x)
 /*
  * Returns 1 if x > 0, 0 otherwise. Take care that the operand is signed.
  */
-static inline br_ssl_u32
+static br_ssl_u32
 GT0(br_ssl_i32 x)
 {
 	/*
@@ -867,7 +867,7 @@ GT0(br_ssl_i32 x)
 /*
  * Returns 1 if x >= 0, 0 otherwise. Take care that the operand is signed.
  */
-static inline br_ssl_u32
+static br_ssl_u32
 GE0(br_ssl_i32 x)
 {
 	return ~(br_ssl_u32)x >> 31;
@@ -876,7 +876,7 @@ GE0(br_ssl_i32 x)
 /*
  * Returns 1 if x < 0, 0 otherwise. Take care that the operand is signed.
  */
-static inline br_ssl_u32
+static br_ssl_u32
 LT0(br_ssl_i32 x)
 {
 	return (br_ssl_u32)x >> 31;
@@ -885,7 +885,7 @@ LT0(br_ssl_i32 x)
 /*
  * Returns 1 if x <= 0, 0 otherwise. Take care that the operand is signed.
  */
-static inline br_ssl_u32
+static br_ssl_u32
 LE0(br_ssl_i32 x)
 {
 	br_ssl_u32 q;
@@ -911,7 +911,7 @@ void br_ccopy(br_ssl_u32 ctl, void *dst, const void *src, size_t len);
  * Compute the bit length of a 32-bit integer. Returned value is between 0
  * and 32 (inclusive).
  */
-static inline br_ssl_u32
+static br_ssl_u32
 BIT_LENGTH(br_ssl_u32 x)
 {
 	br_ssl_u32 k, c;
@@ -928,7 +928,7 @@ BIT_LENGTH(br_ssl_u32 x)
 /*
  * Compute the minimum of x and y.
  */
-static inline br_ssl_u32
+static br_ssl_u32
 MIN(br_ssl_u32 x, br_ssl_u32 y)
 {
 	return MUX(GT(x, y), y, x);
@@ -937,7 +937,7 @@ MIN(br_ssl_u32 x, br_ssl_u32 y)
 /*
  * Compute the maximum of x and y.
  */
-static inline br_ssl_u32
+static br_ssl_u32
 MAX(br_ssl_u32 x, br_ssl_u32 y)
 {
 	return MUX(GT(x, y), x, y);
@@ -969,7 +969,7 @@ MAX(br_ssl_u32 x, br_ssl_u32 y)
                        * (br_ssl_u64)((y) | (br_ssl_u32)0x80000000) \
                        - ((br_ssl_u64)(x) << 31) - ((br_ssl_u64)(y) << 31) \
                        - ((br_ssl_u64)1 << 62))
-static inline br_ssl_u32
+static br_ssl_u32
 MUL31_lo(br_ssl_u32 x, br_ssl_u32 y)
 {
 	br_ssl_u32 xl, xh;
@@ -1046,7 +1046,7 @@ br_ssl_u32 br_divrem(br_ssl_u32 hi, br_ssl_u32 lo, br_ssl_u32 d, br_ssl_u32 *r);
  * Wrapper for br_divrem(); the remainder is returned, and the quotient
  * is discarded.
  */
-static inline br_ssl_u32
+static br_ssl_u32
 br_rem(br_ssl_u32 hi, br_ssl_u32 lo, br_ssl_u32 d)
 {
 	br_ssl_u32 r;
@@ -1059,7 +1059,7 @@ br_rem(br_ssl_u32 hi, br_ssl_u32 lo, br_ssl_u32 d)
  * Wrapper for br_divrem(); the quotient is returned, and the remainder
  * is discarded.
  */
-static inline br_ssl_u32
+static br_ssl_u32
 br_div(br_ssl_u32 hi, br_ssl_u32 lo, br_ssl_u32 d)
 {
 	br_ssl_u32 r;
@@ -1176,7 +1176,7 @@ void br_i32_muladd_small(br_ssl_u32 *x, br_ssl_u32 z, const br_ssl_u32 *m);
  * The word MUST entirely fit within the word elements corresponding
  * to the announced bit length of a[].
  */
-static inline br_ssl_u32
+static br_ssl_u32
 br_i32_word(const br_ssl_u32 *a, br_ssl_u32 off)
 {
 	size_t u;
@@ -1231,7 +1231,7 @@ void br_i32_mulacc(br_ssl_u32 *d, const br_ssl_u32 *a, const br_ssl_u32 *b);
  * Zeroize an integer. The announced bit length is set to the provided
  * value, and the corresponding words are set to 0.
  */
-static inline void
+static void
 br_i32_zero(br_ssl_u32 *x, br_ssl_u32 bit_len)
 {
 	*x ++ = bit_len;
@@ -1379,7 +1379,7 @@ br_ssl_u32 br_i31_decode_mod(br_ssl_u32 *x,
  * value, and the corresponding words are set to 0. The ENCODED bit length
  * is expected here.
  */
-static inline void
+static void
 br_i31_zero(br_ssl_u32 *x, br_ssl_u32 bit_len)
 {
 	*x ++ = bit_len;
@@ -1533,7 +1533,7 @@ br_ssl_u32 br_i31_moddiv(br_ssl_u32 *x, const br_ssl_u32 *y,
  * FIXME: document "i15" functions.
  */
 
-static inline void
+static void
 br_i15_zero(br_ssl_u16 *x, br_ssl_u16 bit_len)
 {
 	*x ++ = bit_len;
@@ -1613,7 +1613,7 @@ br_ssl_u32 br_i62_modpow_opt_as_i31(br_ssl_u32 *x,
 
 /* ==================================================================== */
 
-static inline size_t
+static size_t
 br_digest_size(const br_hash_class *digest_class)
 {
 	return (size_t)(digest_class->desc >> BR_HASHDESC_OUT_OFF)
@@ -2189,7 +2189,7 @@ void br_ssl_engine_fail(br_ssl_engine_context *cc, int err);
 /*
  * Test whether the engine is closed (normally or as a failure).
  */
-static inline int
+static int
 br_ssl_engine_closed(const br_ssl_engine_context *cc)
 {
 	return cc->iomode == BR_IO_FAILED;
@@ -2220,7 +2220,7 @@ void br_ssl_engine_flush_record(br_ssl_engine_context *cc);
 /*
  * Test whether there is some accumulated payload to send.
  */
-static inline int
+static int
 br_ssl_engine_has_pld_to_send(const br_ssl_engine_context *rc)
 {
 	return rc->oxa != rc->oxb && rc->oxa != rc->oxc;
@@ -2373,7 +2373,7 @@ int br_ssl_choose_hash(unsigned bf);
 /*
  * PowerPC / POWER assembly stuff. The special BR_POWER_ASM_MACROS macro
  * must be defined before including this file; this is done by source
- * files that use some inline assembly for PowerPC / POWER machines.
+ * files that use some assembly for PowerPC / POWER machines.
  */
 
 #if BR_POWER_ASM_MACROS
@@ -2457,7 +2457,7 @@ int br_ssl_choose_hash(unsigned bf);
 /*
  * Special "activate intrinsics" code, needed for some compiler versions.
  * This is defined at the end of this file, so that it won't impact any
- * of the inline functions defined previously; and it is controlled by
+ * of the functions defined previously; and it is controlled by
  * a specific macro defined in the caller code.
  *
  * Calling code conventions:
@@ -2537,7 +2537,7 @@ BR_TARGETS_X86_DOWN
 #define br_bswap32   _byteswap_ulong
 #endif
 
-static inline int
+static int
 br_cpuid(br_ssl_u32 mask_eax, br_ssl_u32 mask_ebx,
 	br_ssl_u32 mask_ecx, br_ssl_u32 mask_edx)
 {

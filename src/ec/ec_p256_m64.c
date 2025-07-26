@@ -92,7 +92,7 @@ static const br_ssl_u64 P256_B_MONTY[] = {
 /*
  * Addition in the field.
  */
-static inline void
+static void
 f256_add(br_ssl_u64 *d, const br_ssl_u64 *a, const br_ssl_u64 *b)
 {
 #if BR_INT128
@@ -174,7 +174,7 @@ f256_add(br_ssl_u64 *d, const br_ssl_u64 *a, const br_ssl_u64 *b)
 /*
  * Subtraction in the field.
  */
-static inline void
+static void
 f256_sub(br_ssl_u64 *d, const br_ssl_u64 *a, const br_ssl_u64 *b)
 {
 #if BR_INT128
@@ -495,7 +495,7 @@ f256_montymul(br_ssl_u64 *d, const br_ssl_u64 *a, const br_ssl_u64 *b)
  * multiplication (inline, should be optimized away).
  * TODO: see if some extra speed can be gained here.
  */
-static inline void
+static void
 f256_montysquare(br_ssl_u64 *d, const br_ssl_u64 *a)
 {
 	f256_montymul(d, a, a);
@@ -592,7 +592,7 @@ f256_invert(br_ssl_u64 *d, const br_ssl_u64 *a)
  * Input value fits on 256 bits. This function subtracts p if and only
  * if the input is greater than or equal to p.
  */
-static inline void
+static void
 f256_final_reduce(br_ssl_u64 *a)
 {
 #if BR_INT128

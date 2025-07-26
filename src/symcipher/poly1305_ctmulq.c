@@ -295,7 +295,7 @@ poly1305_inner_small(br_ssl_u64 *acc, br_ssl_u64 *r, const void *data, size_t le
 	acc[2] = a2;
 }
 
-static inline void
+static void
 poly1305_inner(br_ssl_u64 *acc, br_ssl_u64 *r, const void *data, size_t len)
 {
 	if (len >= 64) {

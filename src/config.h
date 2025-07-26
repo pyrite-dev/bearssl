@@ -179,11 +179,11 @@
 
 /*
  * When BR_ARMEL_CORTEXM_GCC is enabled, some operations are replaced with
- * inline assembly which is shorter and/or faster. This should be used
+ * assembly which is shorter and/or faster. This should be used
  * only when all of the following are true:
  *   - target architecture is ARM in Thumb mode
  *   - target endianness is little-endian
- *   - compiler is GCC (or GCC-compatible for inline assembly syntax)
+ *   - compiler is GCC (or GCC-compatible for assembly syntax)
  *
  * This is meant for the low-end cores (Cortex M0, M0+, M1, M3).
  * Note: if BR_LOMUL is not explicitly enabled or disabled, then

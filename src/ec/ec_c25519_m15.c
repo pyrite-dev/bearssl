@@ -140,7 +140,7 @@ le13_to_le8(unsigned char *dst, size_t len, const br_ssl_u32 *src)
  * value is the resulting carry. The source (w) and destination (d)
  * arrays may be identical, but shall not overlap partially.
  */
-static inline br_ssl_u32
+static br_ssl_u32
 norm13(br_ssl_u32 *d, const br_ssl_u32 *w, size_t len)
 {
 	size_t u;
@@ -395,7 +395,7 @@ mul20(br_ssl_u32 *d, const br_ssl_u32 *a, const br_ssl_u32 *b)
 #undef CPR
 }
 
-static inline void
+static void
 square20(br_ssl_u32 *d, const br_ssl_u32 *a)
 {
 	mul20(d, a, a);

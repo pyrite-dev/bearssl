@@ -93,11 +93,11 @@
 #define ADDR_NULL   ((br_ssl_u32)-1)
 
 #define GETSET(name, off) \
-static inline br_ssl_u32 get_ ## name(br_ssl_session_cache_lru *cc, br_ssl_u32 x) \
+static br_ssl_u32 get_ ## name(br_ssl_session_cache_lru *cc, br_ssl_u32 x) \
 { \
 	return br_dec32be(cc->store + x + (off)); \
 } \
-static inline void set_ ## name(br_ssl_session_cache_lru *cc, \
+static void set_ ## name(br_ssl_session_cache_lru *cc, \
 	br_ssl_u32 x, br_ssl_u32 val) \
 { \
 	br_enc32be(cc->store + x + (off), val); \
@@ -234,7 +234,7 @@ find_replacement_node(br_ssl_session_cache_lru *cc, br_ssl_u32 x, br_ssl_u32 *al
  * Set the link at address 'alx' to point to node 'x'. If 'alx' is
  * ADDR_NULL, then this sets the tree root to 'x'.
  */
-static inline void
+static void
 set_link(br_ssl_session_cache_lru *cc, br_ssl_u32 alx, br_ssl_u32 x)
 {
 	if (alx == ADDR_NULL) {

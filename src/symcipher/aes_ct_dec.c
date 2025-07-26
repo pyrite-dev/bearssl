@@ -111,7 +111,7 @@ inv_shift_rows(br_ssl_u32 *q)
 	}
 }
 
-static inline br_ssl_u32
+static br_ssl_u32
 rotr16(br_ssl_u32 x)
 {
 	return (x << 16) | (x >> 16);

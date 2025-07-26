@@ -45,7 +45,7 @@
 /*
  * Multiplication in GF(2)[X], truncated to its low 32 bits.
  */
-static inline br_ssl_u32
+static br_ssl_u32
 bmul32(br_ssl_u32 x, br_ssl_u32 y)
 {
 	br_ssl_u32 x0, x1, x2, x3;

@@ -67,7 +67,7 @@
 		(l) = (br_ssl_u32)mul32tmp; \
 	} while (0)
 
-static inline void
+static void
 bmul(br_ssl_u32 *hi, br_ssl_u32 *lo, br_ssl_u32 x, br_ssl_u32 y)
 {
 	br_ssl_u32 x0, x1, x2, x3;
@@ -161,7 +161,7 @@ bmul(br_ssl_u32 *hi, br_ssl_u32 *lo, br_ssl_u32 x, br_ssl_u32 y)
  * Simple multiplication in GF(2)[X], using 16 integer multiplications.
  */
 
-static inline void
+static void
 bmul(br_ssl_u32 *hi, br_ssl_u32 *lo, br_ssl_u32 x, br_ssl_u32 y)
 {
 	br_ssl_u32 x0, x1, x2, x3;

@@ -172,7 +172,7 @@ br_aes_big_keysched_inv(br_ssl_u32 *skey, const void *key, size_t key_len)
 	return num_rounds;
 }
 
-static inline br_ssl_u32
+static br_ssl_u32
 rotr(br_ssl_u32 x, int n)
 {
 	return (x << (32 - n)) | (x >> n);

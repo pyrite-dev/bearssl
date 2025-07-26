@@ -821,7 +821,7 @@ br_aes_pwr8_ctrcbc_decrypt(const br_aes_pwr8_ctrcbc_keys *ctx,
 	}
 }
 
-static inline void
+static void
 incr_ctr(void *dst, const void *src)
 {
 	br_ssl_u64 hi, lo;

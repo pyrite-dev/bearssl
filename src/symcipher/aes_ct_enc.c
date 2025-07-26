@@ -24,7 +24,7 @@
 
 #include "inner.h"
 
-static inline void
+static void
 add_round_key(br_ssl_u32 *q, const br_ssl_u32 *sk)
 {
 	q[0] ^= sk[0];
@@ -37,7 +37,7 @@ add_round_key(br_ssl_u32 *q, const br_ssl_u32 *sk)
 	q[7] ^= sk[7];
 }
 
-static inline void
+static void
 shift_rows(br_ssl_u32 *q)
 {
 	int i;
@@ -53,13 +53,13 @@ shift_rows(br_ssl_u32 *q)
 	}
 }
 
-static inline br_ssl_u32
+static br_ssl_u32
 rotr16(br_ssl_u32 x)
 {
 	return (x << 16) | (x >> 16);
 }
 
-static inline void
+static void
 mix_columns(br_ssl_u32 *q)
 {
 	br_ssl_u32 q0, q1, q2, q3, q4, q5, q6, q7;

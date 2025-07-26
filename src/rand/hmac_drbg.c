@@ -74,7 +74,7 @@ br_hmac_drbg_generate(br_hmac_drbg_context *ctx, void *out, size_t len)
 	 * br_hmac_drbg_update() with an empty additional seed. However,
 	 * we already have an initialized HMAC context with the right
 	 * initial key, and we don't want to push another one on the
-	 * stack, so we inline that update() call here.
+	 * stack, so we that update() call here.
 	 */
 	br_hmac_init(&hc, &kc, 0);
 	br_hmac_update(&hc, ctx->V, hlen);

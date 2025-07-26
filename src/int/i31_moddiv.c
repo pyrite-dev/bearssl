@@ -414,7 +414,7 @@ br_i31_moddiv(br_ssl_u32 *x, const br_ssl_u32 *y, const br_ssl_u32 *m, br_ssl_u3
 			/*
 			 * r = GT(a_hi, b_hi)
 			 * But the GT() function works on br_ssl_u32 operands,
-			 * so we inline a 64-bit version here.
+			 * so we a 64-bit version here.
 			 */
 			rz = b_hi - a_hi;
 			r = (br_ssl_u32)((rz ^ ((a_hi ^ b_hi)

@@ -79,7 +79,7 @@ api_xoff(int curve, size_t *len)
 /*
  * Swap two field elements, conditionally on a flag.
  */
-static inline void
+static void
 f255_cswap(br_ssl_u64 *a, br_ssl_u64 *b, br_ssl_u32 ctl)
 {
 	br_ssl_u64 m, w;
@@ -94,7 +94,7 @@ f255_cswap(br_ssl_u64 *a, br_ssl_u64 *b, br_ssl_u32 ctl)
 /*
  * Addition in the field.
  */
-static inline void
+static void
 f255_add(br_ssl_u64 *d, const br_ssl_u64 *a, const br_ssl_u64 *b)
 {
 #if BR_INT128
@@ -159,7 +159,7 @@ f255_add(br_ssl_u64 *d, const br_ssl_u64 *a, const br_ssl_u64 *b)
 /*
  * Subtraction.
  */
-static inline void
+static void
 f255_sub(br_ssl_u64 *d, const br_ssl_u64 *a, const br_ssl_u64 *b)
 {
 #if BR_INT128
@@ -249,7 +249,7 @@ f255_sub(br_ssl_u64 *d, const br_ssl_u64 *a, const br_ssl_u64 *b)
 /*
  * Multiplication.
  */
-static inline void
+static void
 f255_mul(br_ssl_u64 *d, br_ssl_u64 *a, br_ssl_u64 *b)
 {
 #if BR_INT128
@@ -494,7 +494,7 @@ f255_mul(br_ssl_u64 *d, br_ssl_u64 *a, br_ssl_u64 *b)
 /*
  * Multiplication by A24 = 121665.
  */
-static inline void
+static void
 f255_mul_a24(br_ssl_u64 *d, const br_ssl_u64 *a)
 {
 #if BR_INT128
@@ -561,7 +561,7 @@ f255_mul_a24(br_ssl_u64 *d, const br_ssl_u64 *a)
 /*
  * Finalize reduction.
  */
-static inline void
+static void
 f255_final_reduce(br_ssl_u64 *a)
 {
 #if BR_INT128

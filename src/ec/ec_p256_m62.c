@@ -103,7 +103,7 @@ static const br_ssl_u64 P256_B_MONTY[] = {
  * On input, limbs may be up to 63 bits each; on output, they will
  * be up to one bit more than on input.
  */
-static inline void
+static void
 f256_add(br_ssl_u64 *d, const br_ssl_u64 *a, const br_ssl_u64 *b)
 {
 	d[0] = a[0] + b[0];
@@ -118,7 +118,7 @@ f256_add(br_ssl_u64 *d, const br_ssl_u64 *a, const br_ssl_u64 *b)
  * Input: limbs can go up to 61 bits each.
  * Output: partially reduced.
  */
-static inline void
+static void
 f256_partial_reduce(br_ssl_u64 *a)
 {
 	br_ssl_u64 w, cc, s;
@@ -161,7 +161,7 @@ f256_partial_reduce(br_ssl_u64 *a)
  * integer will be less than 2^268 + 2^217.
  * Output: partially reduced.
  */
-static inline void
+static void
 f256_sub(br_ssl_u64 *d, const br_ssl_u64 *a, const br_ssl_u64 *b)
 {
 	br_ssl_u64 t[5], w, s, cc;
@@ -434,7 +434,7 @@ f256_montymul(br_ssl_u64 *d, const br_ssl_u64 *a, const br_ssl_u64 *b)
  * multiplication (inline, should be optimized away).
  * TODO: see if some extra speed can be gained here.
  */
-static inline void
+static void
 f256_montysquare(br_ssl_u64 *d, const br_ssl_u64 *a)
 {
 	f256_montymul(d, a, a);
@@ -530,7 +530,7 @@ f256_invert(br_ssl_u64 *d, const br_ssl_u64 *a)
  * On output, limbs a[0] to a[3] fit on 52 bits each, limb a[4] fits
  * on 48 bits, and the integer is less than p.
  */
-static inline void
+static void
 f256_final_reduce(br_ssl_u64 *a)
 {
 	br_ssl_u64 r[5], t[5], w, cc;
