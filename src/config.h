@@ -143,7 +143,7 @@
  * to automatically obtain quality randomness for seeding its internal
  * PRNG.
  */
-#ifndef _WIN32
+#ifdef _WIN32
 #define BR_USE_URANDOM   0
 #endif
 
