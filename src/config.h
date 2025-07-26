@@ -25,6 +25,16 @@
 #ifndef CONFIG_H__
 #define CONFIG_H__
 
+#if defined(_MSC_VER) && _MSC_VER < 1600
+#define BE_PORTABLE
+#endif
+
+#ifdef BE_PORTABLE
+#ifdef BR_ENABLE_INTRINSICS
+#undef BR_ENABLE_INTRINSICS
+#endif
+#endif
+
 /*
  * This file contains compile-time flags that can override the
  * autodetection performed in relevant files. Each flag is a macro; it
@@ -105,9 +115,10 @@
  * support is dynamically tested; if the current CPU does not support
  * it, then another random source will be used, such as /dev/urandom or
  * CryptGenRandom().
- *
-#define BR_RDRAND   1
  */
+#if defined(BE_PORTABLE)
+#define BR_RDRAND   0
+#endif
 
 /*
  * When BR_USE_GETENTROPY is enabled, the SSL engine will use the
@@ -187,9 +198,10 @@
  * enabled explicitly, then that AES implementation will be compiled only
  * if a compatible compiler is detected. If set explicitly to 0, the
  * implementation will not be compiled at all.
- *
-#define BR_AES_X86NI   1
  */
+#if defined(BE_PORTABLE)
+#define BR_AES_X86NI   0
+#endif
 
 /*
  * When BR_SSE2 is enabled, SSE2 intrinsics will be used for some
@@ -197,9 +209,10 @@
  * is not enabled explicitly, then support for SSE2 intrinsics will be
  * automatically detected. If set explicitly to 0, then SSE2 code will
  * not be compiled at all.
- *
-#define BR_SSE2   1
  */
+#if defined(BE_PORTABLE)
+#define BR_SSE2   0
+#endif
 
 /*
  * When BR_POWER8 is enabled, the AES implementation using the POWER ISA
@@ -207,9 +220,10 @@
  * If this is not enabled explicitly, then that implementation will be
  * compiled only if a compatible compiler is detected, _and_ the target
  * architecture is POWER8 or later.
- *
-#define BR_POWER8   1
  */
+#if defined(BE_PORTABLE)
+#define BR_POWER8   0
+#endif
 
 /*
  * When BR_INT128 is enabled, then code using the 'unsigned __int64'
