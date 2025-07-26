@@ -4,3 +4,7 @@
 /testcrypto
 /testspeed
 /testx509
+*.make
+Makefile
+/lib
+/obj
