@@ -29,13 +29,13 @@
  * The header word is untouched.
  */
 static void
-mkrand(const br_prng_class **rng, uint16_t *x, uint32_t esize)
+mkrand(const br_prng_class **rng, br_ssl_u16 *x, br_ssl_u32 esize)
 {
 	size_t u, len;
 	unsigned m;
 
 	len = (esize + 15) >> 4;
-	(*rng)->generate(rng, x + 1, len * sizeof(uint16_t));
+	(*rng)->generate(rng, x + 1, len * sizeof(br_ssl_u16));
 	for (u = 1; u < len; u ++) {
 		x[u] &= 0x7FFF;
 	}
@@ -101,11 +101,11 @@ static const unsigned char SMALL_PRIMES[] = {
  *
  * This function assumes that x is odd.
  */
-static uint32_t
-trial_divisions(const uint16_t *x, uint16_t *t)
+static br_ssl_u32
+trial_divisions(const br_ssl_u16 *x, br_ssl_u16 *t)
 {
-	uint16_t *y;
-	uint16_t x0i;
+	br_ssl_u16 *y;
+	br_ssl_u16 x0i;
 
 	y = t;
 	t += 1 + ((x[0] + 15) >> 4);
@@ -121,9 +121,9 @@ trial_divisions(const uint16_t *x, uint16_t *t)
  * Returned value is 1 on success (all rounds completed successfully),
  * 0 otherwise.
  */
-static uint32_t
-miller_rabin(const br_prng_class **rng, const uint16_t *x, int n,
-	uint16_t *t, size_t tlen)
+static br_ssl_u32
+miller_rabin(const br_prng_class **rng, const br_ssl_u16 *x, int n,
+	br_ssl_u16 *t, size_t tlen)
 {
 	/*
 	 * Since x = 3 mod 4, the Miller-Rabin test is simple:
@@ -143,9 +143,9 @@ miller_rabin(const br_prng_class **rng, const uint16_t *x, int n,
 	 */
 	unsigned char *xm1d2;
 	size_t xlen, xm1d2_len, xm1d2_len_u16, u;
-	uint32_t asize;
+	br_ssl_u32 asize;
 	unsigned cc;
-	uint16_t x0i;
+	br_ssl_u16 x0i;
 
 	/*
 	 * Compute (x-1)/2 (encoded).
@@ -173,8 +173,8 @@ miller_rabin(const br_prng_class **rng, const uint16_t *x, int n,
 	asize = x[0] - 1 - EQ0(x[0] & 15);
 	x0i = br_i15_ninv15(x[1]);
 	while (n -- > 0) {
-		uint16_t *a;
-		uint32_t eq1, eqm1;
+		br_ssl_u16 *a;
+		br_ssl_u32 eq1, eqm1;
 
 		/*
 		 * Generate a random base. We don't need the base to be
@@ -218,8 +218,8 @@ miller_rabin(const br_prng_class **rng, const uint16_t *x, int n,
  * bit length. The two top bits and the two bottom bits are set to 1.
  */
 static void
-mkprime(const br_prng_class **rng, uint16_t *x, uint32_t esize,
-	uint32_t pubexp, uint16_t *t, size_t tlen)
+mkprime(const br_prng_class **rng, br_ssl_u16 *x, br_ssl_u32 esize,
+	br_ssl_u32 pubexp, br_ssl_u16 *t, size_t tlen)
 {
 	size_t len;
 
@@ -227,7 +227,7 @@ mkprime(const br_prng_class **rng, uint16_t *x, uint32_t esize,
 	len = (esize + 15) >> 4;
 	for (;;) {
 		size_t u;
-		uint32_t m3, m5, m7, m11;
+		br_ssl_u32 m3, m5, m7, m11;
 		int rounds;
 
 		/*
@@ -259,7 +259,7 @@ mkprime(const br_prng_class **rng, uint16_t *x, uint32_t esize,
 		m7 = 0;
 		m11 = 0;
 		for (u = 0; u < len; u ++) {
-			uint32_t w;
+			br_ssl_u32 w;
 
 			w = x[1 + u];
 			m3 += w << (u & 1);
@@ -376,11 +376,11 @@ mkprime(const br_prng_class **rng, uint16_t *x, uint32_t esize,
  * The temporary buffer (t) must have room for at least 4 integers of
  * the size of p.
  */
-static uint32_t
-invert_pubexp(uint16_t *d, const uint16_t *m, uint32_t e, uint16_t *t)
+static br_ssl_u32
+invert_pubexp(br_ssl_u16 *d, const br_ssl_u16 *m, br_ssl_u32 e, br_ssl_u16 *t)
 {
-	uint16_t *f;
-	uint32_t r;
+	br_ssl_u16 *f;
+	br_ssl_u32 r;
 
 	f = t;
 	t += 1 + ((m[0] + 15) >> 4);
@@ -407,7 +407,7 @@ invert_pubexp(uint16_t *d, const uint16_t *m, uint32_t e, uint16_t *t)
 	 * is odd, and we must add m to d in order to get the correct
 	 * result.
 	 */
-	br_i15_add(d, m, (uint32_t)(1 - (d[1] & 1)));
+	br_i15_add(d, m, (br_ssl_u32)(1 - (d[1] & 1)));
 
 	return r;
 }
@@ -433,17 +433,17 @@ bufswap(void *b1, void *b2, size_t len)
 }
 
 /* see bearssl_rsa.h */
-uint32_t
+br_ssl_u32
 br_rsa_i15_keygen(const br_prng_class **rng,
 	br_rsa_private_key *sk, void *kbuf_priv,
 	br_rsa_public_key *pk, void *kbuf_pub,
-	unsigned size, uint32_t pubexp)
+	unsigned size, br_ssl_u32 pubexp)
 {
-	uint32_t esize_p, esize_q;
+	br_ssl_u32 esize_p, esize_q;
 	size_t plen, qlen, tlen;
-	uint16_t *p, *q, *t;
-	uint16_t tmp[TEMPS];
-	uint32_t r;
+	br_ssl_u16 *p, *q, *t;
+	br_ssl_u16 tmp[TEMPS];
+	br_ssl_u32 r;
 
 	if (size < BR_MIN_RSA_SIZE || size > BR_MAX_RSA_SIZE) {
 		return 0;
@@ -493,7 +493,7 @@ br_rsa_i15_keygen(const br_prng_class **rng,
 	p = tmp;
 	q = p + 1 + plen;
 	t = q + 1 + qlen;
-	tlen = ((sizeof tmp) / sizeof(uint16_t)) - (2 + plen + qlen);
+	tlen = ((sizeof tmp) / sizeof(br_ssl_u16)) - (2 + plen + qlen);
 
 	/*
 	 * When looking for primes p and q, we temporarily divide

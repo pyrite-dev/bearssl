@@ -65,9 +65,9 @@ br_hmac_outCT(const br_hmac_context *ctx,
 	const br_hash_class *dig;
 	br_hash_compat_context hc;
 	int be;
-	uint32_t po, bs;
-	uint32_t kr, km, kl, kz, u;
-	uint64_t count, ncount, bit_len;
+	br_ssl_u32 po, bs;
+	br_ssl_u32 kr, km, kl, kz, u;
+	br_ssl_u64 count, ncount, bit_len;
 	unsigned char tmp1[64], tmp2[64];
 	size_t hlen;
 
@@ -92,14 +92,14 @@ br_hmac_outCT(const br_hmac_context *ctx,
 	 * Get current input length and compute total bit length.
 	 */
 	count = dig->state(&hc.vtable, tmp1);
-	bit_len = (count + (uint64_t)len) << 3;
+	bit_len = (count + (br_ssl_u64)len) << 3;
 
 	/*
 	 * We can input the blocks that we are sure we will use.
 	 * This offers better performance (no MUX for these blocks)
 	 * and also ensures that the remaining lengths fit on 32 bits.
 	 */
-	ncount = (count + (uint64_t)min_len) & ~(uint64_t)(bs - 1);
+	ncount = (count + (br_ssl_u64)min_len) & ~(br_ssl_u64)(bs - 1);
 	if (ncount > count) {
 		size_t zlen;
 
@@ -129,10 +129,10 @@ br_hmac_outCT(const br_hmac_context *ctx,
 	 * km, kz and kl are counted from the current offset in the
 	 * input data.
 	 */
-	kr = (uint32_t)count & (bs - 1);
-	kz = ((kr + (uint32_t)len + po + bs - 1) & ~(bs - 1)) - 1 - kr;
+	kr = (br_ssl_u32)count & (bs - 1);
+	kz = ((kr + (br_ssl_u32)len + po + bs - 1) & ~(bs - 1)) - 1 - kr;
 	kl = kz - 7;
-	km = ((kr + (uint32_t)max_len + po + bs - 1) & ~(bs - 1)) - kr;
+	km = ((kr + (br_ssl_u32)max_len + po + bs - 1) & ~(bs - 1)) - kr;
 
 	/*
 	 * We must now process km bytes. For index u from 0 to km-1:
@@ -152,8 +152,8 @@ br_hmac_outCT(const br_hmac_context *ctx,
 	 */
 	memset(tmp2, 0, sizeof tmp2);
 	for (u = 0; u < km; u ++) {
-		uint32_t v;
-		uint32_t d, e, x0, x1;
+		br_ssl_u32 v;
+		br_ssl_u32 d, e, x0, x1;
 		unsigned char x[1];
 
 		d = (u < max_len) ? ((const unsigned char *)data)[u] : 0x00;
@@ -163,17 +163,17 @@ br_hmac_outCT(const br_hmac_context *ctx,
 
 			j = (v - (bs - 8)) << 3;
 			if (be) {
-				e = (uint32_t)(bit_len >> (56 - j));
+				e = (br_ssl_u32)(bit_len >> (56 - j));
 			} else {
-				e = (uint32_t)(bit_len >> j);
+				e = (br_ssl_u32)(bit_len >> j);
 			}
 			e &= 0xFF;
 		} else {
 			e = 0x00;
 		}
-		x0 = MUX(EQ(u, (uint32_t)len), 0x80, d);
+		x0 = MUX(EQ(u, (br_ssl_u32)len), 0x80, d);
 		x1 = MUX(LT(u, kl), 0x00, e);
-		x[0] = MUX(LE(u, (uint32_t)len), x0, x1);
+		x[0] = MUX(LE(u, (br_ssl_u32)len), x0, x1);
 		dig->update(&hc.vtable, x, 1);
 		if (v == (bs - 1)) {
 			dig->state(&hc.vtable, tmp1);
@@ -185,7 +185,7 @@ br_hmac_outCT(const br_hmac_context *ctx,
 	 * Inner hash output is in tmp2[]; we finish processing.
 	 */
 	dig->init(&hc.vtable);
-	dig->set_state(&hc.vtable, ctx->kso, (uint64_t)bs);
+	dig->set_state(&hc.vtable, ctx->kso, (br_ssl_u64)bs);
 	dig->update(&hc.vtable, tmp2, hlen);
 	dig->out(&hc.vtable, tmp2);
 	memcpy(out, tmp2, ctx->out_len);

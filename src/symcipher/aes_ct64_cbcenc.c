@@ -39,15 +39,15 @@ br_aes_ct64_cbcenc_run(const br_aes_ct64_cbcenc_keys *ctx,
 	void *iv, void *data, size_t len)
 {
 	unsigned char *buf;
-	uint64_t sk_exp[120];
-	uint32_t ivw[4];
+	br_ssl_u64 sk_exp[120];
+	br_ssl_u32 ivw[4];
 
 	br_aes_ct64_skey_expand(sk_exp, ctx->num_rounds, ctx->skey);
 	br_range_dec32le(ivw, 4, iv);
 	buf = data;
 	while (len > 0) {
-		uint32_t w[4];
-		uint64_t q[8];
+		br_ssl_u32 w[4];
+		br_ssl_u64 q[8];
 
 		w[0] = ivw[0] ^ br_dec32le(buf);
 		w[1] = ivw[1] ^ br_dec32le(buf + 4);

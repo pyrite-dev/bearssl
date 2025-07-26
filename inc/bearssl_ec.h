@@ -26,7 +26,7 @@
 #define BR_BEARSSL_EC_H__
 
 #include <stddef.h>
-#include <stdint.h>
+#include "bearssl_int.h"
 
 #include "bearssl_rand.h"
 
@@ -276,7 +276,7 @@ typedef struct {
 	 * (secp256r1, ID 23) and NIST P-384 (secp384r1, ID 24) will have
 	 * value `0x01800000` in this field.
 	 */
-	uint32_t supported_curves;
+	br_ssl_u32 supported_curves;
 
 	/**
 	 * \brief Get the conventional generator.
@@ -347,7 +347,7 @@ typedef struct {
 	 * \param curve   curve identifier.
 	 * \return  1 on success, 0 on error.
 	 */
-	uint32_t (*mul)(unsigned char *G, size_t Glen,
+	br_ssl_u32 (*mul)(unsigned char *G, size_t Glen,
 		const unsigned char *x, size_t xlen, int curve);
 
 	/**
@@ -409,7 +409,7 @@ typedef struct {
 	 * \param curve   curve identifier.
 	 * \return  1 on success, 0 on error.
 	 */
-	uint32_t (*muladd)(unsigned char *A, const unsigned char *B, size_t len,
+	br_ssl_u32 (*muladd)(unsigned char *A, const unsigned char *B, size_t len,
 		const unsigned char *x, size_t xlen,
 		const unsigned char *y, size_t ylen, int curve);
 } br_ec_impl;
@@ -707,7 +707,7 @@ typedef size_t (*br_ecdsa_sign)(const br_ec_impl *impl,
  * \param sig_len    signature length (in bytes).
  * \return  1 on success, 0 on error.
  */
-typedef uint32_t (*br_ecdsa_vrfy)(const br_ec_impl *impl,
+typedef br_ssl_u32 (*br_ecdsa_vrfy)(const br_ec_impl *impl,
 	const void *hash, size_t hash_len,
 	const br_ec_public_key *pk, const void *sig, size_t sig_len);
 
@@ -756,7 +756,7 @@ size_t br_ecdsa_i31_sign_raw(const br_ec_impl *impl,
  * \param sig_len    signature length (in bytes).
  * \return  1 on success, 0 on error.
  */
-uint32_t br_ecdsa_i31_vrfy_asn1(const br_ec_impl *impl,
+br_ssl_u32 br_ecdsa_i31_vrfy_asn1(const br_ec_impl *impl,
 	const void *hash, size_t hash_len,
 	const br_ec_public_key *pk, const void *sig, size_t sig_len);
 
@@ -773,7 +773,7 @@ uint32_t br_ecdsa_i31_vrfy_asn1(const br_ec_impl *impl,
  * \param sig_len    signature length (in bytes).
  * \return  1 on success, 0 on error.
  */
-uint32_t br_ecdsa_i31_vrfy_raw(const br_ec_impl *impl,
+br_ssl_u32 br_ecdsa_i31_vrfy_raw(const br_ec_impl *impl,
 	const void *hash, size_t hash_len,
 	const br_ec_public_key *pk, const void *sig, size_t sig_len);
 
@@ -822,7 +822,7 @@ size_t br_ecdsa_i15_sign_raw(const br_ec_impl *impl,
  * \param sig_len    signature length (in bytes).
  * \return  1 on success, 0 on error.
  */
-uint32_t br_ecdsa_i15_vrfy_asn1(const br_ec_impl *impl,
+br_ssl_u32 br_ecdsa_i15_vrfy_asn1(const br_ec_impl *impl,
 	const void *hash, size_t hash_len,
 	const br_ec_public_key *pk, const void *sig, size_t sig_len);
 
@@ -839,7 +839,7 @@ uint32_t br_ecdsa_i15_vrfy_asn1(const br_ec_impl *impl,
  * \param sig_len    signature length (in bytes).
  * \return  1 on success, 0 on error.
  */
-uint32_t br_ecdsa_i15_vrfy_raw(const br_ec_impl *impl,
+br_ssl_u32 br_ecdsa_i15_vrfy_raw(const br_ec_impl *impl,
 	const void *hash, size_t hash_len,
 	const br_ec_public_key *pk, const void *sig, size_t sig_len);
 

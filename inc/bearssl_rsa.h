@@ -26,7 +26,7 @@
 #define BR_BEARSSL_RSA_H__
 
 #include <stddef.h>
-#include <stdint.h>
+#include "bearssl_int.h"
 
 #include "bearssl_hash.h"
 #include "bearssl_rand.h"
@@ -181,7 +181,7 @@ typedef struct {
  */
 typedef struct {
 	/** \brief Modulus bit length (in bits, exact value). */
-	uint32_t n_bitlen;
+	br_ssl_u32 n_bitlen;
 	/** \brief First prime factor. */
 	unsigned char *p;
 	/** \brief First prime factor length (in bytes). */
@@ -228,7 +228,7 @@ typedef struct {
  * \param pk     RSA public key.
  * \return  1 on success, 0 on error.
  */
-typedef uint32_t (*br_rsa_public)(unsigned char *x, size_t xlen,
+typedef br_ssl_u32 (*br_rsa_public)(unsigned char *x, size_t xlen,
 	const br_rsa_public_key *pk);
 
 /**
@@ -276,7 +276,7 @@ typedef uint32_t (*br_rsa_public)(unsigned char *x, size_t xlen,
  * \param hash_out   output buffer for the hash value.
  * \return  1 on success, 0 on error.
  */
-typedef uint32_t (*br_rsa_pkcs1_vrfy)(const unsigned char *x, size_t xlen,
+typedef br_ssl_u32 (*br_rsa_pkcs1_vrfy)(const unsigned char *x, size_t xlen,
 	const unsigned char *hash_oid, size_t hash_len,
 	const br_rsa_public_key *pk, unsigned char *hash_out);
 
@@ -325,7 +325,7 @@ typedef uint32_t (*br_rsa_pkcs1_vrfy)(const unsigned char *x, size_t xlen,
  * \param pk         RSA public key.
  * \return  1 on success, 0 on error.
  */
-typedef uint32_t (*br_rsa_pss_vrfy)(const unsigned char *x, size_t xlen,
+typedef br_ssl_u32 (*br_rsa_pss_vrfy)(const unsigned char *x, size_t xlen,
 	const br_hash_class *hf_data, const br_hash_class *hf_mgf1, 
 	const void *hash, size_t salt_len, const br_rsa_public_key *pk);
 
@@ -393,7 +393,7 @@ typedef size_t (*br_rsa_oaep_encrypt)(
  * \param sk   RSA private key.
  * \return  1 on success, 0 on error.
  */
-typedef uint32_t (*br_rsa_private)(unsigned char *x,
+typedef br_ssl_u32 (*br_rsa_private)(unsigned char *x,
 	const br_rsa_private_key *sk);
 
 /**
@@ -431,7 +431,7 @@ typedef uint32_t (*br_rsa_private)(unsigned char *x,
  * \param x          output buffer for the signature value.
  * \return  1 on success, 0 on error.
  */
-typedef uint32_t (*br_rsa_pkcs1_sign)(const unsigned char *hash_oid,
+typedef br_ssl_u32 (*br_rsa_pkcs1_sign)(const unsigned char *hash_oid,
 	const unsigned char *hash, size_t hash_len,
 	const br_rsa_private_key *sk, unsigned char *x);
 
@@ -477,7 +477,7 @@ typedef uint32_t (*br_rsa_pkcs1_sign)(const unsigned char *hash_oid,
  * \param x          output buffer for the signature value.
  * \return  1 on success, 0 on error.
  */
-typedef uint32_t (*br_rsa_pss_sign)(const br_prng_class **rng,
+typedef br_ssl_u32 (*br_rsa_pss_sign)(const br_prng_class **rng,
 	const br_hash_class *hf_data, const br_hash_class *hf_mgf1,
 	const unsigned char *hash_value, size_t salt_len,
 	const br_rsa_private_key *sk, unsigned char *x);
@@ -549,7 +549,7 @@ typedef uint32_t (*br_rsa_pss_sign)(const br_prng_class **rng,
  * \param len         encrypted/decrypted message length.
  * \return  1 on success, 0 on error.
  */
-typedef uint32_t (*br_rsa_oaep_decrypt)(
+typedef br_ssl_u32 (*br_rsa_oaep_decrypt)(
 	const br_hash_class *dig, const void *label, size_t label_len,
 	const br_rsa_private_key *sk, void *data, size_t *len);
 
@@ -569,7 +569,7 @@ typedef uint32_t (*br_rsa_oaep_decrypt)(
  * \param pk     RSA public key.
  * \return  1 on success, 0 on error.
  */
-uint32_t br_rsa_i32_public(unsigned char *x, size_t xlen,
+br_ssl_u32 br_rsa_i32_public(unsigned char *x, size_t xlen,
 	const br_rsa_public_key *pk);
 
 /**
@@ -585,7 +585,7 @@ uint32_t br_rsa_i32_public(unsigned char *x, size_t xlen,
  * \param hash_out   output buffer for the hash value.
  * \return  1 on success, 0 on error.
  */
-uint32_t br_rsa_i32_pkcs1_vrfy(const unsigned char *x, size_t xlen,
+br_ssl_u32 br_rsa_i32_pkcs1_vrfy(const unsigned char *x, size_t xlen,
 	const unsigned char *hash_oid, size_t hash_len,
 	const br_rsa_public_key *pk, unsigned char *hash_out);
 
@@ -603,7 +603,7 @@ uint32_t br_rsa_i32_pkcs1_vrfy(const unsigned char *x, size_t xlen,
  * \param pk         RSA public key.
  * \return  1 on success, 0 on error.
  */
-uint32_t br_rsa_i32_pss_vrfy(const unsigned char *x, size_t xlen,
+br_ssl_u32 br_rsa_i32_pss_vrfy(const unsigned char *x, size_t xlen,
 	const br_hash_class *hf_data, const br_hash_class *hf_mgf1, 
 	const void *hash, size_t salt_len, const br_rsa_public_key *pk);
 
@@ -616,7 +616,7 @@ uint32_t br_rsa_i32_pss_vrfy(const unsigned char *x, size_t xlen,
  * \param sk   RSA private key.
  * \return  1 on success, 0 on error.
  */
-uint32_t br_rsa_i32_private(unsigned char *x,
+br_ssl_u32 br_rsa_i32_private(unsigned char *x,
 	const br_rsa_private_key *sk);
 
 /**
@@ -631,7 +631,7 @@ uint32_t br_rsa_i32_private(unsigned char *x,
  * \param x          output buffer for the hash value.
  * \return  1 on success, 0 on error.
  */
-uint32_t br_rsa_i32_pkcs1_sign(const unsigned char *hash_oid,
+br_ssl_u32 br_rsa_i32_pkcs1_sign(const unsigned char *hash_oid,
 	const unsigned char *hash, size_t hash_len,
 	const br_rsa_private_key *sk, unsigned char *x);
 
@@ -649,7 +649,7 @@ uint32_t br_rsa_i32_pkcs1_sign(const unsigned char *hash_oid,
  * \param x          output buffer for the signature value.
  * \return  1 on success, 0 on error.
  */
-uint32_t br_rsa_i32_pss_sign(const br_prng_class **rng,
+br_ssl_u32 br_rsa_i32_pss_sign(const br_prng_class **rng,
 	const br_hash_class *hf_data, const br_hash_class *hf_mgf1,
 	const unsigned char *hash_value, size_t salt_len,
 	const br_rsa_private_key *sk, unsigned char *x);
@@ -670,7 +670,7 @@ uint32_t br_rsa_i32_pss_sign(const br_prng_class **rng,
  * \param pk     RSA public key.
  * \return  1 on success, 0 on error.
  */
-uint32_t br_rsa_i31_public(unsigned char *x, size_t xlen,
+br_ssl_u32 br_rsa_i31_public(unsigned char *x, size_t xlen,
 	const br_rsa_public_key *pk);
 
 /**
@@ -686,7 +686,7 @@ uint32_t br_rsa_i31_public(unsigned char *x, size_t xlen,
  * \param hash_out   output buffer for the hash value.
  * \return  1 on success, 0 on error.
  */
-uint32_t br_rsa_i31_pkcs1_vrfy(const unsigned char *x, size_t xlen,
+br_ssl_u32 br_rsa_i31_pkcs1_vrfy(const unsigned char *x, size_t xlen,
 	const unsigned char *hash_oid, size_t hash_len,
 	const br_rsa_public_key *pk, unsigned char *hash_out);
 
@@ -704,7 +704,7 @@ uint32_t br_rsa_i31_pkcs1_vrfy(const unsigned char *x, size_t xlen,
  * \param pk         RSA public key.
  * \return  1 on success, 0 on error.
  */
-uint32_t br_rsa_i31_pss_vrfy(const unsigned char *x, size_t xlen,
+br_ssl_u32 br_rsa_i31_pss_vrfy(const unsigned char *x, size_t xlen,
 	const br_hash_class *hf_data, const br_hash_class *hf_mgf1, 
 	const void *hash, size_t salt_len, const br_rsa_public_key *pk);
 
@@ -717,7 +717,7 @@ uint32_t br_rsa_i31_pss_vrfy(const unsigned char *x, size_t xlen,
  * \param sk   RSA private key.
  * \return  1 on success, 0 on error.
  */
-uint32_t br_rsa_i31_private(unsigned char *x,
+br_ssl_u32 br_rsa_i31_private(unsigned char *x,
 	const br_rsa_private_key *sk);
 
 /**
@@ -732,7 +732,7 @@ uint32_t br_rsa_i31_private(unsigned char *x,
  * \param x          output buffer for the hash value.
  * \return  1 on success, 0 on error.
  */
-uint32_t br_rsa_i31_pkcs1_sign(const unsigned char *hash_oid,
+br_ssl_u32 br_rsa_i31_pkcs1_sign(const unsigned char *hash_oid,
 	const unsigned char *hash, size_t hash_len,
 	const br_rsa_private_key *sk, unsigned char *x);
 
@@ -750,7 +750,7 @@ uint32_t br_rsa_i31_pkcs1_sign(const unsigned char *hash_oid,
  * \param x          output buffer for the signature value.
  * \return  1 on success, 0 on error.
  */
-uint32_t br_rsa_i31_pss_sign(const br_prng_class **rng,
+br_ssl_u32 br_rsa_i31_pss_sign(const br_prng_class **rng,
 	const br_hash_class *hf_data, const br_hash_class *hf_mgf1,
 	const unsigned char *hash_value, size_t salt_len,
 	const br_rsa_private_key *sk, unsigned char *x);
@@ -775,7 +775,7 @@ uint32_t br_rsa_i31_pss_sign(const br_prng_class **rng,
  * \param pk     RSA public key.
  * \return  1 on success, 0 on error.
  */
-uint32_t br_rsa_i62_public(unsigned char *x, size_t xlen,
+br_ssl_u32 br_rsa_i62_public(unsigned char *x, size_t xlen,
 	const br_rsa_public_key *pk);
 
 /**
@@ -795,7 +795,7 @@ uint32_t br_rsa_i62_public(unsigned char *x, size_t xlen,
  * \param hash_out   output buffer for the hash value.
  * \return  1 on success, 0 on error.
  */
-uint32_t br_rsa_i62_pkcs1_vrfy(const unsigned char *x, size_t xlen,
+br_ssl_u32 br_rsa_i62_pkcs1_vrfy(const unsigned char *x, size_t xlen,
 	const unsigned char *hash_oid, size_t hash_len,
 	const br_rsa_public_key *pk, unsigned char *hash_out);
 
@@ -817,7 +817,7 @@ uint32_t br_rsa_i62_pkcs1_vrfy(const unsigned char *x, size_t xlen,
  * \param pk         RSA public key.
  * \return  1 on success, 0 on error.
  */
-uint32_t br_rsa_i62_pss_vrfy(const unsigned char *x, size_t xlen,
+br_ssl_u32 br_rsa_i62_pss_vrfy(const unsigned char *x, size_t xlen,
 	const br_hash_class *hf_data, const br_hash_class *hf_mgf1, 
 	const void *hash, size_t salt_len, const br_rsa_public_key *pk);
 
@@ -834,7 +834,7 @@ uint32_t br_rsa_i62_pss_vrfy(const unsigned char *x, size_t xlen,
  * \param sk   RSA private key.
  * \return  1 on success, 0 on error.
  */
-uint32_t br_rsa_i62_private(unsigned char *x,
+br_ssl_u32 br_rsa_i62_private(unsigned char *x,
 	const br_rsa_private_key *sk);
 
 /**
@@ -853,7 +853,7 @@ uint32_t br_rsa_i62_private(unsigned char *x,
  * \param x          output buffer for the hash value.
  * \return  1 on success, 0 on error.
  */
-uint32_t br_rsa_i62_pkcs1_sign(const unsigned char *hash_oid,
+br_ssl_u32 br_rsa_i62_pkcs1_sign(const unsigned char *hash_oid,
 	const unsigned char *hash, size_t hash_len,
 	const br_rsa_private_key *sk, unsigned char *x);
 
@@ -875,7 +875,7 @@ uint32_t br_rsa_i62_pkcs1_sign(const unsigned char *hash_oid,
  * \param x          output buffer for the signature value.
  * \return  1 on success, 0 on error.
  */
-uint32_t br_rsa_i62_pss_sign(const br_prng_class **rng,
+br_ssl_u32 br_rsa_i62_pss_sign(const br_prng_class **rng,
 	const br_hash_class *hf_data, const br_hash_class *hf_mgf1,
 	const unsigned char *hash_value, size_t salt_len,
 	const br_rsa_private_key *sk, unsigned char *x);
@@ -960,7 +960,7 @@ br_rsa_oaep_decrypt br_rsa_i62_oaep_decrypt_get(void);
  * \param pk     RSA public key.
  * \return  1 on success, 0 on error.
  */
-uint32_t br_rsa_i15_public(unsigned char *x, size_t xlen,
+br_ssl_u32 br_rsa_i15_public(unsigned char *x, size_t xlen,
 	const br_rsa_public_key *pk);
 
 /**
@@ -976,7 +976,7 @@ uint32_t br_rsa_i15_public(unsigned char *x, size_t xlen,
  * \param hash_out   output buffer for the hash value.
  * \return  1 on success, 0 on error.
  */
-uint32_t br_rsa_i15_pkcs1_vrfy(const unsigned char *x, size_t xlen,
+br_ssl_u32 br_rsa_i15_pkcs1_vrfy(const unsigned char *x, size_t xlen,
 	const unsigned char *hash_oid, size_t hash_len,
 	const br_rsa_public_key *pk, unsigned char *hash_out);
 
@@ -994,7 +994,7 @@ uint32_t br_rsa_i15_pkcs1_vrfy(const unsigned char *x, size_t xlen,
  * \param pk         RSA public key.
  * \return  1 on success, 0 on error.
  */
-uint32_t br_rsa_i15_pss_vrfy(const unsigned char *x, size_t xlen,
+br_ssl_u32 br_rsa_i15_pss_vrfy(const unsigned char *x, size_t xlen,
 	const br_hash_class *hf_data, const br_hash_class *hf_mgf1, 
 	const void *hash, size_t salt_len, const br_rsa_public_key *pk);
 
@@ -1007,7 +1007,7 @@ uint32_t br_rsa_i15_pss_vrfy(const unsigned char *x, size_t xlen,
  * \param sk   RSA private key.
  * \return  1 on success, 0 on error.
  */
-uint32_t br_rsa_i15_private(unsigned char *x,
+br_ssl_u32 br_rsa_i15_private(unsigned char *x,
 	const br_rsa_private_key *sk);
 
 /**
@@ -1022,7 +1022,7 @@ uint32_t br_rsa_i15_private(unsigned char *x,
  * \param x          output buffer for the hash value.
  * \return  1 on success, 0 on error.
  */
-uint32_t br_rsa_i15_pkcs1_sign(const unsigned char *hash_oid,
+br_ssl_u32 br_rsa_i15_pkcs1_sign(const unsigned char *hash_oid,
 	const unsigned char *hash, size_t hash_len,
 	const br_rsa_private_key *sk, unsigned char *x);
 
@@ -1040,7 +1040,7 @@ uint32_t br_rsa_i15_pkcs1_sign(const unsigned char *hash_oid,
  * \param x          output buffer for the signature value.
  * \return  1 on success, 0 on error.
  */
-uint32_t br_rsa_i15_pss_sign(const br_prng_class **rng,
+br_ssl_u32 br_rsa_i15_pss_sign(const br_prng_class **rng,
 	const br_hash_class *hf_data, const br_hash_class *hf_mgf1,
 	const unsigned char *hash_value, size_t salt_len,
 	const br_rsa_private_key *sk, unsigned char *x);
@@ -1152,7 +1152,7 @@ br_rsa_oaep_decrypt br_rsa_oaep_decrypt_get_default(void);
  * \param len    length (in bytes) of the data to decrypt.
  * \return  1 on success, 0 on error.
  */
-uint32_t br_rsa_ssl_decrypt(br_rsa_private core, const br_rsa_private_key *sk,
+br_ssl_u32 br_rsa_ssl_decrypt(br_rsa_private core, const br_rsa_private_key *sk,
 	unsigned char *data, size_t len);
 
 /**
@@ -1191,7 +1191,7 @@ size_t br_rsa_i15_oaep_encrypt(
  * \param len         encrypted/decrypted message length.
  * \return  1 on success, 0 on error.
  */
-uint32_t br_rsa_i15_oaep_decrypt(
+br_ssl_u32 br_rsa_i15_oaep_decrypt(
 	const br_hash_class *dig, const void *label, size_t label_len,
 	const br_rsa_private_key *sk, void *data, size_t *len);
 
@@ -1231,7 +1231,7 @@ size_t br_rsa_i31_oaep_encrypt(
  * \param len         encrypted/decrypted message length.
  * \return  1 on success, 0 on error.
  */
-uint32_t br_rsa_i31_oaep_decrypt(
+br_ssl_u32 br_rsa_i31_oaep_decrypt(
 	const br_hash_class *dig, const void *label, size_t label_len,
 	const br_rsa_private_key *sk, void *data, size_t *len);
 
@@ -1271,7 +1271,7 @@ size_t br_rsa_i32_oaep_encrypt(
  * \param len         encrypted/decrypted message length.
  * \return  1 on success, 0 on error.
  */
-uint32_t br_rsa_i32_oaep_decrypt(
+br_ssl_u32 br_rsa_i32_oaep_decrypt(
 	const br_hash_class *dig, const void *label, size_t label_len,
 	const br_rsa_private_key *sk, void *data, size_t *len);
 
@@ -1319,7 +1319,7 @@ size_t br_rsa_i62_oaep_encrypt(
  * \param len         encrypted/decrypted message length.
  * \return  1 on success, 0 on error.
  */
-uint32_t br_rsa_i62_oaep_decrypt(
+br_ssl_u32 br_rsa_i62_oaep_decrypt(
 	const br_hash_class *dig, const void *label, size_t label_len,
 	const br_rsa_private_key *sk, void *data, size_t *len);
 
@@ -1387,11 +1387,11 @@ uint32_t br_rsa_i62_oaep_decrypt(
  * \param pubexp      public exponent to use, or zero
  * \return  1 on success, 0 on error (invalid parameters)
  */
-typedef uint32_t (*br_rsa_keygen)(
+typedef br_ssl_u32 (*br_rsa_keygen)(
 	const br_prng_class **rng_ctx,
 	br_rsa_private_key *sk, void *kbuf_priv,
 	br_rsa_public_key *pk, void *kbuf_pub,
-	unsigned size, uint32_t pubexp);
+	unsigned size, br_ssl_u32 pubexp);
 
 /**
  * \brief RSA key pair generation with the "i15" engine.
@@ -1407,11 +1407,11 @@ typedef uint32_t (*br_rsa_keygen)(
  * \param pubexp      public exponent to use, or zero
  * \return  1 on success, 0 on error (invalid parameters)
  */
-uint32_t br_rsa_i15_keygen(
+br_ssl_u32 br_rsa_i15_keygen(
 	const br_prng_class **rng_ctx,
 	br_rsa_private_key *sk, void *kbuf_priv,
 	br_rsa_public_key *pk, void *kbuf_pub,
-	unsigned size, uint32_t pubexp);
+	unsigned size, br_ssl_u32 pubexp);
 
 /**
  * \brief RSA key pair generation with the "i31" engine.
@@ -1427,11 +1427,11 @@ uint32_t br_rsa_i15_keygen(
  * \param pubexp      public exponent to use, or zero
  * \return  1 on success, 0 on error (invalid parameters)
  */
-uint32_t br_rsa_i31_keygen(
+br_ssl_u32 br_rsa_i31_keygen(
 	const br_prng_class **rng_ctx,
 	br_rsa_private_key *sk, void *kbuf_priv,
 	br_rsa_public_key *pk, void *kbuf_pub,
-	unsigned size, uint32_t pubexp);
+	unsigned size, br_ssl_u32 pubexp);
 
 /**
  * \brief RSA key pair generation with the "i62" engine.
@@ -1451,11 +1451,11 @@ uint32_t br_rsa_i31_keygen(
  * \param pubexp      public exponent to use, or zero
  * \return  1 on success, 0 on error (invalid parameters)
  */
-uint32_t br_rsa_i62_keygen(
+br_ssl_u32 br_rsa_i62_keygen(
 	const br_prng_class **rng_ctx,
 	br_rsa_private_key *sk, void *kbuf_priv,
 	br_rsa_public_key *pk, void *kbuf_pub,
-	unsigned size, uint32_t pubexp);
+	unsigned size, br_ssl_u32 pubexp);
 
 /**
  * \brief Get the RSA "i62" implementation (key pair generation),
@@ -1544,7 +1544,7 @@ br_rsa_compute_modulus br_rsa_compute_modulus_get_default(void);
  *
  * \return  the public exponent, or 0.
  */
-typedef uint32_t (*br_rsa_compute_pubexp)(const br_rsa_private_key *sk);
+typedef br_ssl_u32 (*br_rsa_compute_pubexp)(const br_rsa_private_key *sk);
 
 /**
  * \brief Recompute RSA public exponent ("i15" engine).
@@ -1553,7 +1553,7 @@ typedef uint32_t (*br_rsa_compute_pubexp)(const br_rsa_private_key *sk);
  *
  * \return  the public exponent, or 0.
  */
-uint32_t br_rsa_i15_compute_pubexp(const br_rsa_private_key *sk);
+br_ssl_u32 br_rsa_i15_compute_pubexp(const br_rsa_private_key *sk);
 
 /**
  * \brief Recompute RSA public exponent ("i31" engine).
@@ -1562,7 +1562,7 @@ uint32_t br_rsa_i15_compute_pubexp(const br_rsa_private_key *sk);
  *
  * \return  the public exponent, or 0.
  */
-uint32_t br_rsa_i31_compute_pubexp(const br_rsa_private_key *sk);
+br_ssl_u32 br_rsa_i31_compute_pubexp(const br_rsa_private_key *sk);
 
 /**
  * \brief Get "default" RSA implementation (recompute public exponent).
@@ -1610,7 +1610,7 @@ br_rsa_compute_pubexp br_rsa_compute_pubexp_get_default(void);
  * \return  the private exponent length (in bytes), or 0.
  */
 typedef size_t (*br_rsa_compute_privexp)(void *d,
-	const br_rsa_private_key *sk, uint32_t pubexp);
+	const br_rsa_private_key *sk, br_ssl_u32 pubexp);
 
 /**
  * \brief Recompute RSA private exponent ("i15" engine).
@@ -1623,7 +1623,7 @@ typedef size_t (*br_rsa_compute_privexp)(void *d,
  * \return  the private exponent length (in bytes), or 0.
  */
 size_t br_rsa_i15_compute_privexp(void *d,
-	const br_rsa_private_key *sk, uint32_t pubexp);
+	const br_rsa_private_key *sk, br_ssl_u32 pubexp);
 
 /**
  * \brief Recompute RSA private exponent ("i31" engine).
@@ -1636,7 +1636,7 @@ size_t br_rsa_i15_compute_privexp(void *d,
  * \return  the private exponent length (in bytes), or 0.
  */
 size_t br_rsa_i31_compute_privexp(void *d,
-	const br_rsa_private_key *sk, uint32_t pubexp);
+	const br_rsa_private_key *sk, br_ssl_u32 pubexp);
 
 /**
  * \brief Get "default" RSA implementation (recompute private exponent).

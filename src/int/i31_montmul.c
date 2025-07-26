@@ -26,8 +26,8 @@
 
 /* see inner.h */
 void
-br_i31_montymul(uint32_t *d, const uint32_t *x, const uint32_t *y,
-	const uint32_t *m, uint32_t m0i)
+br_i31_montymul(br_ssl_u32 *d, const br_ssl_u32 *x, const br_ssl_u32 *y,
+	const br_ssl_u32 *m, br_ssl_u32 m0i)
 {
 	/*
 	 * Each outer loop iteration computes:
@@ -41,7 +41,7 @@ br_i31_montymul(uint32_t *d, const uint32_t *x, const uint32_t *y,
 	 * which can thus be only 0 or 1.
 	 */
 	size_t len, len4, u, v;
-	uint32_t dh;
+	br_ssl_u32 dh;
 
 	len = (m[0] + 31) >> 5;
 	len4 = len & ~(size_t)3;
@@ -62,11 +62,11 @@ br_i31_montymul(uint32_t *d, const uint32_t *x, const uint32_t *y,
 		 * keep the carry (r) in a 64-bit register, thus avoiding some
 		 * "clear high bits" operations.
 		 */
-		uint32_t f, xu;
+		br_ssl_u32 f, xu;
 #if BR_64
-		uint64_t r;
+		br_ssl_u64 r;
 #else
-		uint32_t r;
+		br_ssl_u32 r;
 #endif
 
 		xu = x[u + 1];
@@ -74,32 +74,32 @@ br_i31_montymul(uint32_t *d, const uint32_t *x, const uint32_t *y,
 
 		r = 0;
 		for (v = 0; v < len4; v += 4) {
-			uint64_t z;
+			br_ssl_u64 z;
 
-			z = (uint64_t)d[v + 1] + MUL31(xu, y[v + 1])
+			z = (br_ssl_u64)d[v + 1] + MUL31(xu, y[v + 1])
 				+ MUL31(f, m[v + 1]) + r;
 			r = z >> 31;
-			d[v + 0] = (uint32_t)z & 0x7FFFFFFF;
-			z = (uint64_t)d[v + 2] + MUL31(xu, y[v + 2])
+			d[v + 0] = (br_ssl_u32)z & 0x7FFFFFFF;
+			z = (br_ssl_u64)d[v + 2] + MUL31(xu, y[v + 2])
 				+ MUL31(f, m[v + 2]) + r;
 			r = z >> 31;
-			d[v + 1] = (uint32_t)z & 0x7FFFFFFF;
-			z = (uint64_t)d[v + 3] + MUL31(xu, y[v + 3])
+			d[v + 1] = (br_ssl_u32)z & 0x7FFFFFFF;
+			z = (br_ssl_u64)d[v + 3] + MUL31(xu, y[v + 3])
 				+ MUL31(f, m[v + 3]) + r;
 			r = z >> 31;
-			d[v + 2] = (uint32_t)z & 0x7FFFFFFF;
-			z = (uint64_t)d[v + 4] + MUL31(xu, y[v + 4])
+			d[v + 2] = (br_ssl_u32)z & 0x7FFFFFFF;
+			z = (br_ssl_u64)d[v + 4] + MUL31(xu, y[v + 4])
 				+ MUL31(f, m[v + 4]) + r;
 			r = z >> 31;
-			d[v + 3] = (uint32_t)z & 0x7FFFFFFF;
+			d[v + 3] = (br_ssl_u32)z & 0x7FFFFFFF;
 		}
 		for (; v < len; v ++) {
-			uint64_t z;
+			br_ssl_u64 z;
 
-			z = (uint64_t)d[v + 1] + MUL31(xu, y[v + 1])
+			z = (br_ssl_u64)d[v + 1] + MUL31(xu, y[v + 1])
 				+ MUL31(f, m[v + 1]) + r;
 			r = z >> 31;
-			d[v] = (uint32_t)z & 0x7FFFFFFF;
+			d[v] = (br_ssl_u32)z & 0x7FFFFFFF;
 		}
 
 		/*

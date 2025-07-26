@@ -52,7 +52,7 @@ br_aes_big_ctrcbc_ctr(const br_aes_big_ctrcbc_keys *ctx,
 	void *ctr, void *data, size_t len)
 {
 	unsigned char *buf, *bctr;
-	uint32_t cc0, cc1, cc2, cc3;
+	br_ssl_u32 cc0, cc1, cc2, cc3;
 
 	buf = data;
 	bctr = ctr;
@@ -62,7 +62,7 @@ br_aes_big_ctrcbc_ctr(const br_aes_big_ctrcbc_keys *ctx,
 	cc0 = br_dec32be(bctr + 12);
 	while (len > 0) {
 		unsigned char tmp[16];
-		uint32_t carry;
+		br_ssl_u32 carry;
 
 		br_enc32be(tmp +  0, cc3);
 		br_enc32be(tmp +  4, cc2);

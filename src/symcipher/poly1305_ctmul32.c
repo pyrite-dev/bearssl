@@ -28,7 +28,7 @@
  * Perform the inner processing of blocks for Poly1305.
  */
 static void
-poly1305_inner(uint32_t *a, const uint32_t *r, const void *data, size_t len)
+poly1305_inner(br_ssl_u32 *a, const br_ssl_u32 *r, const void *data, size_t len)
 {
 	/*
 	 * Implementation notes: we split the 130-bit values into ten
@@ -50,9 +50,9 @@ poly1305_inner(uint32_t *a, const uint32_t *r, const void *data, size_t len)
 	buf = data;
 	while (len > 0) {
 		unsigned char tmp[16];
-		uint32_t b[10];
+		br_ssl_u32 b[10];
 		unsigned u, v;
-		uint32_t z, cc1, cc2;
+		br_ssl_u32 z, cc1, cc2;
 
 		/*
 		 * If there is a partial block, right-pad it with zeros.
@@ -121,7 +121,7 @@ poly1305_inner(uint32_t *a, const uint32_t *r, const void *data, size_t len)
 		 */
 		cc1 = 0;
 		for (u = 0; u < 10; u ++) {
-			uint32_t s;
+			br_ssl_u32 s;
 
 			s = cc1
 				+ MUL15(a[0], r[u + 9 - 0])
@@ -134,7 +134,7 @@ poly1305_inner(uint32_t *a, const uint32_t *r, const void *data, size_t len)
 		}
 		cc2 = 0;
 		for (u = 0; u < 10; u ++) {
-			uint32_t s;
+			br_ssl_u32 s;
 
 			s = b[u] + cc2
 				+ MUL15(a[5], r[u + 9 - 5])
@@ -168,7 +168,7 @@ br_poly1305_ctmul32_run(const void *key, const void *iv,
 	void *tag, br_chacha20_run ichacha, int encrypt)
 {
 	unsigned char pkey[32], foot[16];
-	uint32_t z, r[19], acc[10], cc, ctl;
+	br_ssl_u32 z, r[19], acc[10], cc, ctl;
 	int i;
 
 	/*
@@ -229,8 +229,8 @@ br_poly1305_ctmul32_run(const void *key, const void *iv,
 	 * Process the additional authenticated data, ciphertext, and
 	 * footer in due order.
 	 */
-	br_enc64le(foot, (uint64_t)aad_len);
-	br_enc64le(foot + 8, (uint64_t)len);
+	br_enc64le(foot, (br_ssl_u64)aad_len);
+	br_enc64le(foot + 8, (br_ssl_u64)len);
 	poly1305_inner(acc, r, aad, aad_len);
 	poly1305_inner(acc, r, data, len);
 	poly1305_inner(acc, r, foot, sizeof foot);

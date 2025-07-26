@@ -26,38 +26,38 @@
 
 /* see inner.h */
 void
-br_i32_montymul(uint32_t *d, const uint32_t *x, const uint32_t *y,
-	const uint32_t *m, uint32_t m0i)
+br_i32_montymul(br_ssl_u32 *d, const br_ssl_u32 *x, const br_ssl_u32 *y,
+	const br_ssl_u32 *m, br_ssl_u32 m0i)
 {
 	size_t len, u, v;
-	uint64_t dh;
+	br_ssl_u64 dh;
 
 	len = (m[0] + 31) >> 5;
 	br_i32_zero(d, m[0]);
 	dh = 0;
 	for (u = 0; u < len; u ++) {
-		uint32_t f, xu;
-		uint64_t r1, r2, zh;
+		br_ssl_u32 f, xu;
+		br_ssl_u64 r1, r2, zh;
 
 		xu = x[u + 1];
 		f = (d[1] + x[u + 1] * y[1]) * m0i;
 		r1 = 0;
 		r2 = 0;
 		for (v = 0; v < len; v ++) {
-			uint64_t z;
-			uint32_t t;
+			br_ssl_u64 z;
+			br_ssl_u32 t;
 
-			z = (uint64_t)d[v + 1] + MUL(xu, y[v + 1]) + r1;
+			z = (br_ssl_u64)d[v + 1] + MUL(xu, y[v + 1]) + r1;
 			r1 = z >> 32;
-			t = (uint32_t)z;
-			z = (uint64_t)t + MUL(f, m[v + 1]) + r2;
+			t = (br_ssl_u32)z;
+			z = (br_ssl_u64)t + MUL(f, m[v + 1]) + r2;
 			r2 = z >> 32;
 			if (v != 0) {
-				d[v] = (uint32_t)z;
+				d[v] = (br_ssl_u32)z;
 			}
 		}
 		zh = dh + r1 + r2;
-		d[len] = (uint32_t)zh;
+		d[len] = (br_ssl_u32)zh;
 		dh = zh >> 32;
 	}
 

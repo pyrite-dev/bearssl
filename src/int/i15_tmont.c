@@ -26,7 +26,7 @@
 
 /* see inner.h */
 void
-br_i15_to_monty(uint16_t *x, const uint16_t *m)
+br_i15_to_monty(br_ssl_u16 *x, const br_ssl_u16 *m)
 {
 	unsigned k;
 

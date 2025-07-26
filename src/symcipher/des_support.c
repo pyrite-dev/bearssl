@@ -26,30 +26,30 @@
 
 /* see inner.h */
 void
-br_des_do_IP(uint32_t *xl, uint32_t *xr)
+br_des_do_IP(br_ssl_u32 *xl, br_ssl_u32 *xr)
 {
 	/*
 	 * Permutation algorithm is initially from Richard Outerbridge;
 	 * implementation here is adapted from Crypto++ "des.cpp" file
 	 * (which is in public domain).
 	 */
-	uint32_t l, r, t;
+	br_ssl_u32 l, r, t;
 
 	l = *xl;
 	r = *xr;
-	t = ((l >>  4) ^ r) & (uint32_t)0x0F0F0F0F;
+	t = ((l >>  4) ^ r) & (br_ssl_u32)0x0F0F0F0F;
 	r ^= t;
 	l ^= t <<  4;
-	t = ((l >> 16) ^ r) & (uint32_t)0x0000FFFF;
+	t = ((l >> 16) ^ r) & (br_ssl_u32)0x0000FFFF;
 	r ^= t;
 	l ^= t << 16;
-	t = ((r >>  2) ^ l) & (uint32_t)0x33333333;
+	t = ((r >>  2) ^ l) & (br_ssl_u32)0x33333333;
 	l ^= t;
 	r ^= t <<  2;
-	t = ((r >>  8) ^ l) & (uint32_t)0x00FF00FF;
+	t = ((r >>  8) ^ l) & (br_ssl_u32)0x00FF00FF;
 	l ^= t;
 	r ^= t <<  8;
-	t = ((l >>  1) ^ r) & (uint32_t)0x55555555;
+	t = ((l >>  1) ^ r) & (br_ssl_u32)0x55555555;
 	r ^= t;
 	l ^= t <<  1;
 	*xl = l;
@@ -58,12 +58,12 @@ br_des_do_IP(uint32_t *xl, uint32_t *xr)
 
 /* see inner.h */
 void
-br_des_do_invIP(uint32_t *xl, uint32_t *xr)
+br_des_do_invIP(br_ssl_u32 *xl, br_ssl_u32 *xr)
 {
 	/*
 	 * See br_des_do_IP().
 	 */
-	uint32_t l, r, t;
+	br_ssl_u32 l, r, t;
 
 	l = *xl;
 	r = *xr;
@@ -88,9 +88,9 @@ br_des_do_invIP(uint32_t *xl, uint32_t *xr)
 
 /* see inner.h */
 void
-br_des_keysched_unit(uint32_t *skey, const void *key)
+br_des_keysched_unit(br_ssl_u32 *skey, const void *key)
 {
-	uint32_t xl, xr, kl, kr;
+	br_ssl_u32 xl, xr, kl, kr;
 	int i;
 
 	xl = br_dec32be(key);
@@ -119,14 +119,14 @@ br_des_keysched_unit(uint32_t *skey, const void *key)
 	 *   28 20 12  4
 	 */
 	br_des_do_IP(&xl, &xr);
-	kl = ((xr & (uint32_t)0xFF000000) >> 4)
-		| ((xl & (uint32_t)0xFF000000) >> 12)
-		| ((xr & (uint32_t)0x00FF0000) >> 12)
-		| ((xl & (uint32_t)0x00FF0000) >> 20);
-	kr = ((xr & (uint32_t)0x000000FF) << 20)
-		| ((xl & (uint32_t)0x0000FF00) << 4)
-		| ((xr & (uint32_t)0x0000FF00) >> 4)
-		| ((xl & (uint32_t)0x000F0000) >> 16);
+	kl = ((xr & (br_ssl_u32)0xFF000000) >> 4)
+		| ((xl & (br_ssl_u32)0xFF000000) >> 12)
+		| ((xr & (br_ssl_u32)0x00FF0000) >> 12)
+		| ((xl & (br_ssl_u32)0x00FF0000) >> 20);
+	kr = ((xr & (br_ssl_u32)0x000000FF) << 20)
+		| ((xl & (br_ssl_u32)0x0000FF00) << 4)
+		| ((xr & (br_ssl_u32)0x0000FF00) >> 4)
+		| ((xl & (br_ssl_u32)0x000F0000) >> 16);
 
 	/*
 	 * For each round, rotate the two 28-bit words kl and kr.
@@ -140,8 +140,8 @@ br_des_keysched_unit(uint32_t *skey, const void *key)
 			kl = (kl << 2) | (kl >> 26);
 			kr = (kr << 2) | (kr >> 26);
 		}
-		kl &= (uint32_t)0x0FFFFFFF;
-		kr &= (uint32_t)0x0FFFFFFF;
+		kl &= (br_ssl_u32)0x0FFFFFFF;
+		kr &= (br_ssl_u32)0x0FFFFFFF;
 		skey[(i << 1) + 0] = kl;
 		skey[(i << 1) + 1] = kr;
 	}
@@ -149,12 +149,12 @@ br_des_keysched_unit(uint32_t *skey, const void *key)
 
 /* see inner.h */
 void
-br_des_rev_skey(uint32_t *skey)
+br_des_rev_skey(br_ssl_u32 *skey)
 {
 	int i;
 
 	for (i = 0; i < 16; i += 2) {
-		uint32_t t;
+		br_ssl_u32 t;
 
 		t = skey[i + 0];
 		skey[i + 0] = skey[30 - i];

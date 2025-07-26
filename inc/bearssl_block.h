@@ -26,7 +26,7 @@
 #define BR_BEARSSL_BLOCK_H__
 
 #include <stddef.h>
-#include <stdint.h>
+#include "bearssl_int.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -124,7 +124,7 @@ extern "C" {
  *     key length MUST be adequate for the implemented block cipher. This
  *     function also sets the `vtable` field.
  *
- *   - `br_xxx_ctr_run(const br_xxx_ctr_keys *ctx, const void *iv, uint32_t cc, void *data, size_t len)` (returns `uint32_t`)
+ *   - `br_xxx_ctr_run(const br_xxx_ctr_keys *ctx, const void *iv, br_ssl_u32 cc, void *data, size_t len)` (returns `br_ssl_u32`)
  *
  *     Perform CTR encryption/decryption of some data. Processing is done
  *     "in place" (the output data replaces the input data). This function
@@ -559,8 +559,8 @@ struct br_block_ctr_class_ {
 	 * \param len    data length (in bytes).
 	 * \return  the new block counter value.
 	 */
-	uint32_t (*run)(const br_block_ctr_class *const *ctx,
-		const void *iv, uint32_t cc, void *data, size_t len);
+	br_ssl_u32 (*run)(const br_block_ctr_class *const *ctx,
+		const void *iv, br_ssl_u32 cc, void *data, size_t len);
 };
 
 /**
@@ -710,7 +710,7 @@ typedef struct {
 	/** \brief Pointer to vtable for this context. */
 	const br_block_cbcenc_class *vtable;
 #ifndef BR_DOXYGEN_IGNORE
-	uint32_t skey[60];
+	br_ssl_u32 skey[60];
 	unsigned num_rounds;
 #endif
 } br_aes_big_cbcenc_keys;
@@ -725,7 +725,7 @@ typedef struct {
 	/** \brief Pointer to vtable for this context. */
 	const br_block_cbcdec_class *vtable;
 #ifndef BR_DOXYGEN_IGNORE
-	uint32_t skey[60];
+	br_ssl_u32 skey[60];
 	unsigned num_rounds;
 #endif
 } br_aes_big_cbcdec_keys;
@@ -741,7 +741,7 @@ typedef struct {
 	/** \brief Pointer to vtable for this context. */
 	const br_block_ctr_class *vtable;
 #ifndef BR_DOXYGEN_IGNORE
-	uint32_t skey[60];
+	br_ssl_u32 skey[60];
 	unsigned num_rounds;
 #endif
 } br_aes_big_ctr_keys;
@@ -757,7 +757,7 @@ typedef struct {
 	/** \brief Pointer to vtable for this context. */
 	const br_block_ctrcbc_class *vtable;
 #ifndef BR_DOXYGEN_IGNORE
-	uint32_t skey[60];
+	br_ssl_u32 skey[60];
 	unsigned num_rounds;
 #endif
 } br_aes_big_ctrcbc_keys;
@@ -860,8 +860,8 @@ void br_aes_big_cbcdec_run(const br_aes_big_cbcdec_keys *ctx, void *iv,
  * \param len    data length (in bytes).
  * \return  new block counter value.
  */
-uint32_t br_aes_big_ctr_run(const br_aes_big_ctr_keys *ctx,
-	const void *iv, uint32_t cc, void *data, size_t len);
+br_ssl_u32 br_aes_big_ctr_run(const br_aes_big_ctr_keys *ctx,
+	const void *iv, br_ssl_u32 cc, void *data, size_t len);
 
 /**
  * \brief CTR encryption + CBC-MAC with AES (`aes_big` implementation).
@@ -930,7 +930,7 @@ typedef struct {
 	/** \brief Pointer to vtable for this context. */
 	const br_block_cbcenc_class *vtable;
 #ifndef BR_DOXYGEN_IGNORE
-	uint32_t skey[60];
+	br_ssl_u32 skey[60];
 	unsigned num_rounds;
 #endif
 } br_aes_small_cbcenc_keys;
@@ -945,7 +945,7 @@ typedef struct {
 	/** \brief Pointer to vtable for this context. */
 	const br_block_cbcdec_class *vtable;
 #ifndef BR_DOXYGEN_IGNORE
-	uint32_t skey[60];
+	br_ssl_u32 skey[60];
 	unsigned num_rounds;
 #endif
 } br_aes_small_cbcdec_keys;
@@ -961,7 +961,7 @@ typedef struct {
 	/** \brief Pointer to vtable for this context. */
 	const br_block_ctr_class *vtable;
 #ifndef BR_DOXYGEN_IGNORE
-	uint32_t skey[60];
+	br_ssl_u32 skey[60];
 	unsigned num_rounds;
 #endif
 } br_aes_small_ctr_keys;
@@ -977,7 +977,7 @@ typedef struct {
 	/** \brief Pointer to vtable for this context. */
 	const br_block_ctrcbc_class *vtable;
 #ifndef BR_DOXYGEN_IGNORE
-	uint32_t skey[60];
+	br_ssl_u32 skey[60];
 	unsigned num_rounds;
 #endif
 } br_aes_small_ctrcbc_keys;
@@ -1080,8 +1080,8 @@ void br_aes_small_cbcdec_run(const br_aes_small_cbcdec_keys *ctx, void *iv,
  * \param len    data length (in bytes).
  * \return  new block counter value.
  */
-uint32_t br_aes_small_ctr_run(const br_aes_small_ctr_keys *ctx,
-	const void *iv, uint32_t cc, void *data, size_t len);
+br_ssl_u32 br_aes_small_ctr_run(const br_aes_small_ctr_keys *ctx,
+	const void *iv, br_ssl_u32 cc, void *data, size_t len);
 
 /**
  * \brief CTR encryption + CBC-MAC with AES (`aes_small` implementation).
@@ -1149,7 +1149,7 @@ typedef struct {
 	/** \brief Pointer to vtable for this context. */
 	const br_block_cbcenc_class *vtable;
 #ifndef BR_DOXYGEN_IGNORE
-	uint32_t skey[60];
+	br_ssl_u32 skey[60];
 	unsigned num_rounds;
 #endif
 } br_aes_ct_cbcenc_keys;
@@ -1164,7 +1164,7 @@ typedef struct {
 	/** \brief Pointer to vtable for this context. */
 	const br_block_cbcdec_class *vtable;
 #ifndef BR_DOXYGEN_IGNORE
-	uint32_t skey[60];
+	br_ssl_u32 skey[60];
 	unsigned num_rounds;
 #endif
 } br_aes_ct_cbcdec_keys;
@@ -1180,7 +1180,7 @@ typedef struct {
 	/** \brief Pointer to vtable for this context. */
 	const br_block_ctr_class *vtable;
 #ifndef BR_DOXYGEN_IGNORE
-	uint32_t skey[60];
+	br_ssl_u32 skey[60];
 	unsigned num_rounds;
 #endif
 } br_aes_ct_ctr_keys;
@@ -1196,7 +1196,7 @@ typedef struct {
 	/** \brief Pointer to vtable for this context. */
 	const br_block_ctrcbc_class *vtable;
 #ifndef BR_DOXYGEN_IGNORE
-	uint32_t skey[60];
+	br_ssl_u32 skey[60];
 	unsigned num_rounds;
 #endif
 } br_aes_ct_ctrcbc_keys;
@@ -1299,8 +1299,8 @@ void br_aes_ct_cbcdec_run(const br_aes_ct_cbcdec_keys *ctx, void *iv,
  * \param len    data length (in bytes).
  * \return  new block counter value.
  */
-uint32_t br_aes_ct_ctr_run(const br_aes_ct_ctr_keys *ctx,
-	const void *iv, uint32_t cc, void *data, size_t len);
+br_ssl_u32 br_aes_ct_ctr_run(const br_aes_ct_ctr_keys *ctx,
+	const void *iv, br_ssl_u32 cc, void *data, size_t len);
 
 /**
  * \brief CTR encryption + CBC-MAC with AES (`aes_ct` implementation).
@@ -1370,7 +1370,7 @@ typedef struct {
 	/** \brief Pointer to vtable for this context. */
 	const br_block_cbcenc_class *vtable;
 #ifndef BR_DOXYGEN_IGNORE
-	uint64_t skey[30];
+	br_ssl_u64 skey[30];
 	unsigned num_rounds;
 #endif
 } br_aes_ct64_cbcenc_keys;
@@ -1385,7 +1385,7 @@ typedef struct {
 	/** \brief Pointer to vtable for this context. */
 	const br_block_cbcdec_class *vtable;
 #ifndef BR_DOXYGEN_IGNORE
-	uint64_t skey[30];
+	br_ssl_u64 skey[30];
 	unsigned num_rounds;
 #endif
 } br_aes_ct64_cbcdec_keys;
@@ -1401,7 +1401,7 @@ typedef struct {
 	/** \brief Pointer to vtable for this context. */
 	const br_block_ctr_class *vtable;
 #ifndef BR_DOXYGEN_IGNORE
-	uint64_t skey[30];
+	br_ssl_u64 skey[30];
 	unsigned num_rounds;
 #endif
 } br_aes_ct64_ctr_keys;
@@ -1417,7 +1417,7 @@ typedef struct {
 	/** \brief Pointer to vtable for this context. */
 	const br_block_ctrcbc_class *vtable;
 #ifndef BR_DOXYGEN_IGNORE
-	uint64_t skey[30];
+	br_ssl_u64 skey[30];
 	unsigned num_rounds;
 #endif
 } br_aes_ct64_ctrcbc_keys;
@@ -1520,8 +1520,8 @@ void br_aes_ct64_cbcdec_run(const br_aes_ct64_cbcdec_keys *ctx, void *iv,
  * \param len    data length (in bytes).
  * \return  new block counter value.
  */
-uint32_t br_aes_ct64_ctr_run(const br_aes_ct64_ctr_keys *ctx,
-	const void *iv, uint32_t cc, void *data, size_t len);
+br_ssl_u32 br_aes_ct64_ctr_run(const br_aes_ct64_ctr_keys *ctx,
+	const void *iv, br_ssl_u32 cc, void *data, size_t len);
 
 /**
  * \brief CTR encryption + CBC-MAC with AES (`aes_ct64` implementation).
@@ -1760,8 +1760,8 @@ void br_aes_x86ni_cbcdec_run(const br_aes_x86ni_cbcdec_keys *ctx, void *iv,
  * \param len    data length (in bytes).
  * \return  new block counter value.
  */
-uint32_t br_aes_x86ni_ctr_run(const br_aes_x86ni_ctr_keys *ctx,
-	const void *iv, uint32_t cc, void *data, size_t len);
+br_ssl_u32 br_aes_x86ni_ctr_run(const br_aes_x86ni_ctr_keys *ctx,
+	const void *iv, br_ssl_u32 cc, void *data, size_t len);
 
 /**
  * \brief CTR encryption + CBC-MAC with AES (`aes_x86ni` implementation).
@@ -2051,8 +2051,8 @@ void br_aes_pwr8_cbcdec_run(const br_aes_pwr8_cbcdec_keys *ctx, void *iv,
  * \param len    data length (in bytes).
  * \return  new block counter value.
  */
-uint32_t br_aes_pwr8_ctr_run(const br_aes_pwr8_ctr_keys *ctx,
-	const void *iv, uint32_t cc, void *data, size_t len);
+br_ssl_u32 br_aes_pwr8_ctr_run(const br_aes_pwr8_ctr_keys *ctx,
+	const void *iv, br_ssl_u32 cc, void *data, size_t len);
 
 /**
  * \brief CTR encryption + CBC-MAC with AES (`aes_pwr8` implementation).
@@ -2225,7 +2225,7 @@ typedef struct {
 	/** \brief Pointer to vtable for this context. */
 	const br_block_cbcenc_class *vtable;
 #ifndef BR_DOXYGEN_IGNORE
-	uint32_t skey[96];
+	br_ssl_u32 skey[96];
 	unsigned num_rounds;
 #endif
 } br_des_tab_cbcenc_keys;
@@ -2240,7 +2240,7 @@ typedef struct {
 	/** \brief Pointer to vtable for this context. */
 	const br_block_cbcdec_class *vtable;
 #ifndef BR_DOXYGEN_IGNORE
-	uint32_t skey[96];
+	br_ssl_u32 skey[96];
 	unsigned num_rounds;
 #endif
 } br_des_tab_cbcdec_keys;
@@ -2317,7 +2317,7 @@ typedef struct {
 	/** \brief Pointer to vtable for this context. */
 	const br_block_cbcenc_class *vtable;
 #ifndef BR_DOXYGEN_IGNORE
-	uint32_t skey[96];
+	br_ssl_u32 skey[96];
 	unsigned num_rounds;
 #endif
 } br_des_ct_cbcenc_keys;
@@ -2332,7 +2332,7 @@ typedef struct {
 	/** \brief Pointer to vtable for this context. */
 	const br_block_cbcdec_class *vtable;
 #ifndef BR_DOXYGEN_IGNORE
-	uint32_t skey[96];
+	br_ssl_u32 skey[96];
 	unsigned num_rounds;
 #endif
 } br_des_ct_cbcdec_keys;
@@ -2439,8 +2439,8 @@ typedef union {
  * \param data   data to encrypt or decrypt.
  * \param len    data length (in bytes).
  */
-typedef uint32_t (*br_chacha20_run)(const void *key,
-	const void *iv, uint32_t cc, void *data, size_t len);
+typedef br_ssl_u32 (*br_chacha20_run)(const void *key,
+	const void *iv, br_ssl_u32 cc, void *data, size_t len);
 
 /**
  * \brief ChaCha20 implementation (straightforward C code, constant-time).
@@ -2453,8 +2453,8 @@ typedef uint32_t (*br_chacha20_run)(const void *key,
  * \param data   data to encrypt or decrypt.
  * \param len    data length (in bytes).
  */
-uint32_t br_chacha20_ct_run(const void *key,
-	const void *iv, uint32_t cc, void *data, size_t len);
+br_ssl_u32 br_chacha20_ct_run(const void *key,
+	const void *iv, br_ssl_u32 cc, void *data, size_t len);
 
 /**
  * \brief ChaCha20 implementation (SSE2 code, constant-time).
@@ -2474,8 +2474,8 @@ uint32_t br_chacha20_ct_run(const void *key,
  * \param data   data to encrypt or decrypt.
  * \param len    data length (in bytes).
  */
-uint32_t br_chacha20_sse2_run(const void *key,
-	const void *iv, uint32_t cc, void *data, size_t len);
+br_ssl_u32 br_chacha20_sse2_run(const void *key,
+	const void *iv, br_ssl_u32 cc, void *data, size_t len);
 
 /**
  * \brief Obtain the `sse2` ChaCha20 implementation, if available.

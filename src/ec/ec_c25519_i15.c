@@ -30,7 +30,7 @@
  *   - R^2 mod p (R = 2^(15k) for the smallest k such that R >= p)
  */
 
-static const uint16_t C255_P[] = {
+static const br_ssl_u16 C255_P[] = {
 	0x0110,
 	0x7FED, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF,
 	0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF,
@@ -39,7 +39,7 @@ static const uint16_t C255_P[] = {
 
 #define P0I   0x4A1B
 
-static const uint16_t C255_R2[] = {
+static const br_ssl_u16 C255_R2[] = {
 	0x0110,
 	0x0169, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
@@ -50,9 +50,9 @@ static const uint16_t C255_R2[] = {
 #include <stdio.h>
 #include <stdlib.h>
 static void
-print_int_mont(const char *name, const uint16_t *x)
+print_int_mont(const char *name, const br_ssl_u16 *x)
 {
-	uint16_t y[18];
+	br_ssl_u16 y[18];
 	unsigned char tmp[32];
 	size_t u;
 
@@ -67,7 +67,7 @@ print_int_mont(const char *name, const uint16_t *x)
 }
 */
 
-static const uint16_t C255_A24[] = {
+static const br_ssl_u16 C255_A24[] = {
 	0x0110,
 	0x45D3, 0x0046, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
@@ -113,13 +113,13 @@ api_xoff(int curve, size_t *len)
 }
 
 static void
-cswap(uint16_t *a, uint16_t *b, uint32_t ctl)
+cswap(br_ssl_u16 *a, br_ssl_u16 *b, br_ssl_u32 ctl)
 {
 	int i;
 
 	ctl = -ctl;
 	for (i = 0; i < 18; i ++) {
-		uint32_t aw, bw, tw;
+		br_ssl_u32 aw, bw, tw;
 
 		aw = a[i];
 		bw = b[i];
@@ -130,10 +130,10 @@ cswap(uint16_t *a, uint16_t *b, uint32_t ctl)
 }
 
 static void
-c255_add(uint16_t *d, const uint16_t *a, const uint16_t *b)
+c255_add(br_ssl_u16 *d, const br_ssl_u16 *a, const br_ssl_u16 *b)
 {
-	uint32_t ctl;
-	uint16_t t[18];
+	br_ssl_u32 ctl;
+	br_ssl_u16 t[18];
 
 	memcpy(t, a, sizeof t);
 	ctl = br_i15_add(t, b, 1);
@@ -143,9 +143,9 @@ c255_add(uint16_t *d, const uint16_t *a, const uint16_t *b)
 }
 
 static void
-c255_sub(uint16_t *d, const uint16_t *a, const uint16_t *b)
+c255_sub(br_ssl_u16 *d, const br_ssl_u16 *a, const br_ssl_u16 *b)
 {
-	uint16_t t[18];
+	br_ssl_u16 t[18];
 
 	memcpy(t, a, sizeof t);
 	br_i15_add(t, C255_P, br_i15_sub(t, b, 1));
@@ -153,9 +153,9 @@ c255_sub(uint16_t *d, const uint16_t *a, const uint16_t *b)
 }
 
 static void
-c255_mul(uint16_t *d, const uint16_t *a, const uint16_t *b)
+c255_mul(br_ssl_u16 *d, const br_ssl_u16 *a, const br_ssl_u16 *b)
 {
-	uint16_t t[18];
+	br_ssl_u16 t[18];
 
 	br_i15_montymul(t, a, b, C255_P, P0I);
 	memcpy(d, t, sizeof t);
@@ -175,21 +175,21 @@ byteswap(unsigned char *G)
 	}
 }
 
-static uint32_t
+static br_ssl_u32
 api_mul(unsigned char *G, size_t Glen,
 	const unsigned char *kb, size_t kblen, int curve)
 {
-#define ILEN   (18 * sizeof(uint16_t))
+#define ILEN   (18 * sizeof(br_ssl_u16))
 
 	/*
 	 * The a[] and b[] arrays have an extra word to allow for
 	 * decoding without using br_i15_decode_reduce().
 	 */
-	uint16_t x1[18], x2[18], x3[18], z2[18], z3[18];
-	uint16_t a[19], aa[18], b[19], bb[18];
-	uint16_t c[18], d[18], e[18], da[18], cb[18];
+	br_ssl_u16 x1[18], x2[18], x3[18], z2[18], z3[18];
+	br_ssl_u16 a[19], aa[18], b[19], bb[18];
+	br_ssl_u16 c[18], d[18], e[18], da[18], cb[18];
 	unsigned char k[32];
-	uint32_t swap;
+	br_ssl_u32 swap;
 	int i;
 
 	(void)curve;
@@ -251,7 +251,7 @@ api_mul(unsigned char *G, size_t Glen,
 
 	swap = 0;
 	for (i = 254; i >= 0; i --) {
-		uint32_t kt;
+		br_ssl_u32 kt;
 
 		kt = (k[31 - (i >> 3)] >> (i & 7)) & 1;
 		swap ^= kt;
@@ -365,7 +365,7 @@ api_mulgen(unsigned char *R,
 	return Glen;
 }
 
-static uint32_t
+static br_ssl_u32
 api_muladd(unsigned char *A, const unsigned char *B, size_t len,
 	const unsigned char *x, size_t xlen,
 	const unsigned char *y, size_t ylen, int curve)
@@ -388,7 +388,7 @@ api_muladd(unsigned char *A, const unsigned char *B, size_t len,
 
 /* see bearssl_ec.h */
 const br_ec_impl br_ec_c25519_i15 = {
-	(uint32_t)0x20000000,
+	(br_ssl_u32)0x20000000,
 	&api_generator,
 	&api_order,
 	&api_xoff,

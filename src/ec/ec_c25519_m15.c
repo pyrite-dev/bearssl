@@ -28,7 +28,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 static void
-print_int(const char *name, const uint32_t *x)
+print_int(const char *name, const br_ssl_u32 *x)
 {
 	size_t u;
 	unsigned char tmp[36];
@@ -46,7 +46,7 @@ print_int(const char *name, const uint32_t *x)
 	}
 	memset(tmp, 0, sizeof tmp);
 	for (u = 0; u < 20; u ++) {
-		uint32_t w;
+		br_ssl_u32 w;
 		int j, k;
 
 		w = x[u];
@@ -80,10 +80,10 @@ print_int(const char *name, const uint32_t *x)
  * arithmetic right shift opcode that could not be used otherwise.
  */
 #if BR_NO_ARITH_SHIFT
-#define ARSH(x, n)   (((uint32_t)(x) >> (n)) \
-                    | ((-((uint32_t)(x) >> 31)) << (32 - (n))))
+#define ARSH(x, n)   (((br_ssl_u32)(x) >> (n)) \
+                    | ((-((br_ssl_u32)(x) >> 31)) << (32 - (n))))
 #else
-#define ARSH(x, n)   ((*(int32_t *)&(x)) >> (n))
+#define ARSH(x, n)   ((*(br_ssl_i32 *)&(x)) >> (n))
 #endif
 
 /*
@@ -91,16 +91,16 @@ print_int(const char *name, const uint32_t *x)
  * 13-bit words in little-endian order. The final "partial" word is
  * returned.
  */
-static uint32_t
-le8_to_le13(uint32_t *dst, const unsigned char *src, size_t len)
+static br_ssl_u32
+le8_to_le13(br_ssl_u32 *dst, const unsigned char *src, size_t len)
 {
-	uint32_t acc;
+	br_ssl_u32 acc;
 	int acc_len;
 
 	acc = 0;
 	acc_len = 0;
 	while (len -- > 0) {
-		acc |= (uint32_t)(*src ++) << acc_len;
+		acc |= (br_ssl_u32)(*src ++) << acc_len;
 		acc_len += 8;
 		if (acc_len >= 13) {
 			*dst ++ = acc & 0x1FFF;
@@ -117,9 +117,9 @@ le8_to_le13(uint32_t *dst, const unsigned char *src, size_t len)
  * the destination bytes will be filled.
  */
 static void
-le13_to_le8(unsigned char *dst, size_t len, const uint32_t *src)
+le13_to_le8(unsigned char *dst, size_t len, const br_ssl_u32 *src)
 {
-	uint32_t acc;
+	br_ssl_u32 acc;
 	int acc_len;
 
 	acc = 0;
@@ -140,15 +140,15 @@ le13_to_le8(unsigned char *dst, size_t len, const uint32_t *src)
  * value is the resulting carry. The source (w) and destination (d)
  * arrays may be identical, but shall not overlap partially.
  */
-static inline uint32_t
-norm13(uint32_t *d, const uint32_t *w, size_t len)
+static inline br_ssl_u32
+norm13(br_ssl_u32 *d, const br_ssl_u32 *w, size_t len)
 {
 	size_t u;
-	uint32_t cc;
+	br_ssl_u32 cc;
 
 	cc = 0;
 	for (u = 0; u < len; u ++) {
-		int32_t z;
+		br_ssl_i32 z;
 
 		z = w[u] + cc;
 		d[u] = z & 0x1FFF;
@@ -170,7 +170,7 @@ norm13(uint32_t *d, const uint32_t *w, size_t len)
 #if BR_SLOW_MUL15
 
 static void
-mul20(uint32_t *d, const uint32_t *a, const uint32_t *b)
+mul20(br_ssl_u32 *d, const br_ssl_u32 *a, const br_ssl_u32 *b)
 {
 	/*
 	 * Two-level Karatsuba: turns a 20x20 multiplication into
@@ -190,8 +190,8 @@ mul20(uint32_t *d, const uint32_t *a, const uint32_t *b)
 	 * Highest word value is 8191, 16382 or 32764, for 13-bit, 14-bit
 	 * or 15-bit words, respectively.
 	 */
-	uint32_t u[45], v[45], w[90];
-	uint32_t cc;
+	br_ssl_u32 u[45], v[45], w[90];
+	br_ssl_u32 cc;
 	int i;
 
 #define ZADD(dw, d_off, s1w, s1_off, s2w, s2_off)   do { \
@@ -229,13 +229,13 @@ mul20(uint32_t *d, const uint32_t *a, const uint32_t *b)
 	} while (0)
 
 #define CPR1(w, cprcc)   do { \
-		uint32_t cprz = (w) + cprcc; \
+		br_ssl_u32 cprz = (w) + cprcc; \
 		(w) = cprz & 0x1FFF; \
 		cprcc = cprz >> 13; \
 	} while (0)
 
 #define CPR(dw, d_off)   do { \
-		uint32_t cprcc; \
+		br_ssl_u32 cprcc; \
 		cprcc = 0; \
 		CPR1((dw)[(d_off) + 0], cprcc); \
 		CPR1((dw)[(d_off) + 1], cprcc); \
@@ -396,7 +396,7 @@ mul20(uint32_t *d, const uint32_t *a, const uint32_t *b)
 }
 
 static inline void
-square20(uint32_t *d, const uint32_t *a)
+square20(br_ssl_u32 *d, const br_ssl_u32 *a)
 {
 	mul20(d, a, a);
 }
@@ -404,9 +404,9 @@ square20(uint32_t *d, const uint32_t *a)
 #else
 
 static void
-mul20(uint32_t *d, const uint32_t *a, const uint32_t *b)
+mul20(br_ssl_u32 *d, const br_ssl_u32 *a, const br_ssl_u32 *b)
 {
-	uint32_t t[39];
+	br_ssl_u32 t[39];
 
 	t[ 0] = MUL15(a[ 0], b[ 0]);
 	t[ 1] = MUL15(a[ 0], b[ 1])
@@ -813,9 +813,9 @@ mul20(uint32_t *d, const uint32_t *a, const uint32_t *b)
 }
 
 static void
-square20(uint32_t *d, const uint32_t *a)
+square20(br_ssl_u32 *d, const br_ssl_u32 *a)
 {
-	uint32_t t[39];
+	br_ssl_u32 t[39];
 
 	t[ 0] = MUL15(a[ 0], a[ 0]);
 	t[ 1] = ((MUL15(a[ 0], a[ 1])) << 1);
@@ -1040,17 +1040,17 @@ square20(uint32_t *d, const uint32_t *a)
  * this function returns 1; otherwise, it leaves it untouched and it
  * returns 0.
  */
-static uint32_t
-reduce_final_f255(uint32_t *d)
+static br_ssl_u32
+reduce_final_f255(br_ssl_u32 *d)
 {
-	uint32_t t[20];
-	uint32_t cc;
+	br_ssl_u32 t[20];
+	br_ssl_u32 cc;
 	int i;
 
 	memcpy(t, d, sizeof t);
 	cc = 19;
 	for (i = 0; i < 20; i ++) {
-		uint32_t w;
+		br_ssl_u32 w;
 
 		w = t[i] + cc;
 		cc = w >> 13;
@@ -1063,9 +1063,9 @@ reduce_final_f255(uint32_t *d)
 }
 
 static void
-f255_mulgen(uint32_t *d, const uint32_t *a, const uint32_t *b, int square)
+f255_mulgen(br_ssl_u32 *d, const br_ssl_u32 *a, const br_ssl_u32 *b, int square)
 {
-	uint32_t t[40], cc, w;
+	br_ssl_u32 t[40], cc, w;
 
 	/*
 	 * Compute raw multiplication. All result words fit in 13 bits
@@ -1167,10 +1167,10 @@ f255_mulgen(uint32_t *d, const uint32_t *a, const uint32_t *b, int square)
  * than twice the modulus).
  */
 static void
-f255_add(uint32_t *d, const uint32_t *a, const uint32_t *b)
+f255_add(br_ssl_u32 *d, const br_ssl_u32 *a, const br_ssl_u32 *b)
 {
 	int i;
-	uint32_t cc, w;
+	br_ssl_u32 cc, w;
 
 	cc = 0;
 	for (i = 0; i < 20; i ++) {
@@ -1192,16 +1192,16 @@ f255_add(uint32_t *d, const uint32_t *a, const uint32_t *b)
  * performed (down to less than twice the modulus).
  */
 static void
-f255_sub(uint32_t *d, const uint32_t *a, const uint32_t *b)
+f255_sub(br_ssl_u32 *d, const br_ssl_u32 *a, const br_ssl_u32 *b)
 {
 	/*
 	 * We actually compute a - b + 2*p, so that the final value is
 	 * necessarily positive.
 	 */
 	int i;
-	uint32_t cc, w;
+	br_ssl_u32 cc, w;
 
-	cc = (uint32_t)-38;
+	cc = (br_ssl_u32)-38;
 	for (i = 0; i < 20; i ++) {
 		w = a[i] - b[i] + cc;
 		d[i] = w & 0x1FFF;
@@ -1221,10 +1221,10 @@ f255_sub(uint32_t *d, const uint32_t *a, const uint32_t *b)
  * is performed (down to less than twice the modulus).
  */
 static void
-f255_mul_a24(uint32_t *d, const uint32_t *a)
+f255_mul_a24(br_ssl_u32 *d, const br_ssl_u32 *a)
 {
 	int i;
-	uint32_t cc, w;
+	br_ssl_u32 cc, w;
 
 	cc = 0;
 	for (i = 0; i < 20; i ++) {
@@ -1280,13 +1280,13 @@ api_xoff(int curve, size_t *len)
 }
 
 static void
-cswap(uint32_t *a, uint32_t *b, uint32_t ctl)
+cswap(br_ssl_u32 *a, br_ssl_u32 *b, br_ssl_u32 ctl)
 {
 	int i;
 
 	ctl = -ctl;
 	for (i = 0; i < 20; i ++) {
-		uint32_t aw, bw, tw;
+		br_ssl_u32 aw, bw, tw;
 
 		aw = a[i];
 		bw = b[i];
@@ -1296,15 +1296,15 @@ cswap(uint32_t *a, uint32_t *b, uint32_t ctl)
 	}
 }
 
-static uint32_t
+static br_ssl_u32
 api_mul(unsigned char *G, size_t Glen,
 	const unsigned char *kb, size_t kblen, int curve)
 {
-	uint32_t x1[20], x2[20], x3[20], z2[20], z3[20];
-	uint32_t a[20], aa[20], b[20], bb[20];
-	uint32_t c[20], d[20], e[20], da[20], cb[20];
+	br_ssl_u32 x1[20], x2[20], x3[20], z2[20], z3[20];
+	br_ssl_u32 a[20], aa[20], b[20], bb[20];
+	br_ssl_u32 c[20], d[20], e[20], da[20], cb[20];
 	unsigned char k[32];
-	uint32_t swap;
+	br_ssl_u32 swap;
 	int i;
 
 	(void)curve;
@@ -1344,7 +1344,7 @@ api_mul(unsigned char *G, size_t Glen,
 
 	swap = 0;
 	for (i = 254; i >= 0; i --) {
-		uint32_t kt;
+		br_ssl_u32 kt;
 
 		kt = (k[31 - (i >> 3)] >> (i & 7)) & 1;
 		swap ^= kt;
@@ -1445,7 +1445,7 @@ api_mulgen(unsigned char *R,
 	return Glen;
 }
 
-static uint32_t
+static br_ssl_u32
 api_muladd(unsigned char *A, const unsigned char *B, size_t len,
 	const unsigned char *x, size_t xlen,
 	const unsigned char *y, size_t ylen, int curve)
@@ -1468,7 +1468,7 @@ api_muladd(unsigned char *A, const unsigned char *B, size_t len,
 
 /* see bearssl_ec.h */
 const br_ec_impl br_ec_c25519_m15 = {
-	(uint32_t)0x20000000,
+	(br_ssl_u32)0x20000000,
 	&api_generator,
 	&api_order,
 	&api_xoff,

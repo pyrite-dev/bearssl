@@ -25,17 +25,17 @@
 #include "inner.h"
 
 /* see bearssl_rsa.h */
-uint32_t
+br_ssl_u32
 br_rsa_i32_public(unsigned char *x, size_t xlen,
 	const br_rsa_public_key *pk)
 {
 	const unsigned char *n;
 	size_t nlen;
-	uint32_t m[1 + (BR_MAX_RSA_SIZE >> 5)];
-	uint32_t a[1 + (BR_MAX_RSA_SIZE >> 5)];
-	uint32_t t1[1 + (BR_MAX_RSA_SIZE >> 5)];
-	uint32_t t2[1 + (BR_MAX_RSA_SIZE >> 5)];
-	uint32_t m0i, r;
+	br_ssl_u32 m[1 + (BR_MAX_RSA_SIZE >> 5)];
+	br_ssl_u32 a[1 + (BR_MAX_RSA_SIZE >> 5)];
+	br_ssl_u32 t1[1 + (BR_MAX_RSA_SIZE >> 5)];
+	br_ssl_u32 t2[1 + (BR_MAX_RSA_SIZE >> 5)];
+	br_ssl_u32 m0i, r;
 
 	/*
 	 * Get the actual length of the modulus, and see if it fits within

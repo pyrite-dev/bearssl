@@ -26,13 +26,13 @@
 
 /* see inner.h */
 void
-br_aes_ct64_bitslice_invSbox(uint64_t *q)
+br_aes_ct64_bitslice_invSbox(br_ssl_u64 *q)
 {
 	/*
 	 * See br_aes_ct_bitslice_invSbox(). This is the natural extension
 	 * to 64-bit registers.
 	 */
-	uint64_t q0, q1, q2, q3, q4, q5, q6, q7;
+	br_ssl_u64 q0, q1, q2, q3, q4, q5, q6, q7;
 
 	q0 = ~q[0];
 	q1 = ~q[1];
@@ -72,7 +72,7 @@ br_aes_ct64_bitslice_invSbox(uint64_t *q)
 }
 
 static void
-add_round_key(uint64_t *q, const uint64_t *sk)
+add_round_key(br_ssl_u64 *q, const br_ssl_u64 *sk)
 {
 	int i;
 
@@ -82,35 +82,35 @@ add_round_key(uint64_t *q, const uint64_t *sk)
 }
 
 static void
-inv_shift_rows(uint64_t *q)
+inv_shift_rows(br_ssl_u64 *q)
 {
 	int i;
 
 	for (i = 0; i < 8; i ++) {
-		uint64_t x;
+		br_ssl_u64 x;
 
 		x = q[i];
-		q[i] = (x & (uint64_t)0x000000000000FFFF)
-			| ((x & (uint64_t)0x000000000FFF0000) << 4)
-			| ((x & (uint64_t)0x00000000F0000000) >> 12)
-			| ((x & (uint64_t)0x000000FF00000000) << 8)
-			| ((x & (uint64_t)0x0000FF0000000000) >> 8)
-			| ((x & (uint64_t)0x000F000000000000) << 12)
-			| ((x & (uint64_t)0xFFF0000000000000) >> 4);
+		q[i] = (x & (br_ssl_u64)0x000000000000FFFF)
+			| ((x & (br_ssl_u64)0x000000000FFF0000) << 4)
+			| ((x & (br_ssl_u64)0x00000000F0000000) >> 12)
+			| ((x & (br_ssl_u64)0x000000FF00000000) << 8)
+			| ((x & (br_ssl_u64)0x0000FF0000000000) >> 8)
+			| ((x & (br_ssl_u64)0x000F000000000000) << 12)
+			| ((x & (br_ssl_u64)0xFFF0000000000000) >> 4);
 	}
 }
 
-static inline uint64_t
-rotr32(uint64_t x)
+static inline br_ssl_u64
+rotr32(br_ssl_u64 x)
 {
 	return (x << 32) | (x >> 32);
 }
 
 static void
-inv_mix_columns(uint64_t *q)
+inv_mix_columns(br_ssl_u64 *q)
 {
-	uint64_t q0, q1, q2, q3, q4, q5, q6, q7;
-	uint64_t r0, r1, r2, r3, r4, r5, r6, r7;
+	br_ssl_u64 q0, q1, q2, q3, q4, q5, q6, q7;
+	br_ssl_u64 r0, r1, r2, r3, r4, r5, r6, r7;
 
 	q0 = q[0];
 	q1 = q[1];
@@ -142,7 +142,7 @@ inv_mix_columns(uint64_t *q)
 /* see inner.h */
 void
 br_aes_ct64_bitslice_decrypt(unsigned num_rounds,
-	const uint64_t *skey, uint64_t *q)
+	const br_ssl_u64 *skey, br_ssl_u64 *q)
 {
 	unsigned u;
 

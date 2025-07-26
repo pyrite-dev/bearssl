@@ -42,12 +42,12 @@ br_ecdsa_i31_sign_raw(const br_ec_impl *impl,
 	 * from 0 and 1.
 	 */
 	const br_ec_curve_def *cd;
-	uint32_t n[I31_LEN], r[I31_LEN], s[I31_LEN], x[I31_LEN];
-	uint32_t m[I31_LEN], k[I31_LEN], t1[I31_LEN], t2[I31_LEN];
+	br_ssl_u32 n[I31_LEN], r[I31_LEN], s[I31_LEN], x[I31_LEN];
+	br_ssl_u32 m[I31_LEN], k[I31_LEN], t1[I31_LEN], t2[I31_LEN];
 	unsigned char tt[ORDER_LEN << 1];
 	unsigned char eU[POINT_LEN];
 	size_t hash_len, nlen, ulen;
-	uint32_t n0i, ctl;
+	br_ssl_u32 n0i, ctl;
 	br_hmac_drbg_context drbg;
 
 	/*

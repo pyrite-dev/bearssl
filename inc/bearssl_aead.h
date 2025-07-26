@@ -26,7 +26,7 @@
 #define BR_BEARSSL_AEAD_H__
 
 #include <stddef.h>
-#include <stdint.h>
+#include "bearssl_int.h"
 
 #include "bearssl_block.h"
 #include "bearssl_hash.h"
@@ -293,7 +293,7 @@ struct br_aead_class_ {
 	 * \param tag   tag value to compare with.
 	 * \return  1 on success (exact match of tag value), 0 otherwise.
 	 */
-	uint32_t (*check_tag)(const br_aead_class **cc, const void *tag);
+	br_ssl_u32 (*check_tag)(const br_aead_class **cc, const void *tag);
 
 	/**
 	 * \brief Compute authentication tag (with truncation).
@@ -323,7 +323,7 @@ struct br_aead_class_ {
 	 * \param len   tag length (in bytes).
 	 * \return  1 on success (exact match of tag value), 0 otherwise.
 	 */
-	uint32_t (*check_tag_trunc)(const br_aead_class **cc,
+	br_ssl_u32 (*check_tag_trunc)(const br_aead_class **cc,
 		const void *tag, size_t len);
 };
 
@@ -363,8 +363,8 @@ typedef struct {
 	unsigned char j0_1[12];
 	unsigned char buf[16];
 	unsigned char y[16];
-	uint32_t j0_2, jc;
-	uint64_t count_aad, count_ctr;
+	br_ssl_u32 j0_2, jc;
+	br_ssl_u64 count_aad, count_ctr;
 #endif
 } br_gcm_context;
 
@@ -485,7 +485,7 @@ void br_gcm_get_tag(br_gcm_context *ctx, void *tag);
  * \param tag   tag value to compare with (16 bytes).
  * \return  1 on success (exact match of tag value), 0 otherwise.
  */
-uint32_t br_gcm_check_tag(br_gcm_context *ctx, const void *tag);
+br_ssl_u32 br_gcm_check_tag(br_gcm_context *ctx, const void *tag);
 
 /**
  * \brief Compute GCM authentication tag (with truncation).
@@ -539,7 +539,7 @@ void br_gcm_get_tag_trunc(br_gcm_context *ctx, void *tag, size_t len);
  * \param len   tag length (in bytes).
  * \return  1 on success (exact match of tag value), 0 otherwise.
  */
-uint32_t br_gcm_check_tag_trunc(br_gcm_context *ctx,
+br_ssl_u32 br_gcm_check_tag_trunc(br_gcm_context *ctx,
 	const void *tag, size_t len);
 
 /**
@@ -798,7 +798,7 @@ void br_eax_get_tag(br_eax_context *ctx, void *tag);
  * \param tag   tag value to compare with (16 bytes).
  * \return  1 on success (exact match of tag value), 0 otherwise.
  */
-uint32_t br_eax_check_tag(br_eax_context *ctx, const void *tag);
+br_ssl_u32 br_eax_check_tag(br_eax_context *ctx, const void *tag);
 
 /**
  * \brief Compute EAX authentication tag (with truncation).
@@ -852,7 +852,7 @@ void br_eax_get_tag_trunc(br_eax_context *ctx, void *tag, size_t len);
  * \param len   tag length (in bytes).
  * \return  1 on success (exact match of tag value), 0 otherwise.
  */
-uint32_t br_eax_check_tag_trunc(br_eax_context *ctx,
+br_ssl_u32 br_eax_check_tag_trunc(br_eax_context *ctx,
 	const void *tag, size_t len);
 
 /**
@@ -963,7 +963,7 @@ void br_ccm_init(br_ccm_context *ctx, const br_block_ctrcbc_class **bctx);
  * \return  1 on success, 0 on error.
  */
 int br_ccm_reset(br_ccm_context *ctx, const void *nonce, size_t nonce_len,
-	uint64_t aad_len, uint64_t data_len, size_t tag_len);
+	br_ssl_u64 aad_len, br_ssl_u64 data_len, size_t tag_len);
 
 /**
  * \brief Inject additional authenticated data into CCM.
@@ -1050,7 +1050,7 @@ size_t br_ccm_get_tag(br_ccm_context *ctx, void *tag);
  * \param tag   tag value to compare with (up to 16 bytes).
  * \return  1 on success (exact match of tag value), 0 otherwise.
  */
-uint32_t br_ccm_check_tag(br_ccm_context *ctx, const void *tag);
+br_ssl_u32 br_ccm_check_tag(br_ccm_context *ctx, const void *tag);
 
 #ifdef __cplusplus
 }

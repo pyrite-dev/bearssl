@@ -26,9 +26,9 @@
 
 /* see inner.h */
 void
-br_i15_modpow(uint16_t *x,
+br_i15_modpow(br_ssl_u16 *x,
 	const unsigned char *e, size_t elen,
-	const uint16_t *m, uint16_t m0i, uint16_t *t1, uint16_t *t2)
+	const br_ssl_u16 *m, br_ssl_u16 m0i, br_ssl_u16 *t1, br_ssl_u16 *t2)
 {
 	size_t mlen;
 	unsigned k;
@@ -39,7 +39,7 @@ br_i15_modpow(uint16_t *x,
 	br_i15_zero(x, m[0]);
 	x[1] = 1;
 	for (k = 0; k < ((unsigned)elen << 3); k ++) {
-		uint32_t ctl;
+		br_ssl_u32 ctl;
 
 		ctl = (e[elen - 1 - (k >> 3)] >> (k & 7)) & 1;
 		br_i15_montymul(t2, x, t1, m, m0i);

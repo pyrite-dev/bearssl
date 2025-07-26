@@ -26,10 +26,10 @@
 
 /* see inner.h */
 void
-br_i32_decode_reduce(uint32_t *x,
-	const void *src, size_t len, const uint32_t *m)
+br_i32_decode_reduce(br_ssl_u32 *x,
+	const void *src, size_t len, const br_ssl_u32 *m)
 {
-	uint32_t m_bitlen;
+	br_ssl_u32 m_bitlen;
 	size_t mblen, k, q;
 	const unsigned char *buf;
 
@@ -81,7 +81,7 @@ br_i32_decode_reduce(uint32_t *x,
 	 */
 	if (q > len) {
 		int i;
-		uint32_t w;
+		br_ssl_u32 w;
 
 		w = 0;
 		for (i = 0; i < 4; i ++) {

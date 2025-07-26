@@ -60,8 +60,8 @@ static const unsigned char QR1[] = {
  * 32-bit rotation. The C compiler is supposed to recognize it as a
  * rotation and use the local architecture rotation opcode (if available).
  */
-static inline uint32_t
-rotl(uint32_t x, int n)
+static inline br_ssl_u32
+rotl(br_ssl_u32 x, int n)
 {
 	return (x << n) | (x >> (32 - n));
 }
@@ -70,7 +70,7 @@ rotl(uint32_t x, int n)
  * Compute key schedule for 8 key bytes (produces 32 subkey words).
  */
 static void
-keysched_unit(uint32_t *skey, const void *key)
+keysched_unit(br_ssl_u32 *skey, const void *key)
 {
 	int i;
 
@@ -80,7 +80,7 @@ keysched_unit(uint32_t *skey, const void *key)
 	 * Apply PC-2 + bitslicing.
 	 */
 	for (i = 0; i < 16; i ++) {
-		uint32_t kl, kr, sk0, sk1;
+		br_ssl_u32 kl, kr, sk0, sk1;
 		int j;
 
 		kl = skey[(i << 1) + 0];
@@ -90,10 +90,10 @@ keysched_unit(uint32_t *skey, const void *key)
 		for (j = 0; j < 16; j ++) {
 			sk0 <<= 1;
 			sk1 <<= 1;
-			sk0 |= ((kl >> QL0[j]) & (uint32_t)1) << 16;
-			sk0 |= (kr >> QR0[j]) & (uint32_t)1;
-			sk1 |= ((kl >> QL1[j]) & (uint32_t)1) << 16;
-			sk1 |= (kr >> QR1[j]) & (uint32_t)1;
+			sk0 |= ((kl >> QL0[j]) & (br_ssl_u32)1) << 16;
+			sk0 |= (kr >> QR0[j]) & (br_ssl_u32)1;
+			sk1 |= ((kl >> QL1[j]) & (br_ssl_u32)1) << 16;
+			sk1 |= (kr >> QR1[j]) & (br_ssl_u32)1;
 		}
 
 		skey[(i << 1) + 0] = sk0;
@@ -105,57 +105,57 @@ keysched_unit(uint32_t *skey, const void *key)
 		 * Speed-optimized version for PC-2 + bitslicing.
 		 * (Unused. Kept for reference only.)
 		 */
-		sk0 = kl & (uint32_t)0x00100000;
-		sk0 |= (kl & (uint32_t)0x08008000) << 2;
-		sk0 |= (kl & (uint32_t)0x00400000) << 4;
-		sk0 |= (kl & (uint32_t)0x00800000) << 5;
-		sk0 |= (kl & (uint32_t)0x00040000) << 6;
-		sk0 |= (kl & (uint32_t)0x00010000) << 7;
-		sk0 |= (kl & (uint32_t)0x00000100) << 10;
-		sk0 |= (kl & (uint32_t)0x00022000) << 14;
-		sk0 |= (kl & (uint32_t)0x00000082) << 18;
-		sk0 |= (kl & (uint32_t)0x00000004) << 19;
-		sk0 |= (kl & (uint32_t)0x04000000) >> 10;
-		sk0 |= (kl & (uint32_t)0x00000010) << 26;
-		sk0 |= (kl & (uint32_t)0x01000000) >> 2;
+		sk0 = kl & (br_ssl_u32)0x00100000;
+		sk0 |= (kl & (br_ssl_u32)0x08008000) << 2;
+		sk0 |= (kl & (br_ssl_u32)0x00400000) << 4;
+		sk0 |= (kl & (br_ssl_u32)0x00800000) << 5;
+		sk0 |= (kl & (br_ssl_u32)0x00040000) << 6;
+		sk0 |= (kl & (br_ssl_u32)0x00010000) << 7;
+		sk0 |= (kl & (br_ssl_u32)0x00000100) << 10;
+		sk0 |= (kl & (br_ssl_u32)0x00022000) << 14;
+		sk0 |= (kl & (br_ssl_u32)0x00000082) << 18;
+		sk0 |= (kl & (br_ssl_u32)0x00000004) << 19;
+		sk0 |= (kl & (br_ssl_u32)0x04000000) >> 10;
+		sk0 |= (kl & (br_ssl_u32)0x00000010) << 26;
+		sk0 |= (kl & (br_ssl_u32)0x01000000) >> 2;
 
-		sk0 |= kr & (uint32_t)0x00000100;
-		sk0 |= (kr & (uint32_t)0x00000008) << 1;
-		sk0 |= (kr & (uint32_t)0x00000200) << 4;
-		sk0 |= rotl(kr & (uint32_t)0x08000021, 6);
-		sk0 |= (kr & (uint32_t)0x01000000) >> 24;
-		sk0 |= (kr & (uint32_t)0x00000002) << 11;
-		sk0 |= (kr & (uint32_t)0x00100000) >> 18;
-		sk0 |= (kr & (uint32_t)0x00400000) >> 17;
-		sk0 |= (kr & (uint32_t)0x00800000) >> 14;
-		sk0 |= (kr & (uint32_t)0x02020000) >> 10;
-		sk0 |= (kr & (uint32_t)0x00080000) >> 5;
-		sk0 |= (kr & (uint32_t)0x00000040) >> 3;
-		sk0 |= (kr & (uint32_t)0x00000800) >> 1;
+		sk0 |= kr & (br_ssl_u32)0x00000100;
+		sk0 |= (kr & (br_ssl_u32)0x00000008) << 1;
+		sk0 |= (kr & (br_ssl_u32)0x00000200) << 4;
+		sk0 |= rotl(kr & (br_ssl_u32)0x08000021, 6);
+		sk0 |= (kr & (br_ssl_u32)0x01000000) >> 24;
+		sk0 |= (kr & (br_ssl_u32)0x00000002) << 11;
+		sk0 |= (kr & (br_ssl_u32)0x00100000) >> 18;
+		sk0 |= (kr & (br_ssl_u32)0x00400000) >> 17;
+		sk0 |= (kr & (br_ssl_u32)0x00800000) >> 14;
+		sk0 |= (kr & (br_ssl_u32)0x02020000) >> 10;
+		sk0 |= (kr & (br_ssl_u32)0x00080000) >> 5;
+		sk0 |= (kr & (br_ssl_u32)0x00000040) >> 3;
+		sk0 |= (kr & (br_ssl_u32)0x00000800) >> 1;
 
-		sk1 = kl & (uint32_t)0x02000000;
-		sk1 |= (kl & (uint32_t)0x00001000) << 5;
-		sk1 |= (kl & (uint32_t)0x00000200) << 11;
-		sk1 |= (kl & (uint32_t)0x00004000) << 15;
-		sk1 |= (kl & (uint32_t)0x00000020) << 16;
-		sk1 |= (kl & (uint32_t)0x00000800) << 17;
-		sk1 |= (kl & (uint32_t)0x00000001) << 24;
-		sk1 |= (kl & (uint32_t)0x00200000) >> 5;
+		sk1 = kl & (br_ssl_u32)0x02000000;
+		sk1 |= (kl & (br_ssl_u32)0x00001000) << 5;
+		sk1 |= (kl & (br_ssl_u32)0x00000200) << 11;
+		sk1 |= (kl & (br_ssl_u32)0x00004000) << 15;
+		sk1 |= (kl & (br_ssl_u32)0x00000020) << 16;
+		sk1 |= (kl & (br_ssl_u32)0x00000800) << 17;
+		sk1 |= (kl & (br_ssl_u32)0x00000001) << 24;
+		sk1 |= (kl & (br_ssl_u32)0x00200000) >> 5;
 
-		sk1 |= (kr & (uint32_t)0x00000010) << 8;
-		sk1 |= (kr & (uint32_t)0x04000000) >> 17;
-		sk1 |= (kr & (uint32_t)0x00004000) >> 14;
-		sk1 |= (kr & (uint32_t)0x00000400) >> 9;
-		sk1 |= (kr & (uint32_t)0x00010000) >> 8;
-		sk1 |= (kr & (uint32_t)0x00001000) >> 7;
-		sk1 |= (kr & (uint32_t)0x00000080) >> 3;
-		sk1 |= (kr & (uint32_t)0x00008000) >> 2;
+		sk1 |= (kr & (br_ssl_u32)0x00000010) << 8;
+		sk1 |= (kr & (br_ssl_u32)0x04000000) >> 17;
+		sk1 |= (kr & (br_ssl_u32)0x00004000) >> 14;
+		sk1 |= (kr & (br_ssl_u32)0x00000400) >> 9;
+		sk1 |= (kr & (br_ssl_u32)0x00010000) >> 8;
+		sk1 |= (kr & (br_ssl_u32)0x00001000) >> 7;
+		sk1 |= (kr & (br_ssl_u32)0x00000080) >> 3;
+		sk1 |= (kr & (br_ssl_u32)0x00008000) >> 2;
 #endif
 }
 
 /* see inner.h */
 unsigned
-br_des_ct_keysched(uint32_t *skey, const void *key, size_t key_len)
+br_des_ct_keysched(br_ssl_u32 *skey, const void *key, size_t key_len)
 {
 	switch (key_len) {
 	case 8:
@@ -180,8 +180,8 @@ br_des_ct_keysched(uint32_t *skey, const void *key, size_t key_len)
  * DES confusion function. This function performs expansion E (32 to
  * 48 bits), XOR with subkey, S-boxes, and permutation P.
  */
-static inline uint32_t
-Fconf(uint32_t r0, const uint32_t *sk)
+static inline br_ssl_u32
+Fconf(br_ssl_u32 r0, const br_ssl_u32 *sk)
 {
 	/*
 	 * Each 6->4 S-box is virtually turned into four 6->1 boxes; we
@@ -202,19 +202,19 @@ Fconf(uint32_t r0, const uint32_t *sk)
 	 *
 	 * Words x0 to x5 contain the T-box inputs 0 to 5.
 	 */
-	uint32_t x0, x1, x2, x3, x4, x5, z0;
-	uint32_t y0, y1, y2, y3, y4, y5, y6, y7, y8, y9;
-	uint32_t y10, y11, y12, y13, y14, y15, y16, y17, y18, y19;
-	uint32_t y20, y21, y22, y23, y24, y25, y26, y27, y28, y29;
-	uint32_t y30;
+	br_ssl_u32 x0, x1, x2, x3, x4, x5, z0;
+	br_ssl_u32 y0, y1, y2, y3, y4, y5, y6, y7, y8, y9;
+	br_ssl_u32 y10, y11, y12, y13, y14, y15, y16, y17, y18, y19;
+	br_ssl_u32 y20, y21, y22, y23, y24, y25, y26, y27, y28, y29;
+	br_ssl_u32 y30;
 
 	/*
 	 * Spread input bits over the 6 input words x*.
 	 */
-	x1 = r0 & (uint32_t)0x11111111;
-	x2 = (r0 >> 1) & (uint32_t)0x11111111;
-	x3 = (r0 >> 2) & (uint32_t)0x11111111;
-	x4 = (r0 >> 3) & (uint32_t)0x11111111;
+	x1 = r0 & (br_ssl_u32)0x11111111;
+	x2 = (r0 >> 1) & (br_ssl_u32)0x11111111;
+	x3 = (r0 >> 2) & (br_ssl_u32)0x11111111;
+	x4 = (r0 >> 3) & (br_ssl_u32)0x11111111;
 	x1 = (x1 << 4) - x1;
 	x2 = (x2 << 4) - x2;
 	x3 = (x3 << 4) - x3;
@@ -240,38 +240,38 @@ Fconf(uint32_t r0, const uint32_t *sk)
 	 *
 	 * computes y as either 'a' (if x == 0) or 'a ^ b' (if x == 1).
 	 */
-	y0 = (uint32_t)0xEFA72C4D ^ (x0 & (uint32_t)0xEC7AC69C);
-	y1 = (uint32_t)0xAEAAEDFF ^ (x0 & (uint32_t)0x500FB821);
-	y2 = (uint32_t)0x37396665 ^ (x0 & (uint32_t)0x40EFA809);
-	y3 = (uint32_t)0x68D7B833 ^ (x0 & (uint32_t)0xA5EC0B28);
-	y4 = (uint32_t)0xC9C755BB ^ (x0 & (uint32_t)0x252CF820);
-	y5 = (uint32_t)0x73FC3606 ^ (x0 & (uint32_t)0x40205801);
-	y6 = (uint32_t)0xA2A0A918 ^ (x0 & (uint32_t)0xE220F929);
-	y7 = (uint32_t)0x8222BD90 ^ (x0 & (uint32_t)0x44A3F9E1);
-	y8 = (uint32_t)0xD6B6AC77 ^ (x0 & (uint32_t)0x794F104A);
-	y9 = (uint32_t)0x3069300C ^ (x0 & (uint32_t)0x026F320B);
-	y10 = (uint32_t)0x6CE0D5CC ^ (x0 & (uint32_t)0x7640B01A);
-	y11 = (uint32_t)0x59A9A22D ^ (x0 & (uint32_t)0x238F1572);
-	y12 = (uint32_t)0xAC6D0BD4 ^ (x0 & (uint32_t)0x7A63C083);
-	y13 = (uint32_t)0x21C83200 ^ (x0 & (uint32_t)0x11CCA000);
-	y14 = (uint32_t)0xA0E62188 ^ (x0 & (uint32_t)0x202F69AA);
-	/* y15 = (uint32_t)0x00000000 ^ (x0 & (uint32_t)0x00000000); */
-	y16 = (uint32_t)0xAF7D655A ^ (x0 & (uint32_t)0x51B33BE9);
-	y17 = (uint32_t)0xF0168AA3 ^ (x0 & (uint32_t)0x3B0FE8AE);
-	y18 = (uint32_t)0x90AA30C6 ^ (x0 & (uint32_t)0x90BF8816);
-	y19 = (uint32_t)0x5AB2750A ^ (x0 & (uint32_t)0x09E34F9B);
-	y20 = (uint32_t)0x5391BE65 ^ (x0 & (uint32_t)0x0103BE88);
-	y21 = (uint32_t)0x93372BAF ^ (x0 & (uint32_t)0x49AC8E25);
-	y22 = (uint32_t)0xF288210C ^ (x0 & (uint32_t)0x922C313D);
-	y23 = (uint32_t)0x920AF5C0 ^ (x0 & (uint32_t)0x70EF31B0);
-	y24 = (uint32_t)0x63D312C0 ^ (x0 & (uint32_t)0x6A707100);
-	y25 = (uint32_t)0x537B3006 ^ (x0 & (uint32_t)0xB97C9011);
-	y26 = (uint32_t)0xA2EFB0A5 ^ (x0 & (uint32_t)0xA320C959);
-	y27 = (uint32_t)0xBC8F96A5 ^ (x0 & (uint32_t)0x6EA0AB4A);
-	y28 = (uint32_t)0xFAD176A5 ^ (x0 & (uint32_t)0x6953DDF8);
-	y29 = (uint32_t)0x665A14A3 ^ (x0 & (uint32_t)0xF74F3E2B);
-	y30 = (uint32_t)0xF2EFF0CC ^ (x0 & (uint32_t)0xF0306CAD);
-	/* y31 = (uint32_t)0x00000000 ^ (x0 & (uint32_t)0x00000000); */
+	y0 = (br_ssl_u32)0xEFA72C4D ^ (x0 & (br_ssl_u32)0xEC7AC69C);
+	y1 = (br_ssl_u32)0xAEAAEDFF ^ (x0 & (br_ssl_u32)0x500FB821);
+	y2 = (br_ssl_u32)0x37396665 ^ (x0 & (br_ssl_u32)0x40EFA809);
+	y3 = (br_ssl_u32)0x68D7B833 ^ (x0 & (br_ssl_u32)0xA5EC0B28);
+	y4 = (br_ssl_u32)0xC9C755BB ^ (x0 & (br_ssl_u32)0x252CF820);
+	y5 = (br_ssl_u32)0x73FC3606 ^ (x0 & (br_ssl_u32)0x40205801);
+	y6 = (br_ssl_u32)0xA2A0A918 ^ (x0 & (br_ssl_u32)0xE220F929);
+	y7 = (br_ssl_u32)0x8222BD90 ^ (x0 & (br_ssl_u32)0x44A3F9E1);
+	y8 = (br_ssl_u32)0xD6B6AC77 ^ (x0 & (br_ssl_u32)0x794F104A);
+	y9 = (br_ssl_u32)0x3069300C ^ (x0 & (br_ssl_u32)0x026F320B);
+	y10 = (br_ssl_u32)0x6CE0D5CC ^ (x0 & (br_ssl_u32)0x7640B01A);
+	y11 = (br_ssl_u32)0x59A9A22D ^ (x0 & (br_ssl_u32)0x238F1572);
+	y12 = (br_ssl_u32)0xAC6D0BD4 ^ (x0 & (br_ssl_u32)0x7A63C083);
+	y13 = (br_ssl_u32)0x21C83200 ^ (x0 & (br_ssl_u32)0x11CCA000);
+	y14 = (br_ssl_u32)0xA0E62188 ^ (x0 & (br_ssl_u32)0x202F69AA);
+	/* y15 = (br_ssl_u32)0x00000000 ^ (x0 & (br_ssl_u32)0x00000000); */
+	y16 = (br_ssl_u32)0xAF7D655A ^ (x0 & (br_ssl_u32)0x51B33BE9);
+	y17 = (br_ssl_u32)0xF0168AA3 ^ (x0 & (br_ssl_u32)0x3B0FE8AE);
+	y18 = (br_ssl_u32)0x90AA30C6 ^ (x0 & (br_ssl_u32)0x90BF8816);
+	y19 = (br_ssl_u32)0x5AB2750A ^ (x0 & (br_ssl_u32)0x09E34F9B);
+	y20 = (br_ssl_u32)0x5391BE65 ^ (x0 & (br_ssl_u32)0x0103BE88);
+	y21 = (br_ssl_u32)0x93372BAF ^ (x0 & (br_ssl_u32)0x49AC8E25);
+	y22 = (br_ssl_u32)0xF288210C ^ (x0 & (br_ssl_u32)0x922C313D);
+	y23 = (br_ssl_u32)0x920AF5C0 ^ (x0 & (br_ssl_u32)0x70EF31B0);
+	y24 = (br_ssl_u32)0x63D312C0 ^ (x0 & (br_ssl_u32)0x6A707100);
+	y25 = (br_ssl_u32)0x537B3006 ^ (x0 & (br_ssl_u32)0xB97C9011);
+	y26 = (br_ssl_u32)0xA2EFB0A5 ^ (x0 & (br_ssl_u32)0xA320C959);
+	y27 = (br_ssl_u32)0xBC8F96A5 ^ (x0 & (br_ssl_u32)0x6EA0AB4A);
+	y28 = (br_ssl_u32)0xFAD176A5 ^ (x0 & (br_ssl_u32)0x6953DDF8);
+	y29 = (br_ssl_u32)0x665A14A3 ^ (x0 & (br_ssl_u32)0xF74F3E2B);
+	y30 = (br_ssl_u32)0xF2EFF0CC ^ (x0 & (br_ssl_u32)0xF0306CAD);
+	/* y31 = (br_ssl_u32)0x00000000 ^ (x0 & (br_ssl_u32)0x00000000); */
 
 	y0 = y0 ^ (x1 & y1);
 	y1 = y2 ^ (x1 & y3);
@@ -317,25 +317,25 @@ Fconf(uint32_t r0, const uint32_t *sk)
 	 * where appropriate (this will help architectures that do not have
 	 * a rotation opcode).
 	 */
-	z0 = (y0 & (uint32_t)0x00000004) << 3;
-	z0 |= (y0 & (uint32_t)0x00004000) << 4;
+	z0 = (y0 & (br_ssl_u32)0x00000004) << 3;
+	z0 |= (y0 & (br_ssl_u32)0x00004000) << 4;
 	z0 |= rotl(y0 & 0x12020120, 5);
-	z0 |= (y0 & (uint32_t)0x00100000) << 6;
-	z0 |= (y0 & (uint32_t)0x00008000) << 9;
-	z0 |= (y0 & (uint32_t)0x04000000) >> 22;
-	z0 |= (y0 & (uint32_t)0x00000001) << 11;
+	z0 |= (y0 & (br_ssl_u32)0x00100000) << 6;
+	z0 |= (y0 & (br_ssl_u32)0x00008000) << 9;
+	z0 |= (y0 & (br_ssl_u32)0x04000000) >> 22;
+	z0 |= (y0 & (br_ssl_u32)0x00000001) << 11;
 	z0 |= rotl(y0 & 0x20000200, 12);
-	z0 |= (y0 & (uint32_t)0x00200000) >> 19;
-	z0 |= (y0 & (uint32_t)0x00000040) << 14;
-	z0 |= (y0 & (uint32_t)0x00010000) << 15;
-	z0 |= (y0 & (uint32_t)0x00000002) << 16;
+	z0 |= (y0 & (br_ssl_u32)0x00200000) >> 19;
+	z0 |= (y0 & (br_ssl_u32)0x00000040) << 14;
+	z0 |= (y0 & (br_ssl_u32)0x00010000) << 15;
+	z0 |= (y0 & (br_ssl_u32)0x00000002) << 16;
 	z0 |= rotl(y0 & 0x40801800, 17);
-	z0 |= (y0 & (uint32_t)0x00080000) >> 13;
-	z0 |= (y0 & (uint32_t)0x00000010) << 21;
-	z0 |= (y0 & (uint32_t)0x01000000) >> 10;
+	z0 |= (y0 & (br_ssl_u32)0x00080000) >> 13;
+	z0 |= (y0 & (br_ssl_u32)0x00000010) << 21;
+	z0 |= (y0 & (br_ssl_u32)0x01000000) >> 10;
 	z0 |= rotl(y0 & 0x88000008, 24);
-	z0 |= (y0 & (uint32_t)0x00000480) >> 7;
-	z0 |= (y0 & (uint32_t)0x00442000) >> 6;
+	z0 |= (y0 & (br_ssl_u32)0x00000480) >> 7;
+	z0 |= (y0 & (br_ssl_u32)0x00442000) >> 6;
 	return z0;
 }
 
@@ -344,15 +344,15 @@ Fconf(uint32_t r0, const uint32_t *sk)
  * in the final round.
  */
 static void
-process_block_unit(uint32_t *pl, uint32_t *pr, const uint32_t *sk_exp)
+process_block_unit(br_ssl_u32 *pl, br_ssl_u32 *pr, const br_ssl_u32 *sk_exp)
 {
 	int i;
-	uint32_t l, r;
+	br_ssl_u32 l, r;
 
 	l = *pl;
 	r = *pr;
 	for (i = 0; i < 16; i ++) {
-		uint32_t t;
+		br_ssl_u32 t;
 
 		t = l ^ Fconf(r, sk_exp);
 		l = r;
@@ -366,10 +366,10 @@ process_block_unit(uint32_t *pl, uint32_t *pr, const uint32_t *sk_exp)
 /* see inner.h */
 void
 br_des_ct_process_block(unsigned num_rounds,
-	const uint32_t *sk_exp, void *block)
+	const br_ssl_u32 *sk_exp, void *block)
 {
 	unsigned char *buf;
-	uint32_t l, r;
+	br_ssl_u32 l, r;
 
 	buf = block;
 	l = br_dec32be(buf);
@@ -386,12 +386,12 @@ br_des_ct_process_block(unsigned num_rounds,
 
 /* see inner.h */
 void
-br_des_ct_skey_expand(uint32_t *sk_exp,
-	unsigned num_rounds, const uint32_t *skey)
+br_des_ct_skey_expand(br_ssl_u32 *sk_exp,
+	unsigned num_rounds, const br_ssl_u32 *skey)
 {
 	num_rounds <<= 4;
 	while (num_rounds -- > 0) {
-		uint32_t v, w0, w1, w2, w3;
+		br_ssl_u32 v, w0, w1, w2, w3;
 
 		v = *skey ++;
 		w0 = v & 0x11111111;

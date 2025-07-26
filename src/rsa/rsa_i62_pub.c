@@ -33,17 +33,17 @@
 #define TLEN   (2 * (2 + ((BR_MAX_RSA_SIZE + 30) / 31)))
 
 /* see bearssl_rsa.h */
-uint32_t
+br_ssl_u32
 br_rsa_i62_public(unsigned char *x, size_t xlen,
 	const br_rsa_public_key *pk)
 {
 	const unsigned char *n;
 	size_t nlen;
-	uint64_t tmp[TLEN];
-	uint32_t *m, *a;
+	br_ssl_u64 tmp[TLEN];
+	br_ssl_u32 *m, *a;
 	size_t fwlen;
 	long z;
-	uint32_t m0i, r;
+	br_ssl_u32 m0i, r;
 
 	/*
 	 * Get the actual length of the modulus, and see if it fits within
@@ -73,8 +73,8 @@ br_rsa_i62_public(unsigned char *x, size_t xlen,
 	 * The modulus gets decoded into m[].
 	 * The value to exponentiate goes into a[].
 	 */
-	m = (uint32_t *)tmp;
-	a = (uint32_t *)(tmp + fwlen);
+	m = (br_ssl_u32 *)tmp;
+	a = (br_ssl_u32 *)(tmp + fwlen);
 
 	/*
 	 * Decode the modulus.

@@ -94,8 +94,8 @@ do_tag(br_sslrec_gcm_context *cc,
 	header[8] = (unsigned char)record_type;
 	br_enc16be(header + 9, version);
 	br_enc16be(header + 11, len);
-	br_enc64be(footer, (uint64_t)(sizeof header) << 3);
-	br_enc64be(footer + 8, (uint64_t)len << 3);
+	br_enc64be(footer, (br_ssl_u64)(sizeof header) << 3);
+	br_enc64be(footer + 8, (br_ssl_u64)len << 3);
 	memset(tag, 0, 16);
 	cc->gh(tag, cc->h, header, sizeof header);
 	cc->gh(tag, cc->h, data, len);
@@ -125,7 +125,7 @@ gcm_decrypt(br_sslrec_gcm_context *cc,
 {
 	unsigned char *buf;
 	size_t len, u;
-	uint32_t bad;
+	br_ssl_u32 bad;
 	unsigned char tag[16];
 
 	buf = (unsigned char *)data + 8;

@@ -54,7 +54,7 @@ kk_start_chain(const br_x509_class **ctx, const char *server_name)
 }
 
 static void
-kk_start_cert(const br_x509_class **ctx, uint32_t length)
+kk_start_cert(const br_x509_class **ctx, br_ssl_u32 length)
 {
 	(void)ctx;
 	(void)length;

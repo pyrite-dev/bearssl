@@ -26,11 +26,11 @@
 
 /* see inner.h */
 void
-br_i15_encode(void *dst, size_t len, const uint16_t *x)
+br_i15_encode(void *dst, size_t len, const br_ssl_u16 *x)
 {
 	unsigned char *buf;
 	size_t u, xlen;
-	uint32_t acc;
+	br_ssl_u32 acc;
 	int acc_len;
 
 	xlen = (x[0] + 15) >> 4;
@@ -45,7 +45,7 @@ br_i15_encode(void *dst, size_t len, const uint16_t *x)
 	while (len -- > 0) {
 		if (acc_len < 8) {
 			if (u <= xlen) {
-				acc += (uint32_t)x[u ++] << acc_len;
+				acc += (br_ssl_u32)x[u ++] << acc_len;
 			}
 			acc_len += 15;
 		}

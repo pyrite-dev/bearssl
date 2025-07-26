@@ -48,7 +48,7 @@ cc_none2(const br_ssl_client_certificate_class **pctx,
 
 static void
 cc_choose(const br_ssl_client_certificate_class **pctx,
-	const br_ssl_client_context *cc, uint32_t auth_types,
+	const br_ssl_client_context *cc, br_ssl_u32 auth_types,
 	br_ssl_client_certificate *choices)
 {
 	br_ssl_client_certificate_ec_context *zc;
@@ -88,12 +88,12 @@ cc_choose(const br_ssl_client_certificate_class **pctx,
 	choices->chain_len = zc->chain_len;
 }
 
-static uint32_t
+static br_ssl_u32
 cc_do_keyx(const br_ssl_client_certificate_class **pctx,
 	unsigned char *data, size_t *len)
 {
 	br_ssl_client_certificate_ec_context *zc;
-	uint32_t r;
+	br_ssl_u32 r;
 	size_t xoff, xlen;
 
 	zc = (br_ssl_client_certificate_ec_context *)pctx;

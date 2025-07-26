@@ -49,7 +49,7 @@ static const unsigned char PC2right[] = {
 /*
  * S-boxes and PC-1 merged.
  */
-static const uint32_t S1[] = {
+static const br_ssl_u32 S1[] = {
 	0x00808200, 0x00000000, 0x00008000, 0x00808202,
 	0x00808002, 0x00008202, 0x00000002, 0x00008000,
 	0x00000200, 0x00808200, 0x00808202, 0x00000200,
@@ -68,7 +68,7 @@ static const uint32_t S1[] = {
 	0x00008002, 0x00008200, 0x00000000, 0x00808002
 };
 
-static const uint32_t S2[] = {
+static const br_ssl_u32 S2[] = {
 	0x40084010, 0x40004000, 0x00004000, 0x00084010,
 	0x00080000, 0x00000010, 0x40080010, 0x40004010,
 	0x40000010, 0x40084010, 0x40084000, 0x40000000,
@@ -87,7 +87,7 @@ static const uint32_t S2[] = {
 	0x40000000, 0x40080010, 0x40084010, 0x00084000
 };
 
-static const uint32_t S3[] = {
+static const br_ssl_u32 S3[] = {
 	0x00000104, 0x04010100, 0x00000000, 0x04010004,
 	0x04000100, 0x00000000, 0x00010104, 0x04000100,
 	0x00010004, 0x04000004, 0x04000004, 0x00010000,
@@ -106,7 +106,7 @@ static const uint32_t S3[] = {
 	0x00010104, 0x00000004, 0x04010004, 0x00010100
 };
 
-static const uint32_t S4[] = {
+static const br_ssl_u32 S4[] = {
 	0x80401000, 0x80001040, 0x80001040, 0x00000040,
 	0x00401040, 0x80400040, 0x80400000, 0x80001000,
 	0x00000000, 0x00401000, 0x00401000, 0x80401040,
@@ -125,7 +125,7 @@ static const uint32_t S4[] = {
 	0x00000040, 0x00400000, 0x00001000, 0x00401040
 };
 
-static const uint32_t S5[] = {
+static const br_ssl_u32 S5[] = {
 	0x00000080, 0x01040080, 0x01040000, 0x21000080,
 	0x00040000, 0x00000080, 0x20000000, 0x01040000,
 	0x20040080, 0x00040000, 0x01000080, 0x20040080,
@@ -144,7 +144,7 @@ static const uint32_t S5[] = {
 	0x00000000, 0x20040000, 0x01040080, 0x20000080
 };
 
-static const uint32_t S6[] = {
+static const br_ssl_u32 S6[] = {
 	0x10000008, 0x10200000, 0x00002000, 0x10202008,
 	0x10200000, 0x00000008, 0x10202008, 0x00200000,
 	0x10002000, 0x00202008, 0x00200000, 0x10000008,
@@ -163,7 +163,7 @@ static const uint32_t S6[] = {
 	0x10202000, 0x10000000, 0x00200008, 0x10002008
 };
 
-static const uint32_t S7[] = {
+static const br_ssl_u32 S7[] = {
 	0x00100000, 0x02100001, 0x02000401, 0x00000000,
 	0x00000400, 0x02000401, 0x00100401, 0x02100400,
 	0x02100401, 0x00100000, 0x00000000, 0x02000001,
@@ -182,7 +182,7 @@ static const uint32_t S7[] = {
 	0x02000001, 0x02000400, 0x00000400, 0x00100001
 };
 
-static const uint32_t S8[] = {
+static const br_ssl_u32 S8[] = {
 	0x08000820, 0x00000800, 0x00020000, 0x08020820,
 	0x08000000, 0x08000820, 0x00000020, 0x08000000,
 	0x00020020, 0x08020000, 0x08020820, 0x00020800,
@@ -201,10 +201,10 @@ static const uint32_t S8[] = {
 	0x00000820, 0x00020020, 0x08000000, 0x08020800
 };
 
-static inline uint32_t
-Fconf(uint32_t r0, uint32_t skl, uint32_t skr)
+static inline br_ssl_u32
+Fconf(br_ssl_u32 r0, br_ssl_u32 skl, br_ssl_u32 skr)
 {
-	uint32_t r1;
+	br_ssl_u32 r1;
 
 	r1 = (r0 << 16) | (r0 >> 16);
 	return
@@ -219,15 +219,15 @@ Fconf(uint32_t r0, uint32_t skl, uint32_t skr)
 }
 
 static void
-process_block_unit(uint32_t *pl, uint32_t *pr, const uint32_t *skey)
+process_block_unit(br_ssl_u32 *pl, br_ssl_u32 *pr, const br_ssl_u32 *skey)
 {
 	int i;
-	uint32_t l, r;
+	br_ssl_u32 l, r;
 
 	l = *pl;
 	r = *pr;
 	for (i = 0; i < 16; i ++) {
-		uint32_t t;
+		br_ssl_u32 t;
 
 		t = l ^ Fconf(r, skey[(i << 1) + 0], skey[(i << 1) + 1]);
 		l = r;
@@ -239,10 +239,10 @@ process_block_unit(uint32_t *pl, uint32_t *pr, const uint32_t *skey)
 
 /* see inner.h */
 void
-br_des_tab_process_block(unsigned num_rounds, const uint32_t *skey, void *block)
+br_des_tab_process_block(unsigned num_rounds, const br_ssl_u32 *skey, void *block)
 {
 	unsigned char *buf;
-	uint32_t l, r;
+	br_ssl_u32 l, r;
 
 	buf = block;
 	l = br_dec32be(buf);
@@ -258,7 +258,7 @@ br_des_tab_process_block(unsigned num_rounds, const uint32_t *skey, void *block)
 }
 
 static void
-keysched_unit(uint32_t *skey, const void *key)
+keysched_unit(br_ssl_u32 *skey, const void *key)
 {
 	int i;
 
@@ -268,7 +268,7 @@ keysched_unit(uint32_t *skey, const void *key)
 	 * Apply PC-2 to get the 48-bit subkeys.
 	 */
 	for (i = 0; i < 16; i ++) {
-		uint32_t xl, xr, ul, ur;
+		br_ssl_u32 xl, xr, ul, ur;
 		int j;
 
 		xl = skey[(i << 1) + 0];
@@ -288,7 +288,7 @@ keysched_unit(uint32_t *skey, const void *key)
 
 /* see inner.h */
 unsigned
-br_des_tab_keysched(uint32_t *skey, const void *key, size_t key_len)
+br_des_tab_keysched(br_ssl_u32 *skey, const void *key, size_t key_len)
 {
 	switch (key_len) {
 	case 8:

@@ -470,18 +470,18 @@
  */
 
 typedef union {
-	uint16_t u;
-	unsigned char b[sizeof(uint16_t)];
+	br_ssl_u16 u;
+	unsigned char b[sizeof(br_ssl_u16)];
 } br_union_u16;
 
 typedef union {
-	uint32_t u;
-	unsigned char b[sizeof(uint32_t)];
+	br_ssl_u32 u;
+	unsigned char b[sizeof(br_ssl_u32)];
 } br_union_u32;
 
 typedef union {
-	uint64_t u;
-	unsigned char b[sizeof(uint64_t)];
+	br_ssl_u64 u;
+	unsigned char b[sizeof(br_ssl_u64)];
 } br_union_u64;
 
 static inline void
@@ -539,7 +539,7 @@ br_dec16be(const void *src)
 }
 
 static inline void
-br_enc32le(void *dst, uint32_t x)
+br_enc32le(void *dst, br_ssl_u32 x)
 {
 #if BR_LE_UNALIGNED
 	((br_union_u32 *)dst)->u = x;
@@ -555,7 +555,7 @@ br_enc32le(void *dst, uint32_t x)
 }
 
 static inline void
-br_enc32be(void *dst, uint32_t x)
+br_enc32be(void *dst, br_ssl_u32 x)
 {
 #if BR_BE_UNALIGNED
 	((br_union_u32 *)dst)->u = x;
@@ -570,7 +570,7 @@ br_enc32be(void *dst, uint32_t x)
 #endif
 }
 
-static inline uint32_t
+static inline br_ssl_u32
 br_dec32le(const void *src)
 {
 #if BR_LE_UNALIGNED
@@ -579,14 +579,14 @@ br_dec32le(const void *src)
 	const unsigned char *buf;
 
 	buf = src;
-	return (uint32_t)buf[0]
-		| ((uint32_t)buf[1] << 8)
-		| ((uint32_t)buf[2] << 16)
-		| ((uint32_t)buf[3] << 24);
+	return (br_ssl_u32)buf[0]
+		| ((br_ssl_u32)buf[1] << 8)
+		| ((br_ssl_u32)buf[2] << 16)
+		| ((br_ssl_u32)buf[3] << 24);
 #endif
 }
 
-static inline uint32_t
+static inline br_ssl_u32
 br_dec32be(const void *src)
 {
 #if BR_BE_UNALIGNED
@@ -595,15 +595,15 @@ br_dec32be(const void *src)
 	const unsigned char *buf;
 
 	buf = src;
-	return ((uint32_t)buf[0] << 24)
-		| ((uint32_t)buf[1] << 16)
-		| ((uint32_t)buf[2] << 8)
-		| (uint32_t)buf[3];
+	return ((br_ssl_u32)buf[0] << 24)
+		| ((br_ssl_u32)buf[1] << 16)
+		| ((br_ssl_u32)buf[2] << 8)
+		| (br_ssl_u32)buf[3];
 #endif
 }
 
 static inline void
-br_enc64le(void *dst, uint64_t x)
+br_enc64le(void *dst, br_ssl_u64 x)
 {
 #if BR_LE_UNALIGNED
 	((br_union_u64 *)dst)->u = x;
@@ -611,13 +611,13 @@ br_enc64le(void *dst, uint64_t x)
 	unsigned char *buf;
 
 	buf = dst;
-	br_enc32le(buf, (uint32_t)x);
-	br_enc32le(buf + 4, (uint32_t)(x >> 32));
+	br_enc32le(buf, (br_ssl_u32)x);
+	br_enc32le(buf + 4, (br_ssl_u32)(x >> 32));
 #endif
 }
 
 static inline void
-br_enc64be(void *dst, uint64_t x)
+br_enc64be(void *dst, br_ssl_u64 x)
 {
 #if BR_BE_UNALIGNED
 	((br_union_u64 *)dst)->u = x;
@@ -625,12 +625,12 @@ br_enc64be(void *dst, uint64_t x)
 	unsigned char *buf;
 
 	buf = dst;
-	br_enc32be(buf, (uint32_t)(x >> 32));
-	br_enc32be(buf + 4, (uint32_t)x);
+	br_enc32be(buf, (br_ssl_u32)(x >> 32));
+	br_enc32be(buf + 4, (br_ssl_u32)x);
 #endif
 }
 
-static inline uint64_t
+static inline br_ssl_u64
 br_dec64le(const void *src)
 {
 #if BR_LE_UNALIGNED
@@ -639,12 +639,12 @@ br_dec64le(const void *src)
 	const unsigned char *buf;
 
 	buf = src;
-	return (uint64_t)br_dec32le(buf)
-		| ((uint64_t)br_dec32le(buf + 4) << 32);
+	return (br_ssl_u64)br_dec32le(buf)
+		| ((br_ssl_u64)br_dec32le(buf + 4) << 32);
 #endif
 }
 
-static inline uint64_t
+static inline br_ssl_u64
 br_dec64be(const void *src)
 {
 #if BR_BE_UNALIGNED
@@ -653,37 +653,37 @@ br_dec64be(const void *src)
 	const unsigned char *buf;
 
 	buf = src;
-	return ((uint64_t)br_dec32be(buf) << 32)
-		| (uint64_t)br_dec32be(buf + 4);
+	return ((br_ssl_u64)br_dec32be(buf) << 32)
+		| (br_ssl_u64)br_dec32be(buf + 4);
 #endif
 }
 
 /*
  * Range decoding and encoding (for several successive values).
  */
-void br_range_dec16le(uint16_t *v, size_t num, const void *src);
-void br_range_dec16be(uint16_t *v, size_t num, const void *src);
-void br_range_enc16le(void *dst, const uint16_t *v, size_t num);
-void br_range_enc16be(void *dst, const uint16_t *v, size_t num);
+void br_range_dec16le(br_ssl_u16 *v, size_t num, const void *src);
+void br_range_dec16be(br_ssl_u16 *v, size_t num, const void *src);
+void br_range_enc16le(void *dst, const br_ssl_u16 *v, size_t num);
+void br_range_enc16be(void *dst, const br_ssl_u16 *v, size_t num);
 
-void br_range_dec32le(uint32_t *v, size_t num, const void *src);
-void br_range_dec32be(uint32_t *v, size_t num, const void *src);
-void br_range_enc32le(void *dst, const uint32_t *v, size_t num);
-void br_range_enc32be(void *dst, const uint32_t *v, size_t num);
+void br_range_dec32le(br_ssl_u32 *v, size_t num, const void *src);
+void br_range_dec32be(br_ssl_u32 *v, size_t num, const void *src);
+void br_range_enc32le(void *dst, const br_ssl_u32 *v, size_t num);
+void br_range_enc32be(void *dst, const br_ssl_u32 *v, size_t num);
 
-void br_range_dec64le(uint64_t *v, size_t num, const void *src);
-void br_range_dec64be(uint64_t *v, size_t num, const void *src);
-void br_range_enc64le(void *dst, const uint64_t *v, size_t num);
-void br_range_enc64be(void *dst, const uint64_t *v, size_t num);
+void br_range_dec64le(br_ssl_u64 *v, size_t num, const void *src);
+void br_range_dec64be(br_ssl_u64 *v, size_t num, const void *src);
+void br_range_enc64le(void *dst, const br_ssl_u64 *v, size_t num);
+void br_range_enc64be(void *dst, const br_ssl_u64 *v, size_t num);
 
 /*
  * Byte-swap a 32-bit integer.
  */
-static inline uint32_t
-br_swap32(uint32_t x)
+static inline br_ssl_u32
+br_swap32(br_ssl_u32 x)
 {
-	x = ((x & (uint32_t)0x00FF00FF) << 8)
-		| ((x >> 8) & (uint32_t)0x00FF00FF);
+	x = ((x & (br_ssl_u32)0x00FF00FF) << 8)
+		| ((x >> 8) & (br_ssl_u32)0x00FF00FF);
 	return (x << 16) | (x >> 16);
 }
 
@@ -695,18 +695,18 @@ br_swap32(uint32_t x)
 /*
  * IV for MD5, SHA-1, SHA-224 and SHA-256.
  */
-extern const uint32_t br_md5_IV[];
-extern const uint32_t br_sha1_IV[];
-extern const uint32_t br_sha224_IV[];
-extern const uint32_t br_sha256_IV[];
+extern const br_ssl_u32 br_md5_IV[];
+extern const br_ssl_u32 br_sha1_IV[];
+extern const br_ssl_u32 br_sha224_IV[];
+extern const br_ssl_u32 br_sha256_IV[];
 
 /*
  * Round functions for MD5, SHA-1, SHA-224 and SHA-256 (SHA-224 and
  * SHA-256 use the same round function).
  */
-void br_md5_round(const unsigned char *buf, uint32_t *val);
-void br_sha1_round(const unsigned char *buf, uint32_t *val);
-void br_sha2small_round(const unsigned char *buf, uint32_t *val);
+void br_md5_round(const unsigned char *buf, br_ssl_u32 *val);
+void br_sha1_round(const unsigned char *buf, br_ssl_u32 *val);
+void br_sha2small_round(const unsigned char *buf, br_ssl_u32 *val);
 
 /*
  * The core function for the TLS PRF. It computes
@@ -757,8 +757,8 @@ br_multihash_copyimpl(br_multihash_context *dst,
 /*
  * Negate a boolean.
  */
-static inline uint32_t
-NOT(uint32_t ctl)
+static inline br_ssl_u32
+NOT(br_ssl_u32 ctl)
 {
 	return ctl ^ 1;
 }
@@ -766,8 +766,8 @@ NOT(uint32_t ctl)
 /*
  * Multiplexer: returns x if ctl == 1, y if ctl == 0.
  */
-static inline uint32_t
-MUX(uint32_t ctl, uint32_t x, uint32_t y)
+static inline br_ssl_u32
+MUX(br_ssl_u32 ctl, br_ssl_u32 x, br_ssl_u32 y)
 {
 	return y ^ (-ctl & (x ^ y));
 }
@@ -775,10 +775,10 @@ MUX(uint32_t ctl, uint32_t x, uint32_t y)
 /*
  * Equality check: returns 1 if x == y, 0 otherwise.
  */
-static inline uint32_t
-EQ(uint32_t x, uint32_t y)
+static inline br_ssl_u32
+EQ(br_ssl_u32 x, br_ssl_u32 y)
 {
-	uint32_t q;
+	br_ssl_u32 q;
 
 	q = x ^ y;
 	return NOT((q | -q) >> 31);
@@ -787,10 +787,10 @@ EQ(uint32_t x, uint32_t y)
 /*
  * Inequality check: returns 1 if x != y, 0 otherwise.
  */
-static inline uint32_t
-NEQ(uint32_t x, uint32_t y)
+static inline br_ssl_u32
+NEQ(br_ssl_u32 x, br_ssl_u32 y)
 {
-	uint32_t q;
+	br_ssl_u32 q;
 
 	q = x ^ y;
 	return (q | -q) >> 31;
@@ -799,8 +799,8 @@ NEQ(uint32_t x, uint32_t y)
 /*
  * Comparison: returns 1 if x > y, 0 otherwise.
  */
-static inline uint32_t
-GT(uint32_t x, uint32_t y)
+static inline br_ssl_u32
+GT(br_ssl_u32 x, br_ssl_u32 y)
 {
 	/*
 	 * If both x < 2^31 and x < 2^31, then y-x will have its high
@@ -814,7 +814,7 @@ GT(uint32_t x, uint32_t y)
 	 * Since (y-2^31)-(x-2^31) = y-x, the subtraction is already
 	 * fine.
 	 */
-	uint32_t z;
+	br_ssl_u32 z;
 
 	z = y - x;
 	return (z ^ ((x ^ y) & (x ^ z))) >> 31;
@@ -831,71 +831,71 @@ GT(uint32_t x, uint32_t y)
  * General comparison: returned value is -1, 0 or 1, depending on
  * whether x is lower than, equal to, or greater than y.
  */
-static inline int32_t
-CMP(uint32_t x, uint32_t y)
+static inline br_ssl_i32
+CMP(br_ssl_u32 x, br_ssl_u32 y)
 {
-	return (int32_t)GT(x, y) | -(int32_t)GT(y, x);
+	return (br_ssl_i32)GT(x, y) | -(br_ssl_i32)GT(y, x);
 }
 
 /*
  * Returns 1 if x == 0, 0 otherwise. Take care that the operand is signed.
  */
-static inline uint32_t
-EQ0(int32_t x)
+static inline br_ssl_u32
+EQ0(br_ssl_i32 x)
 {
-	uint32_t q;
+	br_ssl_u32 q;
 
-	q = (uint32_t)x;
+	q = (br_ssl_u32)x;
 	return ~(q | -q) >> 31;
 }
 
 /*
  * Returns 1 if x > 0, 0 otherwise. Take care that the operand is signed.
  */
-static inline uint32_t
-GT0(int32_t x)
+static inline br_ssl_u32
+GT0(br_ssl_i32 x)
 {
 	/*
 	 * High bit of -x is 0 if x == 0, but 1 if x > 0.
 	 */
-	uint32_t q;
+	br_ssl_u32 q;
 
-	q = (uint32_t)x;
+	q = (br_ssl_u32)x;
 	return (~q & -q) >> 31;
 }
 
 /*
  * Returns 1 if x >= 0, 0 otherwise. Take care that the operand is signed.
  */
-static inline uint32_t
-GE0(int32_t x)
+static inline br_ssl_u32
+GE0(br_ssl_i32 x)
 {
-	return ~(uint32_t)x >> 31;
+	return ~(br_ssl_u32)x >> 31;
 }
 
 /*
  * Returns 1 if x < 0, 0 otherwise. Take care that the operand is signed.
  */
-static inline uint32_t
-LT0(int32_t x)
+static inline br_ssl_u32
+LT0(br_ssl_i32 x)
 {
-	return (uint32_t)x >> 31;
+	return (br_ssl_u32)x >> 31;
 }
 
 /*
  * Returns 1 if x <= 0, 0 otherwise. Take care that the operand is signed.
  */
-static inline uint32_t
-LE0(int32_t x)
+static inline br_ssl_u32
+LE0(br_ssl_i32 x)
 {
-	uint32_t q;
+	br_ssl_u32 q;
 
 	/*
 	 * ~-x has its high bit set if and only if -x is nonnegative (as
 	 * a signed int), i.e. x is in the -(2^31-1) to 0 range. We must
 	 * do an OR with x itself to account for x = -2^31.
 	 */
-	q = (uint32_t)x;
+	q = (br_ssl_u32)x;
 	return (q | ~-q) >> 31;
 }
 
@@ -903,7 +903,7 @@ LE0(int32_t x)
  * Conditional copy: src[] is copied into dst[] if and only if ctl is 1.
  * dst[] and src[] may overlap completely (but not partially).
  */
-void br_ccopy(uint32_t ctl, void *dst, const void *src, size_t len);
+void br_ccopy(br_ssl_u32 ctl, void *dst, const void *src, size_t len);
 
 #define CCOPY   br_ccopy
 
@@ -911,10 +911,10 @@ void br_ccopy(uint32_t ctl, void *dst, const void *src, size_t len);
  * Compute the bit length of a 32-bit integer. Returned value is between 0
  * and 32 (inclusive).
  */
-static inline uint32_t
-BIT_LENGTH(uint32_t x)
+static inline br_ssl_u32
+BIT_LENGTH(br_ssl_u32 x)
 {
-	uint32_t k, c;
+	br_ssl_u32 k, c;
 
 	k = NEQ(x, 0);
 	c = GT(x, 0xFFFF); x = MUX(c, x >> 16, x); k += c << 4;
@@ -928,8 +928,8 @@ BIT_LENGTH(uint32_t x)
 /*
  * Compute the minimum of x and y.
  */
-static inline uint32_t
-MIN(uint32_t x, uint32_t y)
+static inline br_ssl_u32
+MIN(br_ssl_u32 x, br_ssl_u32 y)
 {
 	return MUX(GT(x, y), y, x);
 }
@@ -937,8 +937,8 @@ MIN(uint32_t x, uint32_t y)
 /*
  * Compute the maximum of x and y.
  */
-static inline uint32_t
-MAX(uint32_t x, uint32_t y)
+static inline br_ssl_u32
+MAX(br_ssl_u32 x, br_ssl_u32 y)
 {
 	return MUX(GT(x, y), x, y);
 }
@@ -948,7 +948,7 @@ MAX(uint32_t x, uint32_t y)
  * implementation assumes that the basic multiplication operator
  * yields constant-time code.
  */
-#define MUL(x, y)   ((uint64_t)(x) * (uint64_t)(y))
+#define MUL(x, y)   ((br_ssl_u64)(x) * (br_ssl_u64)(y))
 
 #if BR_CT_MUL31
 
@@ -965,21 +965,21 @@ MAX(uint32_t x, uint32_t y)
  * word, and then replace automatically the unsigned multiplication with
  * a signed multiplication opcode.
  */
-#define MUL31(x, y)   ((uint64_t)((x) | (uint32_t)0x80000000) \
-                       * (uint64_t)((y) | (uint32_t)0x80000000) \
-                       - ((uint64_t)(x) << 31) - ((uint64_t)(y) << 31) \
-                       - ((uint64_t)1 << 62))
-static inline uint32_t
-MUL31_lo(uint32_t x, uint32_t y)
+#define MUL31(x, y)   ((br_ssl_u64)((x) | (br_ssl_u32)0x80000000) \
+                       * (br_ssl_u64)((y) | (br_ssl_u32)0x80000000) \
+                       - ((br_ssl_u64)(x) << 31) - ((br_ssl_u64)(y) << 31) \
+                       - ((br_ssl_u64)1 << 62))
+static inline br_ssl_u32
+MUL31_lo(br_ssl_u32 x, br_ssl_u32 y)
 {
-	uint32_t xl, xh;
-	uint32_t yl, yh;
+	br_ssl_u32 xl, xh;
+	br_ssl_u32 yl, yh;
 
-	xl = (x & 0xFFFF) | (uint32_t)0x80000000;
-	xh = (x >> 16) | (uint32_t)0x80000000;
-	yl = (y & 0xFFFF) | (uint32_t)0x80000000;
-	yh = (y >> 16) | (uint32_t)0x80000000;
-	return (xl * yl + ((xl * yh + xh * yl) << 16)) & (uint32_t)0x7FFFFFFF;
+	xl = (x & 0xFFFF) | (br_ssl_u32)0x80000000;
+	xh = (x >> 16) | (br_ssl_u32)0x80000000;
+	yl = (y & 0xFFFF) | (br_ssl_u32)0x80000000;
+	yh = (y >> 16) | (br_ssl_u32)0x80000000;
+	return (xl * yl + ((xl * yh + xh * yl) << 16)) & (br_ssl_u32)0x7FFFFFFF;
 }
 
 #else
@@ -990,8 +990,8 @@ MUL31_lo(uint32_t x, uint32_t y)
  * yields constant-time code.
  * The MUL31_lo() macro returns only the low 31 bits of the product.
  */
-#define MUL31(x, y)     ((uint64_t)(x) * (uint64_t)(y))
-#define MUL31_lo(x, y)  (((uint32_t)(x) * (uint32_t)(y)) & (uint32_t)0x7FFFFFFF)
+#define MUL31(x, y)     ((br_ssl_u64)(x) * (br_ssl_u64)(y))
+#define MUL31_lo(x, y)  (((br_ssl_u32)(x) * (br_ssl_u32)(y)) & (br_ssl_u32)0x7FFFFFFF)
 
 #endif
 
@@ -1004,11 +1004,11 @@ MUL31_lo(uint32_t x, uint32_t y)
  * multiplication is not constant-time.
  */
 #if BR_CT_MUL15
-#define MUL15(x, y)   (((uint32_t)(x) | (uint32_t)0x80000000) \
-                       * ((uint32_t)(y) | (uint32_t)0x80000000) \
-		       & (uint32_t)0x7FFFFFFF)
+#define MUL15(x, y)   (((br_ssl_u32)(x) | (br_ssl_u32)0x80000000) \
+                       * ((br_ssl_u32)(y) | (br_ssl_u32)0x80000000) \
+		       & (br_ssl_u32)0x7FFFFFFF)
 #else
-#define MUL15(x, y)   ((uint32_t)(x) * (uint32_t)(y))
+#define MUL15(x, y)   ((br_ssl_u32)(x) * (br_ssl_u32)(y))
 #endif
 
 /*
@@ -1027,10 +1027,10 @@ MUL31_lo(uint32_t x, uint32_t y)
  * and yields bigger code, which is why it is deactivated by default.
  */
 #if BR_NO_ARITH_SHIFT
-#define ARSH(x, n)   (((uint32_t)(x) >> (n)) \
-                      | ((-((uint32_t)(x) >> 31)) << (32 - (n))))
+#define ARSH(x, n)   (((br_ssl_u32)(x) >> (n)) \
+                      | ((-((br_ssl_u32)(x) >> 31)) << (32 - (n))))
 #else
-#define ARSH(x, n)   ((*(int32_t *)&(x)) >> (n))
+#define ARSH(x, n)   ((*(br_ssl_i32 *)&(x)) >> (n))
 #endif
 
 /*
@@ -1040,16 +1040,16 @@ MUL31_lo(uint32_t x, uint32_t y)
  * returned value is thus truncated. If hi > d, returned values are
  * indeterminate.
  */
-uint32_t br_divrem(uint32_t hi, uint32_t lo, uint32_t d, uint32_t *r);
+br_ssl_u32 br_divrem(br_ssl_u32 hi, br_ssl_u32 lo, br_ssl_u32 d, br_ssl_u32 *r);
 
 /*
  * Wrapper for br_divrem(); the remainder is returned, and the quotient
  * is discarded.
  */
-static inline uint32_t
-br_rem(uint32_t hi, uint32_t lo, uint32_t d)
+static inline br_ssl_u32
+br_rem(br_ssl_u32 hi, br_ssl_u32 lo, br_ssl_u32 d)
 {
-	uint32_t r;
+	br_ssl_u32 r;
 
 	br_divrem(hi, lo, d, &r);
 	return r;
@@ -1059,10 +1059,10 @@ br_rem(uint32_t hi, uint32_t lo, uint32_t d)
  * Wrapper for br_divrem(); the quotient is returned, and the remainder
  * is discarded.
  */
-static inline uint32_t
-br_div(uint32_t hi, uint32_t lo, uint32_t d)
+static inline br_ssl_u32
+br_div(br_ssl_u32 hi, br_ssl_u32 lo, br_ssl_u32 d)
 {
-	uint32_t r;
+	br_ssl_u32 r;
 
 	return br_divrem(hi, lo, d, &r);
 }
@@ -1102,7 +1102,7 @@ br_div(uint32_t hi, uint32_t lo, uint32_t d)
  *
  * CT: value or length of x does not leak.
  */
-uint32_t br_i32_bit_length(uint32_t *x, size_t xlen);
+br_ssl_u32 br_i32_bit_length(br_ssl_u32 *x, size_t xlen);
 
 /*
  * Decode an integer from its big-endian unsigned representation. The
@@ -1111,7 +1111,7 @@ uint32_t br_i32_bit_length(uint32_t *x, size_t xlen);
  *
  * CT: value or length of x does not leak.
  */
-void br_i32_decode(uint32_t *x, const void *src, size_t len);
+void br_i32_decode(br_ssl_u32 *x, const void *src, size_t len);
 
 /*
  * Decode an integer from its big-endian unsigned representation. The
@@ -1127,8 +1127,8 @@ void br_i32_decode(uint32_t *x, const void *src, size_t len);
  * only of 'len' and the announced bit length of m. Whether x fits or
  * not does not leak either.
  */
-uint32_t br_i32_decode_mod(uint32_t *x,
-	const void *src, size_t len, const uint32_t *m);
+br_ssl_u32 br_i32_decode_mod(br_ssl_u32 *x,
+	const void *src, size_t len, const br_ssl_u32 *m);
 
 /*
  * Reduce an integer (a[]) modulo another (m[]). The result is written
@@ -1138,7 +1138,7 @@ uint32_t br_i32_decode_mod(uint32_t *x,
  *
  * CT: only announced bit lengths leak, not values of x, a or m.
  */
-void br_i32_reduce(uint32_t *x, const uint32_t *a, const uint32_t *m);
+void br_i32_reduce(br_ssl_u32 *x, const br_ssl_u32 *a, const br_ssl_u32 *m);
 
 /*
  * Decode an integer from its big-endian unsigned representation, and
@@ -1147,8 +1147,8 @@ void br_i32_reduce(uint32_t *x, const uint32_t *a, const uint32_t *m);
  *
  * x[] MUST be distinct from m[].
  */
-void br_i32_decode_reduce(uint32_t *x,
-	const void *src, size_t len, const uint32_t *m);
+void br_i32_decode_reduce(br_ssl_u32 *x,
+	const void *src, size_t len, const br_ssl_u32 *m);
 
 /*
  * Encode an integer into its big-endian unsigned representation. The
@@ -1156,7 +1156,7 @@ void br_i32_decode_reduce(uint32_t *x,
  * is too short then the integer is appropriately truncated; if it is
  * too long then the extra bytes are set to 0.
  */
-void br_i32_encode(void *dst, size_t len, const uint32_t *x);
+void br_i32_encode(void *dst, size_t len, const br_ssl_u32 *x);
 
 /*
  * Multiply x[] by 2^32 and then add integer z, modulo m[]. This
@@ -1169,15 +1169,15 @@ void br_i32_encode(void *dst, size_t len, const uint32_t *x);
  * CT: only the common announced bit length of x and m leaks, not
  * the values of x, z or m.
  */
-void br_i32_muladd_small(uint32_t *x, uint32_t z, const uint32_t *m);
+void br_i32_muladd_small(br_ssl_u32 *x, br_ssl_u32 z, const br_ssl_u32 *m);
 
 /*
  * Extract one word from an integer. The offset is counted in bits.
  * The word MUST entirely fit within the word elements corresponding
  * to the announced bit length of a[].
  */
-static inline uint32_t
-br_i32_word(const uint32_t *a, uint32_t off)
+static inline br_ssl_u32
+br_i32_word(const br_ssl_u32 *a, br_ssl_u32 off)
 {
 	size_t u;
 	unsigned j;
@@ -1194,7 +1194,7 @@ br_i32_word(const uint32_t *a, uint32_t off)
 /*
  * Test whether an integer is zero.
  */
-uint32_t br_i32_iszero(const uint32_t *x);
+br_ssl_u32 br_i32_iszero(const br_ssl_u32 *x);
 
 /*
  * Add b[] to a[] and return the carry (0 or 1). If ctl is 0, then a[]
@@ -1203,7 +1203,7 @@ uint32_t br_i32_iszero(const uint32_t *x);
  *
  * a[] and b[] MAY be the same array, but partial overlap is not allowed.
  */
-uint32_t br_i32_add(uint32_t *a, const uint32_t *b, uint32_t ctl);
+br_ssl_u32 br_i32_add(br_ssl_u32 *a, const br_ssl_u32 *b, br_ssl_u32 ctl);
 
 /*
  * Subtract b[] from a[] and return the carry (0 or 1). If ctl is 0,
@@ -1212,7 +1212,7 @@ uint32_t br_i32_add(uint32_t *a, const uint32_t *b, uint32_t ctl);
  *
  * a[] and b[] MAY be the same array, but partial overlap is not allowed.
  */
-uint32_t br_i32_sub(uint32_t *a, const uint32_t *b, uint32_t ctl);
+br_ssl_u32 br_i32_sub(br_ssl_u32 *a, const br_ssl_u32 *b, br_ssl_u32 ctl);
 
 /*
  * Compute d+a*b, result in d. The initial announced bit length of d[]
@@ -1225,14 +1225,14 @@ uint32_t br_i32_sub(uint32_t *a, const uint32_t *b, uint32_t ctl);
  * a[] and b[] may be the same array. d[] must be disjoint from both a[]
  * and b[].
  */
-void br_i32_mulacc(uint32_t *d, const uint32_t *a, const uint32_t *b);
+void br_i32_mulacc(br_ssl_u32 *d, const br_ssl_u32 *a, const br_ssl_u32 *b);
 
 /*
  * Zeroize an integer. The announced bit length is set to the provided
  * value, and the corresponding words are set to 0.
  */
 static inline void
-br_i32_zero(uint32_t *x, uint32_t bit_len)
+br_i32_zero(br_ssl_u32 *x, br_ssl_u32 bit_len)
 {
 	*x ++ = bit_len;
 	memset(x, 0, ((bit_len + 31) >> 5) * sizeof *x);
@@ -1241,13 +1241,13 @@ br_i32_zero(uint32_t *x, uint32_t bit_len)
 /*
  * Compute -(1/x) mod 2^32. If x is even, then this function returns 0.
  */
-uint32_t br_i32_ninv32(uint32_t x);
+br_ssl_u32 br_i32_ninv32(br_ssl_u32 x);
 
 /*
  * Convert a modular integer to Montgomery representation. The integer x[]
  * MUST be lower than m[], but with the same announced bit length.
  */
-void br_i32_to_monty(uint32_t *x, const uint32_t *m);
+void br_i32_to_monty(br_ssl_u32 *x, const br_ssl_u32 *m);
 
 /*
  * Convert a modular integer back from Montgomery representation. The
@@ -1256,7 +1256,7 @@ void br_i32_to_monty(uint32_t *x, const uint32_t *m);
  * the least significant value word of m[] (this works only if m[] is
  * an odd integer).
  */
-void br_i32_from_monty(uint32_t *x, const uint32_t *m, uint32_t m0i);
+void br_i32_from_monty(br_ssl_u32 *x, const br_ssl_u32 *m, br_ssl_u32 m0i);
 
 /*
  * Compute a modular Montgomery multiplication. d[] is filled with the
@@ -1267,8 +1267,8 @@ void br_i32_from_monty(uint32_t *x, const uint32_t *m, uint32_t m0i);
  * significant value word of m[] (this works only if m[] is an odd
  * integer).
  */
-void br_i32_montymul(uint32_t *d, const uint32_t *x, const uint32_t *y,
-	const uint32_t *m, uint32_t m0i);
+void br_i32_montymul(br_ssl_u32 *d, const br_ssl_u32 *x, const br_ssl_u32 *y,
+	const br_ssl_u32 *m, br_ssl_u32 m0i);
 
 /*
  * Compute a modular exponentiation. x[] MUST be an integer modulo m[]
@@ -1279,8 +1279,8 @@ void br_i32_montymul(uint32_t *d, const uint32_t *x, const uint32_t *y,
  * integer). The t1[] and t2[] parameters must be temporary arrays,
  * each large enough to accommodate an integer with the same size as m[].
  */
-void br_i32_modpow(uint32_t *x, const unsigned char *e, size_t elen,
-	const uint32_t *m, uint32_t m0i, uint32_t *t1, uint32_t *t2);
+void br_i32_modpow(br_ssl_u32 *x, const unsigned char *e, size_t elen,
+	const br_ssl_u32 *m, br_ssl_u32 m0i, br_ssl_u32 *t1, br_ssl_u32 *t2);
 
 /* ==================================================================== */
 
@@ -1316,7 +1316,7 @@ void br_i32_modpow(uint32_t *x, const unsigned char *e, size_t elen,
 /*
  * Test whether an integer is zero.
  */
-uint32_t br_i31_iszero(const uint32_t *x);
+br_ssl_u32 br_i31_iszero(const br_ssl_u32 *x);
 
 /*
  * Add b[] to a[] and return the carry (0 or 1). If ctl is 0, then a[]
@@ -1325,7 +1325,7 @@ uint32_t br_i31_iszero(const uint32_t *x);
  *
  * a[] and b[] MAY be the same array, but partial overlap is not allowed.
  */
-uint32_t br_i31_add(uint32_t *a, const uint32_t *b, uint32_t ctl);
+br_ssl_u32 br_i31_add(br_ssl_u32 *a, const br_ssl_u32 *b, br_ssl_u32 ctl);
 
 /*
  * Subtract b[] from a[] and return the carry (0 or 1). If ctl is 0,
@@ -1334,7 +1334,7 @@ uint32_t br_i31_add(uint32_t *a, const uint32_t *b, uint32_t ctl);
  *
  * a[] and b[] MAY be the same array, but partial overlap is not allowed.
  */
-uint32_t br_i31_sub(uint32_t *a, const uint32_t *b, uint32_t ctl);
+br_ssl_u32 br_i31_sub(br_ssl_u32 *a, const br_ssl_u32 *b, br_ssl_u32 ctl);
 
 /*
  * Compute the ENCODED actual bit length of an integer. The argument x
@@ -1345,7 +1345,7 @@ uint32_t br_i31_sub(uint32_t *a, const uint32_t *b, uint32_t ctl);
  *
  * CT: value or length of x does not leak.
  */
-uint32_t br_i31_bit_length(uint32_t *x, size_t xlen);
+br_ssl_u32 br_i31_bit_length(br_ssl_u32 *x, size_t xlen);
 
 /*
  * Decode an integer from its big-endian unsigned representation. The
@@ -1355,7 +1355,7 @@ uint32_t br_i31_bit_length(uint32_t *x, size_t xlen);
  *
  * CT: value or length of x does not leak.
  */
-void br_i31_decode(uint32_t *x, const void *src, size_t len);
+void br_i31_decode(br_ssl_u32 *x, const void *src, size_t len);
 
 /*
  * Decode an integer from its big-endian unsigned representation. The
@@ -1371,8 +1371,8 @@ void br_i31_decode(uint32_t *x, const void *src, size_t len);
  * only of 'len' and the announced bit length of m. Whether x fits or
  * not does not leak either.
  */
-uint32_t br_i31_decode_mod(uint32_t *x,
-	const void *src, size_t len, const uint32_t *m);
+br_ssl_u32 br_i31_decode_mod(br_ssl_u32 *x,
+	const void *src, size_t len, const br_ssl_u32 *m);
 
 /*
  * Zeroize an integer. The announced bit length is set to the provided
@@ -1380,7 +1380,7 @@ uint32_t br_i31_decode_mod(uint32_t *x,
  * is expected here.
  */
 static inline void
-br_i31_zero(uint32_t *x, uint32_t bit_len)
+br_i31_zero(br_ssl_u32 *x, br_ssl_u32 bit_len)
 {
 	*x ++ = bit_len;
 	memset(x, 0, ((bit_len + 31) >> 5) * sizeof *x);
@@ -1390,7 +1390,7 @@ br_i31_zero(uint32_t *x, uint32_t bit_len)
  * Right-shift an integer. The shift amount must be lower than 31
  * bits.
  */
-void br_i31_rshift(uint32_t *x, int count);
+void br_i31_rshift(br_ssl_u32 *x, int count);
 
 /*
  * Reduce an integer (a[]) modulo another (m[]). The result is written
@@ -1400,7 +1400,7 @@ void br_i31_rshift(uint32_t *x, int count);
  *
  * CT: only announced bit lengths leak, not values of x, a or m.
  */
-void br_i31_reduce(uint32_t *x, const uint32_t *a, const uint32_t *m);
+void br_i31_reduce(br_ssl_u32 *x, const br_ssl_u32 *a, const br_ssl_u32 *m);
 
 /*
  * Decode an integer from its big-endian unsigned representation, and
@@ -1409,8 +1409,8 @@ void br_i31_reduce(uint32_t *x, const uint32_t *a, const uint32_t *m);
  *
  * x[] MUST be distinct from m[].
  */
-void br_i31_decode_reduce(uint32_t *x,
-	const void *src, size_t len, const uint32_t *m);
+void br_i31_decode_reduce(br_ssl_u32 *x,
+	const void *src, size_t len, const br_ssl_u32 *m);
 
 /*
  * Multiply x[] by 2^31 and then add integer z, modulo m[]. This
@@ -1424,7 +1424,7 @@ void br_i31_decode_reduce(uint32_t *x,
  * CT: only the common announced bit length of x and m leaks, not
  * the values of x, z or m.
  */
-void br_i31_muladd_small(uint32_t *x, uint32_t z, const uint32_t *m);
+void br_i31_muladd_small(br_ssl_u32 *x, br_ssl_u32 z, const br_ssl_u32 *m);
 
 /*
  * Encode an integer into its big-endian unsigned representation. The
@@ -1432,12 +1432,12 @@ void br_i31_muladd_small(uint32_t *x, uint32_t z, const uint32_t *m);
  * is too short then the integer is appropriately truncated; if it is
  * too long then the extra bytes are set to 0.
  */
-void br_i31_encode(void *dst, size_t len, const uint32_t *x);
+void br_i31_encode(void *dst, size_t len, const br_ssl_u32 *x);
 
 /*
  * Compute -(1/x) mod 2^31. If x is even, then this function returns 0.
  */
-uint32_t br_i31_ninv31(uint32_t x);
+br_ssl_u32 br_i31_ninv31(br_ssl_u32 x);
 
 /*
  * Compute a modular Montgomery multiplication. d[] is filled with the
@@ -1448,14 +1448,14 @@ uint32_t br_i31_ninv31(uint32_t x);
  * significant value word of m[] (this works only if m[] is an odd
  * integer).
  */
-void br_i31_montymul(uint32_t *d, const uint32_t *x, const uint32_t *y,
-	const uint32_t *m, uint32_t m0i);
+void br_i31_montymul(br_ssl_u32 *d, const br_ssl_u32 *x, const br_ssl_u32 *y,
+	const br_ssl_u32 *m, br_ssl_u32 m0i);
 
 /*
  * Convert a modular integer to Montgomery representation. The integer x[]
  * MUST be lower than m[], but with the same announced bit length.
  */
-void br_i31_to_monty(uint32_t *x, const uint32_t *m);
+void br_i31_to_monty(br_ssl_u32 *x, const br_ssl_u32 *m);
 
 /*
  * Convert a modular integer back from Montgomery representation. The
@@ -1464,7 +1464,7 @@ void br_i31_to_monty(uint32_t *x, const uint32_t *m);
  * the least significant value word of m[] (this works only if m[] is
  * an odd integer).
  */
-void br_i31_from_monty(uint32_t *x, const uint32_t *m, uint32_t m0i);
+void br_i31_from_monty(br_ssl_u32 *x, const br_ssl_u32 *m, br_ssl_u32 m0i);
 
 /*
  * Compute a modular exponentiation. x[] MUST be an integer modulo m[]
@@ -1475,8 +1475,8 @@ void br_i31_from_monty(uint32_t *x, const uint32_t *m, uint32_t m0i);
  * integer). The t1[] and t2[] parameters must be temporary arrays,
  * each large enough to accommodate an integer with the same size as m[].
  */
-void br_i31_modpow(uint32_t *x, const unsigned char *e, size_t elen,
-	const uint32_t *m, uint32_t m0i, uint32_t *t1, uint32_t *t2);
+void br_i31_modpow(br_ssl_u32 *x, const unsigned char *e, size_t elen,
+	const br_ssl_u32 *m, br_ssl_u32 m0i, br_ssl_u32 *t1, br_ssl_u32 *t2);
 
 /*
  * Compute a modular exponentiation. x[] MUST be an integer modulo m[]
@@ -1494,8 +1494,8 @@ void br_i31_modpow(uint32_t *x, const unsigned char *e, size_t elen,
  * Returned value is 1 on success, 0 on error. An error is reported if
  * the provided tmp[] array is too short.
  */
-uint32_t br_i31_modpow_opt(uint32_t *x, const unsigned char *e, size_t elen,
-	const uint32_t *m, uint32_t m0i, uint32_t *tmp, size_t twlen);
+br_ssl_u32 br_i31_modpow_opt(br_ssl_u32 *x, const unsigned char *e, size_t elen,
+	const br_ssl_u32 *m, br_ssl_u32 m0i, br_ssl_u32 *tmp, size_t twlen);
 
 /*
  * Compute d+a*b, result in d. The initial announced bit length of d[]
@@ -1508,7 +1508,7 @@ uint32_t br_i31_modpow_opt(uint32_t *x, const unsigned char *e, size_t elen,
  * a[] and b[] may be the same array. d[] must be disjoint from both a[]
  * and b[].
  */
-void br_i31_mulacc(uint32_t *d, const uint32_t *a, const uint32_t *b);
+void br_i31_mulacc(br_ssl_u32 *d, const br_ssl_u32 *a, const br_ssl_u32 *b);
 
 /*
  * Compute x/y mod m, result in x. Values x and y must be between 0 and
@@ -1524,8 +1524,8 @@ void br_i31_mulacc(uint32_t *d, const uint32_t *a, const uint32_t *b);
  * Returned value is 1 on success, 0 otherwise. Success is attained if
  * y is invertible modulo m.
  */
-uint32_t br_i31_moddiv(uint32_t *x, const uint32_t *y,
-	const uint32_t *m, uint32_t m0i, uint32_t *t);
+br_ssl_u32 br_i31_moddiv(br_ssl_u32 *x, const br_ssl_u32 *y,
+	const br_ssl_u32 *m, br_ssl_u32 m0i, br_ssl_u32 *t);
 
 /* ==================================================================== */
 
@@ -1534,55 +1534,55 @@ uint32_t br_i31_moddiv(uint32_t *x, const uint32_t *y,
  */
 
 static inline void
-br_i15_zero(uint16_t *x, uint16_t bit_len)
+br_i15_zero(br_ssl_u16 *x, br_ssl_u16 bit_len)
 {
 	*x ++ = bit_len;
 	memset(x, 0, ((bit_len + 15) >> 4) * sizeof *x);
 }
 
-uint32_t br_i15_iszero(const uint16_t *x);
+br_ssl_u32 br_i15_iszero(const br_ssl_u16 *x);
 
-uint16_t br_i15_ninv15(uint16_t x);
+br_ssl_u16 br_i15_ninv15(br_ssl_u16 x);
 
-uint32_t br_i15_add(uint16_t *a, const uint16_t *b, uint32_t ctl);
+br_ssl_u32 br_i15_add(br_ssl_u16 *a, const br_ssl_u16 *b, br_ssl_u32 ctl);
 
-uint32_t br_i15_sub(uint16_t *a, const uint16_t *b, uint32_t ctl);
+br_ssl_u32 br_i15_sub(br_ssl_u16 *a, const br_ssl_u16 *b, br_ssl_u32 ctl);
 
-void br_i15_muladd_small(uint16_t *x, uint16_t z, const uint16_t *m);
+void br_i15_muladd_small(br_ssl_u16 *x, br_ssl_u16 z, const br_ssl_u16 *m);
 
-void br_i15_montymul(uint16_t *d, const uint16_t *x, const uint16_t *y,
-	const uint16_t *m, uint16_t m0i);
+void br_i15_montymul(br_ssl_u16 *d, const br_ssl_u16 *x, const br_ssl_u16 *y,
+	const br_ssl_u16 *m, br_ssl_u16 m0i);
 
-void br_i15_to_monty(uint16_t *x, const uint16_t *m);
+void br_i15_to_monty(br_ssl_u16 *x, const br_ssl_u16 *m);
 
-void br_i15_modpow(uint16_t *x, const unsigned char *e, size_t elen,
-	const uint16_t *m, uint16_t m0i, uint16_t *t1, uint16_t *t2);
+void br_i15_modpow(br_ssl_u16 *x, const unsigned char *e, size_t elen,
+	const br_ssl_u16 *m, br_ssl_u16 m0i, br_ssl_u16 *t1, br_ssl_u16 *t2);
 
-uint32_t br_i15_modpow_opt(uint16_t *x, const unsigned char *e, size_t elen,
-	const uint16_t *m, uint16_t m0i, uint16_t *tmp, size_t twlen);
+br_ssl_u32 br_i15_modpow_opt(br_ssl_u16 *x, const unsigned char *e, size_t elen,
+	const br_ssl_u16 *m, br_ssl_u16 m0i, br_ssl_u16 *tmp, size_t twlen);
 
-void br_i15_encode(void *dst, size_t len, const uint16_t *x);
+void br_i15_encode(void *dst, size_t len, const br_ssl_u16 *x);
 
-uint32_t br_i15_decode_mod(uint16_t *x,
-	const void *src, size_t len, const uint16_t *m);
+br_ssl_u32 br_i15_decode_mod(br_ssl_u16 *x,
+	const void *src, size_t len, const br_ssl_u16 *m);
 
-void br_i15_rshift(uint16_t *x, int count);
+void br_i15_rshift(br_ssl_u16 *x, int count);
 
-uint32_t br_i15_bit_length(uint16_t *x, size_t xlen);
+br_ssl_u32 br_i15_bit_length(br_ssl_u16 *x, size_t xlen);
 
-void br_i15_decode(uint16_t *x, const void *src, size_t len);
+void br_i15_decode(br_ssl_u16 *x, const void *src, size_t len);
 
-void br_i15_from_monty(uint16_t *x, const uint16_t *m, uint16_t m0i);
+void br_i15_from_monty(br_ssl_u16 *x, const br_ssl_u16 *m, br_ssl_u16 m0i);
 
-void br_i15_decode_reduce(uint16_t *x,
-	const void *src, size_t len, const uint16_t *m);
+void br_i15_decode_reduce(br_ssl_u16 *x,
+	const void *src, size_t len, const br_ssl_u16 *m);
 
-void br_i15_reduce(uint16_t *x, const uint16_t *a, const uint16_t *m);
+void br_i15_reduce(br_ssl_u16 *x, const br_ssl_u16 *a, const br_ssl_u16 *m);
 
-void br_i15_mulacc(uint16_t *d, const uint16_t *a, const uint16_t *b);
+void br_i15_mulacc(br_ssl_u16 *d, const br_ssl_u16 *a, const br_ssl_u16 *b);
 
-uint32_t br_i15_moddiv(uint16_t *x, const uint16_t *y,
-	const uint16_t *m, uint16_t m0i, uint16_t *t);
+br_ssl_u32 br_i15_moddiv(br_ssl_u16 *x, const br_ssl_u16 *y,
+	const br_ssl_u16 *m, br_ssl_u16 m0i, br_ssl_u16 *t);
 
 /*
  * Variant of br_i31_modpow_opt() that internally uses 64x64->128
@@ -1590,26 +1590,26 @@ uint32_t br_i15_moddiv(uint16_t *x, const uint16_t *y,
  * except that the temporaries should be 64-bit integers, not 32-bit
  * integers.
  */
-uint32_t br_i62_modpow_opt(uint32_t *x31, const unsigned char *e, size_t elen,
-	const uint32_t *m31, uint32_t m0i31, uint64_t *tmp, size_t twlen);
+br_ssl_u32 br_i62_modpow_opt(br_ssl_u32 *x31, const unsigned char *e, size_t elen,
+	const br_ssl_u32 *m31, br_ssl_u32 m0i31, br_ssl_u64 *tmp, size_t twlen);
 
 /*
  * Type for a function with the same API as br_i31_modpow_opt() (some
  * implementations of this type may have stricter alignment requirements
  * on the temporaries).
  */
-typedef uint32_t (*br_i31_modpow_opt_type)(uint32_t *x,
+typedef br_ssl_u32 (*br_i31_modpow_opt_type)(br_ssl_u32 *x,
 	const unsigned char *e, size_t elen,
-	const uint32_t *m, uint32_t m0i, uint32_t *tmp, size_t twlen);
+	const br_ssl_u32 *m, br_ssl_u32 m0i, br_ssl_u32 *tmp, size_t twlen);
 
 /*
  * Wrapper for br_i62_modpow_opt() that uses the same type as
  * br_i31_modpow_opt(); however, it requires its 'tmp' argument to the
  * 64-bit aligned.
  */
-uint32_t br_i62_modpow_opt_as_i31(uint32_t *x,
+br_ssl_u32 br_i62_modpow_opt_as_i31(br_ssl_u32 *x,
 	const unsigned char *e, size_t elen,
-	const uint32_t *m, uint32_t m0i, uint32_t *tmp, size_t twlen);
+	const br_ssl_u32 *m, br_ssl_u32 m0i, br_ssl_u32 *tmp, size_t twlen);
 
 /* ==================================================================== */
 
@@ -1641,54 +1641,54 @@ const unsigned char *br_digest_OID(int digest_id, size_t *len);
 /*
  * Apply DES Initial Permutation.
  */
-void br_des_do_IP(uint32_t *xl, uint32_t *xr);
+void br_des_do_IP(br_ssl_u32 *xl, br_ssl_u32 *xr);
 
 /*
  * Apply DES Final Permutation (inverse of IP).
  */
-void br_des_do_invIP(uint32_t *xl, uint32_t *xr);
+void br_des_do_invIP(br_ssl_u32 *xl, br_ssl_u32 *xr);
 
 /*
  * Key schedule unit: for a DES key (8 bytes), compute 16 subkeys. Each
  * subkey is two 28-bit words represented as two 32-bit words; the PC-2
  * bit extration is NOT applied.
  */
-void br_des_keysched_unit(uint32_t *skey, const void *key);
+void br_des_keysched_unit(br_ssl_u32 *skey, const void *key);
 
 /*
  * Reversal of 16 DES sub-keys (for decryption).
  */
-void br_des_rev_skey(uint32_t *skey);
+void br_des_rev_skey(br_ssl_u32 *skey);
 
 /*
  * DES/3DES key schedule for 'des_tab' (encryption direction). Returned
  * value is the number of rounds.
  */
-unsigned br_des_tab_keysched(uint32_t *skey, const void *key, size_t key_len);
+unsigned br_des_tab_keysched(br_ssl_u32 *skey, const void *key, size_t key_len);
 
 /*
  * DES/3DES key schedule for 'des_ct' (encryption direction). Returned
  * value is the number of rounds.
  */
-unsigned br_des_ct_keysched(uint32_t *skey, const void *key, size_t key_len);
+unsigned br_des_ct_keysched(br_ssl_u32 *skey, const void *key, size_t key_len);
 
 /*
  * DES/3DES subkey decompression (from the compressed bitsliced subkeys).
  */
-void br_des_ct_skey_expand(uint32_t *sk_exp,
-	unsigned num_rounds, const uint32_t *skey);
+void br_des_ct_skey_expand(br_ssl_u32 *sk_exp,
+	unsigned num_rounds, const br_ssl_u32 *skey);
 
 /*
  * DES/3DES block encryption/decryption ('des_tab').
  */
 void br_des_tab_process_block(unsigned num_rounds,
-	const uint32_t *skey, void *block);
+	const br_ssl_u32 *skey, void *block);
 
 /*
  * DES/3DES block encryption/decryption ('des_ct').
  */
 void br_des_ct_process_block(unsigned num_rounds,
-	const uint32_t *skey, void *block);
+	const br_ssl_u32 *skey, void *block);
 
 /* ==================================================================== */
 /*
@@ -1708,25 +1708,25 @@ extern const unsigned char br_aes_S[];
  *
  * This implementation uses a 256-byte table and is NOT constant-time.
  */
-unsigned br_aes_keysched(uint32_t *skey, const void *key, size_t key_len);
+unsigned br_aes_keysched(br_ssl_u32 *skey, const void *key, size_t key_len);
 
 /*
  * AES key schedule for decryption ('aes_big' implementation).
  */
-unsigned br_aes_big_keysched_inv(uint32_t *skey,
+unsigned br_aes_big_keysched_inv(br_ssl_u32 *skey,
 	const void *key, size_t key_len);
 
 /*
  * AES block encryption with the 'aes_big' implementation (fast, but
  * not constant-time). This function encrypts a single block "in place".
  */
-void br_aes_big_encrypt(unsigned num_rounds, const uint32_t *skey, void *data);
+void br_aes_big_encrypt(unsigned num_rounds, const br_ssl_u32 *skey, void *data);
 
 /*
  * AES block decryption with the 'aes_big' implementation (fast, but
  * not constant-time). This function decrypts a single block "in place".
  */
-void br_aes_big_decrypt(unsigned num_rounds, const uint32_t *skey, void *data);
+void br_aes_big_decrypt(unsigned num_rounds, const br_ssl_u32 *skey, void *data);
 
 /*
  * AES block encryption with the 'aes_small' implementation (small, but
@@ -1734,7 +1734,7 @@ void br_aes_big_decrypt(unsigned num_rounds, const uint32_t *skey, void *data);
  * "in place".
  */
 void br_aes_small_encrypt(unsigned num_rounds,
-	const uint32_t *skey, void *data);
+	const br_ssl_u32 *skey, void *data);
 
 /*
  * AES block decryption with the 'aes_small' implementation (small, but
@@ -1742,7 +1742,7 @@ void br_aes_small_encrypt(unsigned num_rounds,
  * "in place".
  */
 void br_aes_small_decrypt(unsigned num_rounds,
-	const uint32_t *skey, void *data);
+	const br_ssl_u32 *skey, void *data);
 
 /*
  * The constant-time implementation is "bitsliced": the 128-bit state is
@@ -1784,7 +1784,7 @@ void br_aes_small_decrypt(unsigned num_rounds,
  *
  * This operation is an involution.
  */
-void br_aes_ct_ortho(uint32_t *q);
+void br_aes_ct_ortho(br_ssl_u32 *q);
 
 /*
  * The AES S-box, as a bitsliced constant-time version. The input array
@@ -1792,12 +1792,12 @@ void br_aes_ct_ortho(uint32_t *q);
  * parallel. Bits 0 to 7 of each S-box input (bit 0 is least significant)
  * are spread over the words 0 to 7, at the same rank.
  */
-void br_aes_ct_bitslice_Sbox(uint32_t *q);
+void br_aes_ct_bitslice_Sbox(br_ssl_u32 *q);
 
 /*
  * Like br_aes_bitslice_Sbox(), but for the inverse S-box.
  */
-void br_aes_ct_bitslice_invSbox(uint32_t *q);
+void br_aes_ct_bitslice_invSbox(br_ssl_u32 *q);
 
 /*
  * Compute AES encryption on bitsliced data. Since input is stored on
@@ -1805,7 +1805,7 @@ void br_aes_ct_bitslice_invSbox(uint32_t *q);
  * in parallel.
  */
 void br_aes_ct_bitslice_encrypt(unsigned num_rounds,
-	const uint32_t *skey, uint32_t *q);
+	const br_ssl_u32 *skey, br_ssl_u32 *q);
 
 /*
  * Compute AES decryption on bitsliced data. Since input is stored on
@@ -1813,7 +1813,7 @@ void br_aes_ct_bitslice_encrypt(unsigned num_rounds,
  * in parallel.
  */
 void br_aes_ct_bitslice_decrypt(unsigned num_rounds,
-	const uint32_t *skey, uint32_t *q);
+	const br_ssl_u32 *skey, br_ssl_u32 *q);
 
 /*
  * AES key schedule, constant-time version. skey[] is filled with n+1
@@ -1821,7 +1821,7 @@ void br_aes_ct_bitslice_decrypt(unsigned num_rounds,
  * on key size). The number of rounds is returned. If the key size is
  * invalid (not 16, 24 or 32), then 0 is returned.
  */
-unsigned br_aes_ct_keysched(uint32_t *comp_skey,
+unsigned br_aes_ct_keysched(br_ssl_u32 *comp_skey,
 	const void *key, size_t key_len);
 
 /*
@@ -1829,8 +1829,8 @@ unsigned br_aes_ct_keysched(uint32_t *comp_skey,
  * a larger array suitable for br_aes_ct_bitslice_encrypt() and
  * br_aes_ct_bitslice_decrypt().
  */
-void br_aes_ct_skey_expand(uint32_t *skey,
-	unsigned num_rounds, const uint32_t *comp_skey);
+void br_aes_ct_skey_expand(br_ssl_u32 *skey,
+	unsigned num_rounds, const br_ssl_u32 *comp_skey);
 
 /*
  * For the ct64 implementation, the same bitslicing technique is used,
@@ -1847,7 +1847,7 @@ void br_aes_ct_skey_expand(uint32_t *skey,
  *
  * This operation is an involution.
  */
-void br_aes_ct64_ortho(uint64_t *q);
+void br_aes_ct64_ortho(br_ssl_u64 *q);
 
 /*
  * Interleave bytes for an AES input block. If input bytes are
@@ -1857,12 +1857,12 @@ void br_aes_ct64_ortho(uint64_t *q);
  * set to 08192A3B (again little-endian convention) and q1 will
  * be set to 4C5D6E7F.
  */
-void br_aes_ct64_interleave_in(uint64_t *q0, uint64_t *q1, const uint32_t *w);
+void br_aes_ct64_interleave_in(br_ssl_u64 *q0, br_ssl_u64 *q1, const br_ssl_u32 *w);
 
 /*
  * Perform the opposite of br_aes_ct64_interleave_in().
  */
-void br_aes_ct64_interleave_out(uint32_t *w, uint64_t q0, uint64_t q1);
+void br_aes_ct64_interleave_out(br_ssl_u32 *w, br_ssl_u64 q0, br_ssl_u64 q1);
 
 /*
  * The AES S-box, as a bitsliced constant-time version. The input array
@@ -1870,12 +1870,12 @@ void br_aes_ct64_interleave_out(uint32_t *w, uint64_t q0, uint64_t q1);
  * parallel. Bits 0 to 7 of each S-box input (bit 0 is least significant)
  * are spread over the words 0 to 7, at the same rank.
  */
-void br_aes_ct64_bitslice_Sbox(uint64_t *q);
+void br_aes_ct64_bitslice_Sbox(br_ssl_u64 *q);
 
 /*
  * Like br_aes_bitslice_Sbox(), but for the inverse S-box.
  */
-void br_aes_ct64_bitslice_invSbox(uint64_t *q);
+void br_aes_ct64_bitslice_invSbox(br_ssl_u64 *q);
 
 /*
  * Compute AES encryption on bitsliced data. Since input is stored on
@@ -1883,7 +1883,7 @@ void br_aes_ct64_bitslice_invSbox(uint64_t *q);
  * in parallel.
  */
 void br_aes_ct64_bitslice_encrypt(unsigned num_rounds,
-	const uint64_t *skey, uint64_t *q);
+	const br_ssl_u64 *skey, br_ssl_u64 *q);
 
 /*
  * Compute AES decryption on bitsliced data. Since input is stored on
@@ -1891,7 +1891,7 @@ void br_aes_ct64_bitslice_encrypt(unsigned num_rounds,
  * in parallel.
  */
 void br_aes_ct64_bitslice_decrypt(unsigned num_rounds,
-	const uint64_t *skey, uint64_t *q);
+	const br_ssl_u64 *skey, br_ssl_u64 *q);
 
 /*
  * AES key schedule, constant-time version. skey[] is filled with n+1
@@ -1899,7 +1899,7 @@ void br_aes_ct64_bitslice_decrypt(unsigned num_rounds,
  * on key size). The number of rounds is returned. If the key size is
  * invalid (not 16, 24 or 32), then 0 is returned.
  */
-unsigned br_aes_ct64_keysched(uint64_t *comp_skey,
+unsigned br_aes_ct64_keysched(br_ssl_u64 *comp_skey,
 	const void *key, size_t key_len);
 
 /*
@@ -1907,8 +1907,8 @@ unsigned br_aes_ct64_keysched(uint64_t *comp_skey,
  * a larger array suitable for br_aes_ct64_bitslice_encrypt() and
  * br_aes_ct64_bitslice_decrypt().
  */
-void br_aes_ct64_skey_expand(uint64_t *skey,
-	unsigned num_rounds, const uint64_t *comp_skey);
+void br_aes_ct64_skey_expand(br_ssl_u64 *skey,
+	unsigned num_rounds, const br_ssl_u64 *comp_skey);
 
 /*
  * Test support for AES-NI opcodes.
@@ -1953,9 +1953,9 @@ unsigned br_aes_pwr8_keysched(unsigned char *skni,
  * Apply proper PKCS#1 v1.5 padding (for signatures). 'hash_oid' is
  * the encoded hash function OID, or NULL.
  */
-uint32_t br_rsa_pkcs1_sig_pad(const unsigned char *hash_oid,
+br_ssl_u32 br_rsa_pkcs1_sig_pad(const unsigned char *hash_oid,
 	const unsigned char *hash, size_t hash_len,
-	uint32_t n_bitlen, unsigned char *x);
+	br_ssl_u32 n_bitlen, unsigned char *x);
 
 /*
  * Check PKCS#1 v1.5 padding (for signatures). 'hash_oid' is the encoded
@@ -1963,7 +1963,7 @@ uint32_t br_rsa_pkcs1_sig_pad(const unsigned char *hash_oid,
  * modular exponentiation, i.e. it should be the padded hash. On
  * success, the hashed message is extracted.
  */
-uint32_t br_rsa_pkcs1_sig_unpad(const unsigned char *sig, size_t sig_len,
+br_ssl_u32 br_rsa_pkcs1_sig_unpad(const unsigned char *sig, size_t sig_len,
 	const unsigned char *hash_oid, size_t hash_len,
 	unsigned char *hash_out);
 
@@ -1971,10 +1971,10 @@ uint32_t br_rsa_pkcs1_sig_unpad(const unsigned char *sig, size_t sig_len,
  * Apply proper PSS padding. The 'x' buffer is output only: it
  * receives the value that is to be exponentiated.
  */
-uint32_t br_rsa_pss_sig_pad(const br_prng_class **rng,
+br_ssl_u32 br_rsa_pss_sig_pad(const br_prng_class **rng,
 	const br_hash_class *hf_data, const br_hash_class *hf_mgf1,
 	const unsigned char *hash, size_t salt_len,
-	uint32_t n_bitlen, unsigned char *x);
+	br_ssl_u32 n_bitlen, unsigned char *x);
 
 /*
  * Check PSS padding. The provided value is the one _after_
@@ -1983,7 +1983,7 @@ uint32_t br_rsa_pss_sig_pad(const br_prng_class **rng,
  * size, i.e. it assumes that this has already been verified (as
  * part of the exponentiation).
  */
-uint32_t br_rsa_pss_sig_unpad(
+br_ssl_u32 br_rsa_pss_sig_unpad(
 	const br_hash_class *hf_data, const br_hash_class *hf_mgf1,
 	const unsigned char *hash, size_t salt_len,
 	const br_rsa_public_key *pk, unsigned char *x);
@@ -2003,7 +2003,7 @@ size_t br_rsa_oaep_pad(const br_prng_class **rnd, const br_hash_class *dig,
  * incorrect, then 0 is returned and '*len' is untouched. Either way,
  * the complete buffer contents are altered.
  */
-uint32_t br_rsa_oaep_unpad(const br_hash_class *dig,
+br_ssl_u32 br_rsa_oaep_unpad(const br_hash_class *dig,
 	const void *label, size_t label_len, void *data, size_t *len);
 
 /*
@@ -2017,10 +2017,10 @@ void br_mgf1_xor(void *data, size_t len,
  * Inner function for RSA key generation; used by the "i31" and "i62"
  * implementations.
  */
-uint32_t br_rsa_i31_keygen_inner(const br_prng_class **rng,
+br_ssl_u32 br_rsa_i31_keygen_inner(const br_prng_class **rng,
 	br_rsa_private_key *sk, void *kbuf_priv,
 	br_rsa_public_key *pk, void *kbuf_pub,
-	unsigned size, uint32_t pubexp, br_i31_modpow_opt_type mp31);
+	unsigned size, br_ssl_u32 pubexp, br_i31_modpow_opt_type mp31);
 
 /* ==================================================================== */
 /*
@@ -2059,8 +2059,8 @@ extern const br_ec_curve_def br_curve25519;
  * this declared bit length, and consists the big-endian unsigned decoding
  * of exactly that many bits in the source (capped at the source length).
  */
-void br_ecdsa_i31_bits2int(uint32_t *x,
-	const void *src, size_t len, uint32_t ebitlen);
+void br_ecdsa_i31_bits2int(br_ssl_u32 *x,
+	const void *src, size_t len, br_ssl_u32 ebitlen);
 
 /*
  * Decode some bytes as an i15 integer, with truncation (corresponding
@@ -2069,8 +2069,8 @@ void br_ecdsa_i31_bits2int(uint32_t *x,
  * this declared bit length, and consists the big-endian unsigned decoding
  * of exactly that many bits in the source (capped at the source length).
  */
-void br_ecdsa_i15_bits2int(uint16_t *x,
-	const void *src, size_t len, uint32_t ebitlen);
+void br_ecdsa_i15_bits2int(br_ssl_u16 *x,
+	const void *src, size_t len, br_ssl_u32 ebitlen);
 
 /* ==================================================================== */
 /*
@@ -2538,8 +2538,8 @@ BR_TARGETS_X86_DOWN
 #endif
 
 static inline int
-br_cpuid(uint32_t mask_eax, uint32_t mask_ebx,
-	uint32_t mask_ecx, uint32_t mask_edx)
+br_cpuid(br_ssl_u32 mask_eax, br_ssl_u32 mask_ebx,
+	br_ssl_u32 mask_ecx, br_ssl_u32 mask_edx)
 {
 #if BR_GCC || BR_CLANG
 	unsigned eax, ebx, ecx, edx;
@@ -2557,10 +2557,10 @@ br_cpuid(uint32_t mask_eax, uint32_t mask_ebx,
 	int info[4];
 
 	__cpuid(info, 1);
-	if (((uint32_t)info[0] & mask_eax) == mask_eax
-		&& ((uint32_t)info[1] & mask_ebx) == mask_ebx
-		&& ((uint32_t)info[2] & mask_ecx) == mask_ecx
-		&& ((uint32_t)info[3] & mask_edx) == mask_edx)
+	if (((br_ssl_u32)info[0] & mask_eax) == mask_eax
+		&& ((br_ssl_u32)info[1] & mask_ebx) == mask_ebx
+		&& ((br_ssl_u32)info[2] & mask_ecx) == mask_ecx
+		&& ((br_ssl_u32)info[3] & mask_edx) == mask_edx)
 	{
 		return 1;
 	}

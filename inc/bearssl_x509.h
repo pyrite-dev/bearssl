@@ -26,7 +26,7 @@
 #define BR_BEARSSL_X509_H__
 
 #include <stddef.h>
-#include <stdint.h>
+#include "bearssl_int.h"
 
 #include "bearssl_ec.h"
 #include "bearssl_hash.h"
@@ -396,7 +396,7 @@ struct br_x509_class_ {
 	 * \param ctx      validation context.
 	 * \param length   new certificate length (in bytes).
 	 */
-	void (*start_cert)(const br_x509_class **ctx, uint32_t length);
+	void (*start_cert)(const br_x509_class **ctx, br_ssl_u32 length);
 
 	/**
 	 * \brief Receive some bytes for the current certificate.
@@ -668,8 +668,8 @@ typedef struct {
  * \return  -1, 0 or +1.
  */
 typedef int (*br_x509_time_check)(void *tctx,
-	uint32_t not_before_days, uint32_t not_before_seconds,
-	uint32_t not_after_days, uint32_t not_after_seconds);
+	br_ssl_u32 not_before_days, br_ssl_u32 not_before_seconds,
+	br_ssl_u32 not_after_days, br_ssl_u32 not_after_seconds);
 
 /**
  * \brief The "minimal" X.509 engine structure.
@@ -689,12 +689,12 @@ typedef struct {
 
 	/* CPU for the T0 virtual machine. */
 	struct {
-		uint32_t *dp;
-		uint32_t *rp;
+		br_ssl_u32 *dp;
+		br_ssl_u32 *rp;
 		const unsigned char *ip;
 	} cpu;
-	uint32_t dp_stack[31];
-	uint32_t rp_stack[31];
+	br_ssl_u32 dp_stack[31];
+	br_ssl_u32 rp_stack[31];
 	int err;
 
 	/* Server name to match with the SAN / CN of the EE certificate. */
@@ -704,16 +704,16 @@ typedef struct {
 	unsigned char key_usages;
 
 	/* Explicitly set date and time. */
-	uint32_t days, seconds;
+	br_ssl_u32 days, seconds;
 
 	/* Current certificate length (in bytes). Set to 0 when the
 	   certificate has been fully processed. */
-	uint32_t cert_length;
+	br_ssl_u32 cert_length;
 
 	/* Number of certificates processed so far in the current chain.
 	   It is incremented at the end of the processing of a certificate,
 	   so it is 0 for the EE. */
-	uint32_t num_certs;
+	br_ssl_u32 num_certs;
 
 	/* Certificate data chunk. */
 	const unsigned char *hbuf;
@@ -732,15 +732,15 @@ typedef struct {
 	   function OID (in the T0 data block) and hash function
 	   output length (TBS hash length). */
 	unsigned char cert_signer_key_type;
-	uint16_t cert_sig_hash_oid;
+	br_ssl_u16 cert_sig_hash_oid;
 	unsigned char cert_sig_hash_len;
 
 	/* Current/last certificate signature. */
 	unsigned char cert_sig[BR_X509_BUFSIZE_SIG];
-	uint16_t cert_sig_len;
+	br_ssl_u16 cert_sig_len;
 
 	/* Minimum RSA key length (difference in bytes from 128). */
-	int16_t min_rsa_size;
+	br_ssl_i16 min_rsa_size;
 
 	/* Configured trust anchors. */
 	const br_x509_trust_anchor *trust_anchors;
@@ -922,7 +922,7 @@ void br_x509_minimal_init_full(br_x509_minimal_context *ctx,
  */
 static inline void
 br_x509_minimal_set_time(br_x509_minimal_context *ctx,
-	uint32_t days, uint32_t seconds)
+	br_ssl_u32 days, br_ssl_u32 seconds)
 {
 	ctx->days = days;
 	ctx->seconds = seconds;
@@ -966,7 +966,7 @@ br_x509_minimal_set_time_callback(br_x509_minimal_context *ctx,
 static inline void
 br_x509_minimal_set_minrsa(br_x509_minimal_context *ctx, int byte_length)
 {
-	ctx->min_rsa_size = (int16_t)(byte_length - 128);
+	ctx->min_rsa_size = (br_ssl_i16)(byte_length - 128);
 }
 
 /**
@@ -1006,12 +1006,12 @@ typedef struct {
 
 	/* CPU for the T0 virtual machine. */
 	struct {
-		uint32_t *dp;
-		uint32_t *rp;
+		br_ssl_u32 *dp;
+		br_ssl_u32 *rp;
 		const unsigned char *ip;
 	} cpu;
-	uint32_t dp_stack[32];
-	uint32_t rp_stack[32];
+	br_ssl_u32 dp_stack[32];
+	br_ssl_u32 rp_stack[32];
 	int err;
 
 	/* The pad serves as destination for various operations. */
@@ -1021,8 +1021,8 @@ typedef struct {
 	unsigned char decoded;
 
 	/* Validity dates. */
-	uint32_t notbefore_days, notbefore_seconds;
-	uint32_t notafter_days, notafter_seconds;
+	br_ssl_u32 notbefore_days, notbefore_seconds;
+	br_ssl_u32 notafter_days, notafter_seconds;
 
 	/* The "CA" flag. This is set to true if the certificate contains
 	   a Basic Constraints extension that asserts CA status. */
@@ -1198,12 +1198,12 @@ typedef struct {
 
 	/* CPU for the T0 virtual machine. */
 	struct {
-		uint32_t *dp;
-		uint32_t *rp;
+		br_ssl_u32 *dp;
+		br_ssl_u32 *rp;
 		const unsigned char *ip;
 	} cpu;
-	uint32_t dp_stack[32];
-	uint32_t rp_stack[32];
+	br_ssl_u32 dp_stack[32];
+	br_ssl_u32 rp_stack[32];
 	int err;
 
 	/* Private key data chunk. */

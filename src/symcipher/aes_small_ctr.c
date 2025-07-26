@@ -47,9 +47,9 @@ xorbuf(void *dst, const void *src, size_t len)
 }
 
 /* see bearssl_block.h */
-uint32_t
+br_ssl_u32
 br_aes_small_ctr_run(const br_aes_small_ctr_keys *ctx,
-	const void *iv, uint32_t cc, void *data, size_t len)
+	const void *iv, br_ssl_u32 cc, void *data, size_t len)
 {
 	unsigned char *buf;
 
@@ -78,7 +78,7 @@ const br_block_ctr_class br_aes_small_ctr_vtable = {
 	4,
 	(void (*)(const br_block_ctr_class **, const void *, size_t))
 		&br_aes_small_ctr_init,
-	(uint32_t (*)(const br_block_ctr_class *const *,
-		const void *, uint32_t, void *, size_t))
+	(br_ssl_u32 (*)(const br_block_ctr_class *const *,
+		const void *, br_ssl_u32, void *, size_t))
 		&br_aes_small_ctr_run
 };

@@ -43,11 +43,11 @@ ctr_128(const unsigned char *sk, const unsigned char *ivbuf,
 	long cc0, cc1, cc2, cc3;
 
 #if BR_POWER8_LE
-	static const uint32_t idx2be[] = {
+	static const br_ssl_u32 idx2be[] = {
 		0x03020100, 0x07060504, 0x0B0A0908, 0x0F0E0D0C
 	};
 #endif
-	static const uint32_t ctrinc[] = {
+	static const br_ssl_u32 ctrinc[] = {
 		0, 0, 0, 4
 	};
 
@@ -227,11 +227,11 @@ ctr_192(const unsigned char *sk, const unsigned char *ivbuf,
 	long cc0, cc1, cc2, cc3;
 
 #if BR_POWER8_LE
-	static const uint32_t idx2be[] = {
+	static const br_ssl_u32 idx2be[] = {
 		0x03020100, 0x07060504, 0x0B0A0908, 0x0F0E0D0C
 	};
 #endif
-	static const uint32_t ctrinc[] = {
+	static const br_ssl_u32 ctrinc[] = {
 		0, 0, 0, 4
 	};
 
@@ -423,11 +423,11 @@ ctr_256(const unsigned char *sk, const unsigned char *ivbuf,
 	long cc0, cc1, cc2, cc3;
 
 #if BR_POWER8_LE
-	static const uint32_t idx2be[] = {
+	static const br_ssl_u32 idx2be[] = {
 		0x03020100, 0x07060504, 0x0B0A0908, 0x0F0E0D0C
 	};
 #endif
-	static const uint32_t ctrinc[] = {
+	static const br_ssl_u32 ctrinc[] = {
 		0, 0, 0, 4
 	};
 
@@ -625,9 +625,9 @@ ctr_256(const unsigned char *sk, const unsigned char *ivbuf,
 }
 
 /* see bearssl_block.h */
-uint32_t
+br_ssl_u32
 br_aes_pwr8_ctr_run(const br_aes_pwr8_ctr_keys *ctx,
-	const void *iv, uint32_t cc, void *data, size_t len)
+	const void *iv, br_ssl_u32 cc, void *data, size_t len)
 {
 	unsigned char *buf;
 	unsigned char ivbuf[64];
@@ -693,8 +693,8 @@ const br_block_ctr_class br_aes_pwr8_ctr_vtable = {
 	4,
 	(void (*)(const br_block_ctr_class **, const void *, size_t))
 		&br_aes_pwr8_ctr_init,
-	(uint32_t (*)(const br_block_ctr_class *const *,
-		const void *, uint32_t, void *, size_t))
+	(br_ssl_u32 (*)(const br_block_ctr_class *const *,
+		const void *, br_ssl_u32, void *, size_t))
 		&br_aes_pwr8_ctr_run
 };
 

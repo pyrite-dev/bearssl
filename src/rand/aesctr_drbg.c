@@ -66,7 +66,7 @@ br_aesctr_drbg_generate(br_aesctr_drbg_context *ctx, void *out, size_t len)
 		 * We make sure that the counter won't exceed the configured
 		 * limit.
 		 */
-		if ((uint32_t)(ctx->cc + ((clen + 15) >> 4)) > 32768) {
+		if ((br_ssl_u32)(ctx->cc + ((clen + 15) >> 4)) > 32768) {
 			clen = (32768 - ctx->cc) << 4;
 			if (clen > len) {
 				clen = len;

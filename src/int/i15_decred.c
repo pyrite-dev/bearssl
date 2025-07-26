@@ -26,13 +26,13 @@
 
 /* see inner.h */
 void
-br_i15_decode_reduce(uint16_t *x,
-	const void *src, size_t len, const uint16_t *m)
+br_i15_decode_reduce(br_ssl_u16 *x,
+	const void *src, size_t len, const br_ssl_u16 *m)
 {
-	uint32_t m_ebitlen, m_rbitlen;
+	br_ssl_u32 m_ebitlen, m_rbitlen;
 	size_t mblen, k;
 	const unsigned char *buf;
-	uint32_t acc;
+	br_ssl_u32 acc;
 	int acc_len;
 
 	/*
@@ -76,7 +76,7 @@ br_i15_decode_reduce(uint16_t *x,
 	acc = 0;
 	acc_len = 0;
 	while (k < len) {
-		uint32_t v;
+		br_ssl_u32 v;
 
 		v = buf[k ++];
 		acc = (acc << 8) | v;
@@ -84,7 +84,7 @@ br_i15_decode_reduce(uint16_t *x,
 		if (acc_len >= 15) {
 			br_i15_muladd_small(x, acc >> (acc_len - 15), m);
 			acc_len -= 15;
-			acc &= ~((uint32_t)-1 << acc_len);
+			acc &= ~((br_ssl_u32)-1 << acc_len);
 		}
 	}
 

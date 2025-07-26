@@ -25,12 +25,12 @@
 #include "inner.h"
 
 /* see inner.h */
-uint32_t
-br_divrem(uint32_t hi, uint32_t lo, uint32_t d, uint32_t *r)
+br_ssl_u32
+br_divrem(br_ssl_u32 hi, br_ssl_u32 lo, br_ssl_u32 d, br_ssl_u32 *r)
 {
 	/* TODO: optimize this */
-	uint32_t q;
-	uint32_t ch, cf;
+	br_ssl_u32 q;
+	br_ssl_u32 ch, cf;
 	int k;
 
 	q = 0;
@@ -38,7 +38,7 @@ br_divrem(uint32_t hi, uint32_t lo, uint32_t d, uint32_t *r)
 	hi = MUX(ch, 0, hi);
 	for (k = 31; k > 0; k --) {
 		int j;
-		uint32_t w, ctl, hi2, lo2;
+		br_ssl_u32 w, ctl, hi2, lo2;
 
 		j = 32 - k;
 		w = (hi << j) | (lo >> k);

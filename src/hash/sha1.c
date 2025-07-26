@@ -31,22 +31,22 @@
 
 #define ROTL(x, n)    (((x) << (n)) | ((x) >> (32 - (n))))
 
-#define K1     ((uint32_t)0x5A827999)
-#define K2     ((uint32_t)0x6ED9EBA1)
-#define K3     ((uint32_t)0x8F1BBCDC)
-#define K4     ((uint32_t)0xCA62C1D6)
+#define K1     ((br_ssl_u32)0x5A827999)
+#define K2     ((br_ssl_u32)0x6ED9EBA1)
+#define K3     ((br_ssl_u32)0x8F1BBCDC)
+#define K4     ((br_ssl_u32)0xCA62C1D6)
 
 /* see inner.h */
-const uint32_t br_sha1_IV[5] = {
+const br_ssl_u32 br_sha1_IV[5] = {
 	0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0
 };
 
 /* see inner.h */
 void
-br_sha1_round(const unsigned char *buf, uint32_t *val)
+br_sha1_round(const unsigned char *buf, br_ssl_u32 *val)
 {
-	uint32_t m[80];
-	uint32_t a, b, c, d, e;
+	br_ssl_u32 m[80];
+	br_ssl_u32 a, b, c, d, e;
 	int i;
 
 	a = val[0];
@@ -56,7 +56,7 @@ br_sha1_round(const unsigned char *buf, uint32_t *val)
 	e = val[4];
 	br_range_dec32be(m, 16, buf);
 	for (i = 16; i < 80; i ++) {
-		uint32_t x = m[i - 3] ^ m[i - 8] ^ m[i - 14] ^ m[i - 16];
+		br_ssl_u32 x = m[i - 3] ^ m[i - 8] ^ m[i - 14] ^ m[i - 16];
 		m[i] = ROTL(x, 1);
 	}
 
@@ -125,7 +125,7 @@ br_sha1_update(br_sha1_context *cc, const void *data, size_t len)
 		ptr += clen;
 		buf += clen;
 		len -= clen;
-		cc->count += (uint64_t)clen;
+		cc->count += (br_ssl_u64)clen;
 		if (ptr == 64) {
 			br_sha1_round(cc->buf, cc->val);
 			ptr = 0;
@@ -138,7 +138,7 @@ void
 br_sha1_out(const br_sha1_context *cc, void *dst)
 {
 	unsigned char buf[64];
-	uint32_t val[5];
+	br_ssl_u32 val[5];
 	size_t ptr;
 
 	ptr = (size_t)cc->count & 63;
@@ -158,7 +158,7 @@ br_sha1_out(const br_sha1_context *cc, void *dst)
 }
 
 /* see bearssl.h */
-uint64_t
+br_ssl_u64
 br_sha1_state(const br_sha1_context *cc, void *dst)
 {
 	br_range_enc32be(dst, cc->val, 5);
@@ -167,7 +167,7 @@ br_sha1_state(const br_sha1_context *cc, void *dst)
 
 /* see bearssl.h */
 void
-br_sha1_set_state(br_sha1_context *cc, const void *stb, uint64_t count)
+br_sha1_set_state(br_sha1_context *cc, const void *stb, br_ssl_u64 count)
 {
 	br_range_dec32be(cc->val, 5, stb);
 	cc->count = count;
@@ -185,7 +185,7 @@ const br_hash_class br_sha1_vtable = {
 	(void (*)(const br_hash_class **))&br_sha1_init,
 	(void (*)(const br_hash_class **, const void *, size_t))&br_sha1_update,
 	(void (*)(const br_hash_class *const *, void *))&br_sha1_out,
-	(uint64_t (*)(const br_hash_class *const *, void *))&br_sha1_state,
-	(void (*)(const br_hash_class **, const void *, uint64_t))
+	(br_ssl_u64 (*)(const br_hash_class *const *, void *))&br_sha1_state,
+	(void (*)(const br_hash_class **, const void *, br_ssl_u64))
 		&br_sha1_set_state
 };

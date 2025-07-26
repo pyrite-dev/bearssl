@@ -25,15 +25,15 @@
 #include "inner.h"
 
 /* see bearssl_block.h */
-uint32_t
+br_ssl_u32
 br_chacha20_ct_run(const void *key,
-	const void *iv, uint32_t cc, void *data, size_t len)
+	const void *iv, br_ssl_u32 cc, void *data, size_t len)
 {
 	unsigned char *buf;
-	uint32_t kw[8], ivw[3];
+	br_ssl_u32 kw[8], ivw[3];
 	size_t u;
 
-	static const uint32_t CW[] = {
+	static const br_ssl_u32 CW[] = {
 		0x61707865, 0x3320646e, 0x79622d32, 0x6b206574
 	};
 
@@ -45,7 +45,7 @@ br_chacha20_ct_run(const void *key,
 		ivw[u] = br_dec32le((const unsigned char *)iv + (u << 2));
 	}
 	while (len > 0) {
-		uint32_t state[16];
+		br_ssl_u32 state[16];
 		int i;
 		size_t clen;
 		unsigned char tmp[64];

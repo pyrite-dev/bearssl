@@ -26,7 +26,7 @@
 #define BR_BEARSSL_PEM_H__
 
 #include <stddef.h>
-#include <stdint.h>
+#include "bearssl_int.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -113,12 +113,12 @@ typedef struct {
 #ifndef BR_DOXYGEN_IGNORE
 	/* CPU for the T0 virtual machine. */
 	struct {
-		uint32_t *dp;
-		uint32_t *rp;
+		br_ssl_u32 *dp;
+		br_ssl_u32 *rp;
 		const unsigned char *ip;
 	} cpu;
-	uint32_t dp_stack[32];
-	uint32_t rp_stack[32];
+	br_ssl_u32 dp_stack[32];
+	br_ssl_u32 rp_stack[32];
 	int err;
 
 	const unsigned char *hbuf;

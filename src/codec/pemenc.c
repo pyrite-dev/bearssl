@@ -29,7 +29,7 @@
  * 0..63 range. This is constant-time.
  */
 static char
-b64char(uint32_t x)
+b64char(br_ssl_u32 x)
 {
 	/*
 	 * Values 0 to 25 map to 0x41..0x5A ('A' to 'Z')
@@ -38,7 +38,7 @@ b64char(uint32_t x)
 	 * Value 62 maps to 0x2B ('+')
 	 * Value 63 maps to 0x2F ('/')
 	 */
-	uint32_t a, b, c;
+	br_ssl_u32 a, b, c;
 
 	a = x - 26;
 	b = x - 52;
@@ -114,11 +114,11 @@ br_pem_encode(void *dest, const void *data, size_t len,
 	off = 0;
 	lim = (flags & BR_PEM_LINE64) != 0 ? 16 : 19;
 	for (u = 0; (u + 2) < len; u += 3) {
-		uint32_t w;
+		br_ssl_u32 w;
 
-		w = ((uint32_t)buf[u] << 16)
-			| ((uint32_t)buf[u + 1] << 8)
-			| (uint32_t)buf[u + 2];
+		w = ((br_ssl_u32)buf[u] << 16)
+			| ((br_ssl_u32)buf[u + 1] << 8)
+			| (br_ssl_u32)buf[u + 2];
 		*d ++ = b64char(w >> 18);
 		*d ++ = b64char((w >> 12) & 0x3F);
 		*d ++ = b64char((w >> 6) & 0x3F);
@@ -132,11 +132,11 @@ br_pem_encode(void *dest, const void *data, size_t len,
 		}
 	}
 	if (u < len) {
-		uint32_t w;
+		br_ssl_u32 w;
 
-		w = (uint32_t)buf[u] << 16;
+		w = (br_ssl_u32)buf[u] << 16;
 		if (u + 1 < len) {
-			w |= (uint32_t)buf[u + 1] << 8;
+			w |= (br_ssl_u32)buf[u + 1] << 8;
 		}
 		*d ++ = b64char(w >> 18);
 		*d ++ = b64char((w >> 12) & 0x3F);

@@ -1018,7 +1018,7 @@ const br_sslrec_out_class br_sslrec_out_clear_vtable = {
 /* see bearssl_ssl.h */
 void
 br_ssl_engine_set_suites(br_ssl_engine_context *cc,
-	const uint16_t *suites, size_t suites_num)
+	const br_ssl_u16 *suites, size_t suites_num)
 {
 	if ((suites_num * sizeof *suites) > sizeof cc->suites_buf) {
 		br_ssl_engine_fail(cc, BR_ERR_BAD_PARAM);

@@ -28,7 +28,7 @@
 #define POINT_LEN   (1 + (((BR_MAX_EC_SIZE + 7) >> 3) << 1))
 
 /* see bearssl_ec.h */
-uint32_t
+br_ssl_u32
 br_ecdsa_i15_vrfy_raw(const br_ec_impl *impl,
 	const void *hash, size_t hash_len,
 	const br_ec_public_key *pk,
@@ -40,13 +40,13 @@ br_ecdsa_i15_vrfy_raw(const br_ec_impl *impl,
 	 * coordinate of a point can be done with a simple subtraction.
 	 */
 	const br_ec_curve_def *cd;
-	uint16_t n[I15_LEN], r[I15_LEN], s[I15_LEN], t1[I15_LEN], t2[I15_LEN];
+	br_ssl_u16 n[I15_LEN], r[I15_LEN], s[I15_LEN], t1[I15_LEN], t2[I15_LEN];
 	unsigned char tx[(BR_MAX_EC_SIZE + 7) >> 3];
 	unsigned char ty[(BR_MAX_EC_SIZE + 7) >> 3];
 	unsigned char eU[POINT_LEN];
 	size_t nlen, rlen, ulen;
-	uint16_t n0i;
-	uint32_t res;
+	br_ssl_u16 n0i;
+	br_ssl_u32 res;
 
 	/*
 	 * If the curve is not supported, then report an error.

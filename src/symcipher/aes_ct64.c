@@ -26,7 +26,7 @@
 
 /* see inner.h */
 void
-br_aes_ct64_bitslice_Sbox(uint64_t *q)
+br_aes_ct64_bitslice_Sbox(br_ssl_u64 *q)
 {
 	/*
 	 * This S-box implementation is a straightforward translation of
@@ -38,20 +38,20 @@ br_aes_ct64_bitslice_Sbox(uint64_t *q)
 	 * in "reverse" order (x0 is the high bit, x7 is the low bit).
 	 */
 
-	uint64_t x0, x1, x2, x3, x4, x5, x6, x7;
-	uint64_t y1, y2, y3, y4, y5, y6, y7, y8, y9;
-	uint64_t y10, y11, y12, y13, y14, y15, y16, y17, y18, y19;
-	uint64_t y20, y21;
-	uint64_t z0, z1, z2, z3, z4, z5, z6, z7, z8, z9;
-	uint64_t z10, z11, z12, z13, z14, z15, z16, z17;
-	uint64_t t0, t1, t2, t3, t4, t5, t6, t7, t8, t9;
-	uint64_t t10, t11, t12, t13, t14, t15, t16, t17, t18, t19;
-	uint64_t t20, t21, t22, t23, t24, t25, t26, t27, t28, t29;
-	uint64_t t30, t31, t32, t33, t34, t35, t36, t37, t38, t39;
-	uint64_t t40, t41, t42, t43, t44, t45, t46, t47, t48, t49;
-	uint64_t t50, t51, t52, t53, t54, t55, t56, t57, t58, t59;
-	uint64_t t60, t61, t62, t63, t64, t65, t66, t67;
-	uint64_t s0, s1, s2, s3, s4, s5, s6, s7;
+	br_ssl_u64 x0, x1, x2, x3, x4, x5, x6, x7;
+	br_ssl_u64 y1, y2, y3, y4, y5, y6, y7, y8, y9;
+	br_ssl_u64 y10, y11, y12, y13, y14, y15, y16, y17, y18, y19;
+	br_ssl_u64 y20, y21;
+	br_ssl_u64 z0, z1, z2, z3, z4, z5, z6, z7, z8, z9;
+	br_ssl_u64 z10, z11, z12, z13, z14, z15, z16, z17;
+	br_ssl_u64 t0, t1, t2, t3, t4, t5, t6, t7, t8, t9;
+	br_ssl_u64 t10, t11, t12, t13, t14, t15, t16, t17, t18, t19;
+	br_ssl_u64 t20, t21, t22, t23, t24, t25, t26, t27, t28, t29;
+	br_ssl_u64 t30, t31, t32, t33, t34, t35, t36, t37, t38, t39;
+	br_ssl_u64 t40, t41, t42, t43, t44, t45, t46, t47, t48, t49;
+	br_ssl_u64 t50, t51, t52, t53, t54, t55, t56, t57, t58, t59;
+	br_ssl_u64 t60, t61, t62, t63, t64, t65, t66, t67;
+	br_ssl_u64 s0, s1, s2, s3, s4, s5, s6, s7;
 
 	x0 = q[7];
 	x1 = q[6];
@@ -203,14 +203,14 @@ br_aes_ct64_bitslice_Sbox(uint64_t *q)
 
 /* see inner.h */
 void
-br_aes_ct64_ortho(uint64_t *q)
+br_aes_ct64_ortho(br_ssl_u64 *q)
 {
 #define SWAPN(cl, ch, s, x, y)   do { \
-		uint64_t a, b; \
+		br_ssl_u64 a, b; \
 		a = (x); \
 		b = (y); \
-		(x) = (a & (uint64_t)cl) | ((b & (uint64_t)cl) << (s)); \
-		(y) = ((a & (uint64_t)ch) >> (s)) | (b & (uint64_t)ch); \
+		(x) = (a & (br_ssl_u64)cl) | ((b & (br_ssl_u64)cl) << (s)); \
+		(y) = ((a & (br_ssl_u64)ch) >> (s)) | (b & (br_ssl_u64)ch); \
 	} while (0)
 
 #define SWAP2(x, y)    SWAPN(0x5555555555555555, 0xAAAAAAAAAAAAAAAA,  1, x, y)
@@ -235,9 +235,9 @@ br_aes_ct64_ortho(uint64_t *q)
 
 /* see inner.h */
 void
-br_aes_ct64_interleave_in(uint64_t *q0, uint64_t *q1, const uint32_t *w)
+br_aes_ct64_interleave_in(br_ssl_u64 *q0, br_ssl_u64 *q1, const br_ssl_u32 *w)
 {
-	uint64_t x0, x1, x2, x3;
+	br_ssl_u64 x0, x1, x2, x3;
 
 	x0 = w[0];
 	x1 = w[1];
@@ -247,71 +247,71 @@ br_aes_ct64_interleave_in(uint64_t *q0, uint64_t *q1, const uint32_t *w)
 	x1 |= (x1 << 16);
 	x2 |= (x2 << 16);
 	x3 |= (x3 << 16);
-	x0 &= (uint64_t)0x0000FFFF0000FFFF;
-	x1 &= (uint64_t)0x0000FFFF0000FFFF;
-	x2 &= (uint64_t)0x0000FFFF0000FFFF;
-	x3 &= (uint64_t)0x0000FFFF0000FFFF;
+	x0 &= (br_ssl_u64)0x0000FFFF0000FFFF;
+	x1 &= (br_ssl_u64)0x0000FFFF0000FFFF;
+	x2 &= (br_ssl_u64)0x0000FFFF0000FFFF;
+	x3 &= (br_ssl_u64)0x0000FFFF0000FFFF;
 	x0 |= (x0 << 8);
 	x1 |= (x1 << 8);
 	x2 |= (x2 << 8);
 	x3 |= (x3 << 8);
-	x0 &= (uint64_t)0x00FF00FF00FF00FF;
-	x1 &= (uint64_t)0x00FF00FF00FF00FF;
-	x2 &= (uint64_t)0x00FF00FF00FF00FF;
-	x3 &= (uint64_t)0x00FF00FF00FF00FF;
+	x0 &= (br_ssl_u64)0x00FF00FF00FF00FF;
+	x1 &= (br_ssl_u64)0x00FF00FF00FF00FF;
+	x2 &= (br_ssl_u64)0x00FF00FF00FF00FF;
+	x3 &= (br_ssl_u64)0x00FF00FF00FF00FF;
 	*q0 = x0 | (x2 << 8);
 	*q1 = x1 | (x3 << 8);
 }
 
 /* see inner.h */
 void
-br_aes_ct64_interleave_out(uint32_t *w, uint64_t q0, uint64_t q1)
+br_aes_ct64_interleave_out(br_ssl_u32 *w, br_ssl_u64 q0, br_ssl_u64 q1)
 {
-	uint64_t x0, x1, x2, x3;
+	br_ssl_u64 x0, x1, x2, x3;
 
-	x0 = q0 & (uint64_t)0x00FF00FF00FF00FF;
-	x1 = q1 & (uint64_t)0x00FF00FF00FF00FF;
-	x2 = (q0 >> 8) & (uint64_t)0x00FF00FF00FF00FF;
-	x3 = (q1 >> 8) & (uint64_t)0x00FF00FF00FF00FF;
+	x0 = q0 & (br_ssl_u64)0x00FF00FF00FF00FF;
+	x1 = q1 & (br_ssl_u64)0x00FF00FF00FF00FF;
+	x2 = (q0 >> 8) & (br_ssl_u64)0x00FF00FF00FF00FF;
+	x3 = (q1 >> 8) & (br_ssl_u64)0x00FF00FF00FF00FF;
 	x0 |= (x0 >> 8);
 	x1 |= (x1 >> 8);
 	x2 |= (x2 >> 8);
 	x3 |= (x3 >> 8);
-	x0 &= (uint64_t)0x0000FFFF0000FFFF;
-	x1 &= (uint64_t)0x0000FFFF0000FFFF;
-	x2 &= (uint64_t)0x0000FFFF0000FFFF;
-	x3 &= (uint64_t)0x0000FFFF0000FFFF;
-	w[0] = (uint32_t)x0 | (uint32_t)(x0 >> 16);
-	w[1] = (uint32_t)x1 | (uint32_t)(x1 >> 16);
-	w[2] = (uint32_t)x2 | (uint32_t)(x2 >> 16);
-	w[3] = (uint32_t)x3 | (uint32_t)(x3 >> 16);
+	x0 &= (br_ssl_u64)0x0000FFFF0000FFFF;
+	x1 &= (br_ssl_u64)0x0000FFFF0000FFFF;
+	x2 &= (br_ssl_u64)0x0000FFFF0000FFFF;
+	x3 &= (br_ssl_u64)0x0000FFFF0000FFFF;
+	w[0] = (br_ssl_u32)x0 | (br_ssl_u32)(x0 >> 16);
+	w[1] = (br_ssl_u32)x1 | (br_ssl_u32)(x1 >> 16);
+	w[2] = (br_ssl_u32)x2 | (br_ssl_u32)(x2 >> 16);
+	w[3] = (br_ssl_u32)x3 | (br_ssl_u32)(x3 >> 16);
 }
 
 static const unsigned char Rcon[] = {
 	0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1B, 0x36
 };
 
-static uint32_t
-sub_word(uint32_t x)
+static br_ssl_u32
+sub_word(br_ssl_u32 x)
 {
-	uint64_t q[8];
+	br_ssl_u64 q[8];
 
 	memset(q, 0, sizeof q);
 	q[0] = x;
 	br_aes_ct64_ortho(q);
 	br_aes_ct64_bitslice_Sbox(q);
 	br_aes_ct64_ortho(q);
-	return (uint32_t)q[0];
+	return (br_ssl_u32)q[0];
 }
 
 /* see inner.h */
 unsigned
-br_aes_ct64_keysched(uint64_t *comp_skey, const void *key, size_t key_len)
+br_aes_ct64_keysched(br_ssl_u64 *comp_skey, const void *key, size_t key_len)
 {
 	unsigned num_rounds;
 	int i, j, k, nk, nkf;
-	uint32_t tmp;
-	uint32_t skey[60];
+	br_ssl_u32 tmp;
+	br_ssl_u32 skey[60];
 
 	switch (key_len) {
 	case 16:
@@ -347,7 +347,7 @@ br_aes_ct64_keysched(uint64_t *comp_skey, const void *key, size_t key_len)
 	}
 
 	for (i = 0, j = 0; i < nkf; i += 4, j += 2) {
-		uint64_t q[8];
+		br_ssl_u64 q[8];
 
 		br_aes_ct64_interleave_in(&q[0], &q[4], skey + i);
 		q[1] = q[0];
@@ -358,35 +358,35 @@ br_aes_ct64_keysched(uint64_t *comp_skey, const void *key, size_t key_len)
 		q[7] = q[4];
 		br_aes_ct64_ortho(q);
 		comp_skey[j + 0] =
-			  (q[0] & (uint64_t)0x1111111111111111)
-			| (q[1] & (uint64_t)0x2222222222222222)
-			| (q[2] & (uint64_t)0x4444444444444444)
-			| (q[3] & (uint64_t)0x8888888888888888);
+			  (q[0] & (br_ssl_u64)0x1111111111111111)
+			| (q[1] & (br_ssl_u64)0x2222222222222222)
+			| (q[2] & (br_ssl_u64)0x4444444444444444)
+			| (q[3] & (br_ssl_u64)0x8888888888888888);
 		comp_skey[j + 1] =
-			  (q[4] & (uint64_t)0x1111111111111111)
-			| (q[5] & (uint64_t)0x2222222222222222)
-			| (q[6] & (uint64_t)0x4444444444444444)
-			| (q[7] & (uint64_t)0x8888888888888888);
+			  (q[4] & (br_ssl_u64)0x1111111111111111)
+			| (q[5] & (br_ssl_u64)0x2222222222222222)
+			| (q[6] & (br_ssl_u64)0x4444444444444444)
+			| (q[7] & (br_ssl_u64)0x8888888888888888);
 	}
 	return num_rounds;
 }
 
 /* see inner.h */
 void
-br_aes_ct64_skey_expand(uint64_t *skey,
-	unsigned num_rounds, const uint64_t *comp_skey)
+br_aes_ct64_skey_expand(br_ssl_u64 *skey,
+	unsigned num_rounds, const br_ssl_u64 *comp_skey)
 {
 	unsigned u, v, n;
 
 	n = (num_rounds + 1) << 1;
 	for (u = 0, v = 0; u < n; u ++, v += 4) {
-		uint64_t x0, x1, x2, x3;
+		br_ssl_u64 x0, x1, x2, x3;
 
 		x0 = x1 = x2 = x3 = comp_skey[u];
-		x0 &= (uint64_t)0x1111111111111111;
-		x1 &= (uint64_t)0x2222222222222222;
-		x2 &= (uint64_t)0x4444444444444444;
-		x3 &= (uint64_t)0x8888888888888888;
+		x0 &= (br_ssl_u64)0x1111111111111111;
+		x1 &= (br_ssl_u64)0x2222222222222222;
+		x2 &= (br_ssl_u64)0x4444444444444444;
+		x3 &= (br_ssl_u64)0x8888888888888888;
 		x1 >>= 1;
 		x2 >>= 2;
 		x3 >>= 3;

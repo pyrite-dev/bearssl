@@ -53,8 +53,8 @@ br_aes_ct_ctrcbc_ctr(const br_aes_ct_ctrcbc_keys *ctx,
 {
 	unsigned char *buf;
 	unsigned char *ivbuf;
-	uint32_t iv0, iv1, iv2, iv3;
-	uint32_t sk_exp[120];
+	br_ssl_u32 iv0, iv1, iv2, iv3;
+	br_ssl_u32 sk_exp[120];
 
 	br_aes_ct_skey_expand(sk_exp, ctx->num_rounds, ctx->skey);
 
@@ -71,7 +71,7 @@ br_aes_ct_ctrcbc_ctr(const br_aes_ct_ctrcbc_keys *ctx,
 
 	buf = data;
 	while (len > 0) {
-		uint32_t q[8], carry;
+		br_ssl_u32 q[8], carry;
 		unsigned char tmp[32];
 
 		/*
@@ -136,9 +136,9 @@ br_aes_ct_ctrcbc_mac(const br_aes_ct_ctrcbc_keys *ctx,
 	void *cbcmac, const void *data, size_t len)
 {
 	const unsigned char *buf;
-	uint32_t cm0, cm1, cm2, cm3;
-	uint32_t q[8];
-	uint32_t sk_exp[120];
+	br_ssl_u32 cm0, cm1, cm2, cm3;
+	br_ssl_u32 q[8];
+	br_ssl_u32 sk_exp[120];
 
 	br_aes_ct_skey_expand(sk_exp, ctx->num_rounds, ctx->skey);
 
@@ -189,9 +189,9 @@ br_aes_ct_ctrcbc_encrypt(const br_aes_ct_ctrcbc_keys *ctx,
 
 	unsigned char *buf;
 	unsigned char *ivbuf;
-	uint32_t iv0, iv1, iv2, iv3;
-	uint32_t cm0, cm1, cm2, cm3;
-	uint32_t sk_exp[120];
+	br_ssl_u32 iv0, iv1, iv2, iv3;
+	br_ssl_u32 cm0, cm1, cm2, cm3;
+	br_ssl_u32 sk_exp[120];
 	int first_iter;
 
 	br_aes_ct_skey_expand(sk_exp, ctx->num_rounds, ctx->skey);
@@ -218,7 +218,7 @@ br_aes_ct_ctrcbc_encrypt(const br_aes_ct_ctrcbc_keys *ctx,
 	buf = data;
 	first_iter = 1;
 	while (len > 0) {
-		uint32_t q[8], carry;
+		br_ssl_u32 q[8], carry;
 
 		/*
 		 * The bitslice implementation expects values in
@@ -319,9 +319,9 @@ br_aes_ct_ctrcbc_decrypt(const br_aes_ct_ctrcbc_keys *ctx,
 {
 	unsigned char *buf;
 	unsigned char *ivbuf;
-	uint32_t iv0, iv1, iv2, iv3;
-	uint32_t cm0, cm1, cm2, cm3;
-	uint32_t sk_exp[120];
+	br_ssl_u32 iv0, iv1, iv2, iv3;
+	br_ssl_u32 cm0, cm1, cm2, cm3;
+	br_ssl_u32 sk_exp[120];
 
 	br_aes_ct_skey_expand(sk_exp, ctx->num_rounds, ctx->skey);
 
@@ -346,7 +346,7 @@ br_aes_ct_ctrcbc_decrypt(const br_aes_ct_ctrcbc_keys *ctx,
 
 	buf = data;
 	while (len > 0) {
-		uint32_t q[8], carry;
+		br_ssl_u32 q[8], carry;
 		unsigned char tmp[16];
 
 		/*

@@ -72,7 +72,7 @@ br_encode_rsa_raw_der(void *dest, const br_rsa_private_key *sk,
 	 */
 	slen = 0;
 	for (u = 0; u < 9; u ++) {
-		uint32_t ilen;
+		br_ssl_u32 ilen;
 
 		ilen = num[u].asn1len;
 		slen += 1 + len_of_len(ilen) + ilen;

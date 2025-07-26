@@ -26,11 +26,11 @@
 
 /* see inner.h */
 void
-br_i31_encode(void *dst, size_t len, const uint32_t *x)
+br_i31_encode(void *dst, size_t len, const br_ssl_u32 *x)
 {
 	unsigned char *buf;
 	size_t k, xlen;
-	uint32_t acc;
+	br_ssl_u32 acc;
 	int acc_len;
 
 	xlen = (x[0] + 31) >> 5;
@@ -43,7 +43,7 @@ br_i31_encode(void *dst, size_t len, const uint32_t *x)
 	acc = 0;
 	acc_len = 0;
 	while (len != 0) {
-		uint32_t w;
+		br_ssl_u32 w;
 
 		w = (k <= xlen) ? x[k] : 0;
 		k ++;
@@ -51,7 +51,7 @@ br_i31_encode(void *dst, size_t len, const uint32_t *x)
 			acc = w;
 			acc_len = 31;
 		} else {
-			uint32_t z;
+			br_ssl_u32 z;
 
 			z = acc | (w << acc_len);
 			acc_len --;

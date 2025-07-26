@@ -26,7 +26,7 @@
 
 /* see inner.h */
 void
-br_range_enc16le(void *dst, const uint16_t *v, size_t num)
+br_range_enc16le(void *dst, const br_ssl_u16 *v, size_t num)
 {
 	unsigned char *buf;
 

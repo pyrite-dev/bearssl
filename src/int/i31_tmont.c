@@ -26,9 +26,9 @@
 
 /* see inner.h */
 void
-br_i31_to_monty(uint32_t *x, const uint32_t *m)
+br_i31_to_monty(br_ssl_u32 *x, const br_ssl_u32 *m)
 {
-	uint32_t k;
+	br_ssl_u32 k;
 
 	for (k = (m[0] + 31) >> 5; k > 0; k --) {
 		br_i31_muladd_small(x, 0, m);

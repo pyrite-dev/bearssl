@@ -25,10 +25,10 @@
 #include "inner.h"
 
 /* see inner.h */
-uint32_t
-br_i32_ninv32(uint32_t x)
+br_ssl_u32
+br_i32_ninv32(br_ssl_u32 x)
 {
-	uint32_t y;
+	br_ssl_u32 y;
 
 	y = 2 - x;
 	y *= 2 - y * x;

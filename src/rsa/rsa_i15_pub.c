@@ -31,18 +31,18 @@
 #define TLEN   (4 * (2 + ((BR_MAX_RSA_SIZE + 14) / 15)))
 
 /* see bearssl_rsa.h */
-uint32_t
+br_ssl_u32
 br_rsa_i15_public(unsigned char *x, size_t xlen,
 	const br_rsa_public_key *pk)
 {
 	const unsigned char *n;
 	size_t nlen;
-	uint16_t tmp[1 + TLEN];
-	uint16_t *m, *a, *t;
+	br_ssl_u16 tmp[1 + TLEN];
+	br_ssl_u16 *m, *a, *t;
 	size_t fwlen;
 	long z;
-	uint16_t m0i;
-	uint32_t r;
+	br_ssl_u16 m0i;
+	br_ssl_u32 r;
 
 	/*
 	 * Get the actual length of the modulus, and see if it fits within

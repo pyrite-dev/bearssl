@@ -39,8 +39,8 @@ br_aes_ct_cbcdec_run(const br_aes_ct_cbcdec_keys *ctx,
 	void *iv, void *data, size_t len)
 {
 	unsigned char *buf, *ivbuf;
-	uint32_t iv0, iv1, iv2, iv3;
-	uint32_t sk_exp[120];
+	br_ssl_u32 iv0, iv1, iv2, iv3;
+	br_ssl_u32 sk_exp[120];
 
 	br_aes_ct_skey_expand(sk_exp, ctx->num_rounds, ctx->skey);
 	ivbuf = iv;
@@ -50,7 +50,7 @@ br_aes_ct_cbcdec_run(const br_aes_ct_cbcdec_keys *ctx,
 	iv3 = br_dec32le(ivbuf + 12);
 	buf = data;
 	while (len > 0) {
-		uint32_t q[8], sq[8];
+		br_ssl_u32 q[8], sq[8];
 
 		q[0] = br_dec32le(buf);
 		q[2] = br_dec32le(buf + 4);

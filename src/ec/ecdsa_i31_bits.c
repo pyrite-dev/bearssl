@@ -26,14 +26,14 @@
 
 /* see inner.h */
 void
-br_ecdsa_i31_bits2int(uint32_t *x,
-	const void *src, size_t len, uint32_t ebitlen)
+br_ecdsa_i31_bits2int(br_ssl_u32 *x,
+	const void *src, size_t len, br_ssl_u32 ebitlen)
 {
-	uint32_t bitlen, hbitlen;
+	br_ssl_u32 bitlen, hbitlen;
 	int sc;
 
 	bitlen = ebitlen - (ebitlen >> 5);
-	hbitlen = (uint32_t)len << 3;
+	hbitlen = (br_ssl_u32)len << 3;
 	if (hbitlen > bitlen) {
 		len = (bitlen + 7) >> 3;
 		sc = (int)((hbitlen - bitlen) & 7);

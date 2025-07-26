@@ -28,16 +28,16 @@
  * Constant-time division. The divisor must not be larger than 16 bits,
  * and the quotient must fit on 17 bits.
  */
-static uint32_t
-divrem16(uint32_t x, uint32_t d, uint32_t *r)
+static br_ssl_u32
+divrem16(br_ssl_u32 x, br_ssl_u32 d, br_ssl_u32 *r)
 {
 	int i;
-	uint32_t q;
+	br_ssl_u32 q;
 
 	q = 0;
 	d <<= 16;
 	for (i = 16; i >= 0; i --) {
-		uint32_t ctl;
+		br_ssl_u32 ctl;
 
 		ctl = LE(d, x);
 		q |= ctl << i;
@@ -52,7 +52,7 @@ divrem16(uint32_t x, uint32_t d, uint32_t *r)
 
 /* see inner.h */
 void
-br_i15_muladd_small(uint16_t *x, uint16_t z, const uint16_t *m)
+br_i15_muladd_small(br_ssl_u16 *x, br_ssl_u16 z, const br_ssl_u16 *m)
 {
 	/*
 	 * Constant-time: we accept to leak the exact bit length of the
@@ -60,8 +60,8 @@ br_i15_muladd_small(uint16_t *x, uint16_t z, const uint16_t *m)
 	 */
 	unsigned m_bitlen, mblr;
 	size_t u, mlen;
-	uint32_t hi, a0, a, b, q;
-	uint32_t cc, tb, over, under;
+	br_ssl_u32 hi, a0, a, b, q;
+	br_ssl_u32 cc, tb, over, under;
 
 	/*
 	 * Simple case: the modulus fits on one word.
@@ -71,9 +71,9 @@ br_i15_muladd_small(uint16_t *x, uint16_t z, const uint16_t *m)
 		return;
 	}
 	if (m_bitlen <= 15) {
-		uint32_t rem;
+		br_ssl_u32 rem;
 
-		divrem16(((uint32_t)x[1] << 15) | z, m[1], &rem);
+		divrem16(((br_ssl_u32)x[1] << 15) | z, m[1], &rem);
 		x[1] = rem;
 		return;
 	}
@@ -145,7 +145,7 @@ br_i15_muladd_small(uint16_t *x, uint16_t z, const uint16_t *m)
 	cc = 0;
 	tb = 1;
 	for (u = 1; u <= mlen; u ++) {
-		uint32_t mw, zl, xw, nxw;
+		br_ssl_u32 mw, zl, xw, nxw;
 
 		mw = m[u];
 		zl = MUL15(mw, q) + cc;

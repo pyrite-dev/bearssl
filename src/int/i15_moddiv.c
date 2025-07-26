@@ -40,15 +40,15 @@
  * computed; otherwise, if 'ctl' is 0, then the value is unchanged.
  */
 static void
-cond_negate(uint16_t *a, size_t len, uint32_t ctl)
+cond_negate(br_ssl_u16 *a, size_t len, br_ssl_u32 ctl)
 {
 	size_t k;
-	uint32_t cc, xm;
+	br_ssl_u32 cc, xm;
 
 	cc = ctl;
 	xm = 0x7FFF & -ctl;
 	for (k = 0; k < len; k ++) {
-		uint32_t aw;
+		br_ssl_u32 aw;
 
 		aw = a[k];
 		aw = (aw ^ xm) + cc;
@@ -68,17 +68,17 @@ cond_negate(uint16_t *a, size_t len, uint32_t ctl)
  * Also, modulus m must be odd.
  */
 static void
-finish_mod(uint16_t *a, size_t len, const uint16_t *m, uint32_t neg)
+finish_mod(br_ssl_u16 *a, size_t len, const br_ssl_u16 *m, br_ssl_u32 neg)
 {
 	size_t k;
-	uint32_t cc, xm, ym;
+	br_ssl_u32 cc, xm, ym;
 
 	/*
 	 * First pass: compare a (assumed nonnegative) with m.
 	 */
 	cc = 0;
 	for (k = 0; k < len; k ++) {
-		uint32_t aw, mw;
+		br_ssl_u32 aw, mw;
 
 		aw = a[k];
 		mw = m[k];
@@ -95,7 +95,7 @@ finish_mod(uint16_t *a, size_t len, const uint16_t *m, uint32_t neg)
 	ym = -(neg | (1 - cc));
 	cc = neg;
 	for (k = 0; k < len; k ++) {
-		uint32_t aw, mw;
+		br_ssl_u32 aw, mw;
 
 		aw = a[k];
 		mw = (m[k] ^ xm) & ym;
@@ -119,19 +119,19 @@ finish_mod(uint16_t *a, size_t len, const uint16_t *m, uint32_t neg)
  * Source integers a and b must be nonnegative; top word is not allowed
  * to contain an extra 16th bit.
  */
-static uint32_t
-co_reduce(uint16_t *a, uint16_t *b, size_t len,
-	int32_t pa, int32_t pb, int32_t qa, int32_t qb)
+static br_ssl_u32
+co_reduce(br_ssl_u16 *a, br_ssl_u16 *b, size_t len,
+	br_ssl_i32 pa, br_ssl_i32 pb, br_ssl_i32 qa, br_ssl_i32 qb)
 {
 	size_t k;
-	int32_t cca, ccb;
-	uint32_t nega, negb;
+	br_ssl_i32 cca, ccb;
+	br_ssl_u32 nega, negb;
 
 	cca = 0;
 	ccb = 0;
 	for (k = 0; k < len; k ++) {
-		uint32_t wa, wb, za, zb;
-		uint16_t tta, ttb;
+		br_ssl_u32 wa, wb, za, zb;
+		br_ssl_u16 tta, ttb;
 
 		/*
 		 * Since:
@@ -148,21 +148,21 @@ co_reduce(uint16_t *a, uint16_t *b, size_t len,
 		 */
 		wa = a[k];
 		wb = b[k];
-		za = wa * (uint32_t)pa + wb * (uint32_t)pb + (uint32_t)cca;
-		zb = wa * (uint32_t)qa + wb * (uint32_t)qb + (uint32_t)ccb;
+		za = wa * (br_ssl_u32)pa + wb * (br_ssl_u32)pb + (br_ssl_u32)cca;
+		zb = wa * (br_ssl_u32)qa + wb * (br_ssl_u32)qb + (br_ssl_u32)ccb;
 		if (k > 0) {
 			a[k - 1] = za & 0x7FFF;
 			b[k - 1] = zb & 0x7FFF;
 		}
 		tta = za >> 15;
 		ttb = zb >> 15;
-		cca = *(int16_t *)&tta;
-		ccb = *(int16_t *)&ttb;
+		cca = *(br_ssl_i16 *)&tta;
+		ccb = *(br_ssl_i16 *)&ttb;
 	}
-	a[len - 1] = (uint16_t)cca;
-	b[len - 1] = (uint16_t)ccb;
-	nega = (uint32_t)cca >> 31;
-	negb = (uint32_t)ccb >> 31;
+	a[len - 1] = (br_ssl_u16)cca;
+	b[len - 1] = (br_ssl_u16)ccb;
+	nega = (br_ssl_u32)cca >> 31;
+	negb = (br_ssl_u32)ccb >> 31;
 	cond_negate(a, len, nega);
 	cond_negate(b, len, negb);
 	return nega | (negb << 1);
@@ -180,20 +180,20 @@ co_reduce(uint16_t *a, uint16_t *b, size_t len,
  * to contain an extra 16th bit.
  */
 static void
-co_reduce_mod(uint16_t *a, uint16_t *b, size_t len,
-	int32_t pa, int32_t pb, int32_t qa, int32_t qb,
-	const uint16_t *m, uint16_t m0i)
+co_reduce_mod(br_ssl_u16 *a, br_ssl_u16 *b, size_t len,
+	br_ssl_i32 pa, br_ssl_i32 pb, br_ssl_i32 qa, br_ssl_i32 qb,
+	const br_ssl_u16 *m, br_ssl_u16 m0i)
 {
 	size_t k;
-	int32_t cca, ccb, fa, fb;
+	br_ssl_i32 cca, ccb, fa, fb;
 
 	cca = 0;
 	ccb = 0;
-	fa = ((a[0] * (uint32_t)pa + b[0] * (uint32_t)pb) * m0i) & 0x7FFF;
-	fb = ((a[0] * (uint32_t)qa + b[0] * (uint32_t)qb) * m0i) & 0x7FFF;
+	fa = ((a[0] * (br_ssl_u32)pa + b[0] * (br_ssl_u32)pb) * m0i) & 0x7FFF;
+	fb = ((a[0] * (br_ssl_u32)qa + b[0] * (br_ssl_u32)qb) * m0i) & 0x7FFF;
 	for (k = 0; k < len; k ++) {
-		uint32_t wa, wb, za, zb;
-		uint32_t tta, ttb;
+		br_ssl_u32 wa, wb, za, zb;
+		br_ssl_u32 tta, ttb;
 
 		/*
 		 * In this loop, carries 'cca' and 'ccb' always fit on
@@ -201,10 +201,10 @@ co_reduce_mod(uint16_t *a, uint16_t *b, size_t len,
 		 */
 		wa = a[k];
 		wb = b[k];
-		za = wa * (uint32_t)pa + wb * (uint32_t)pb
-			+ m[k] * (uint32_t)fa + (uint32_t)cca;
-		zb = wa * (uint32_t)qa + wb * (uint32_t)qb
-			+ m[k] * (uint32_t)fb + (uint32_t)ccb;
+		za = wa * (br_ssl_u32)pa + wb * (br_ssl_u32)pb
+			+ m[k] * (br_ssl_u32)fa + (br_ssl_u32)cca;
+		zb = wa * (br_ssl_u32)qa + wb * (br_ssl_u32)qb
+			+ m[k] * (br_ssl_u32)fb + (br_ssl_u32)ccb;
 		if (k > 0) {
 			a[k - 1] = za & 0x7FFF;
 			b[k - 1] = zb & 0x7FFF;
@@ -215,17 +215,17 @@ co_reduce_mod(uint16_t *a, uint16_t *b, size_t len,
 		 * right shift in a portable way (technically, right-shifting
 		 * a negative signed value is implementation-defined in C).
 		 */
-#define M   ((uint32_t)1 << 16)
+#define M   ((br_ssl_u32)1 << 16)
 		tta = za >> 15;
 		ttb = zb >> 15;
 		tta = (tta ^ M) - M;
 		ttb = (ttb ^ M) - M;
-		cca = *(int32_t *)&tta;
-		ccb = *(int32_t *)&ttb;
+		cca = *(br_ssl_i32 *)&tta;
+		ccb = *(br_ssl_i32 *)&ttb;
 #undef M
 	}
-	a[len - 1] = (uint32_t)cca;
-	b[len - 1] = (uint32_t)ccb;
+	a[len - 1] = (br_ssl_u32)cca;
+	b[len - 1] = (br_ssl_u32)ccb;
 
 	/*
 	 * At this point:
@@ -235,14 +235,14 @@ co_reduce_mod(uint16_t *a, uint16_t *b, size_t len,
 	 * The top word of 'a' and 'b' may have a 16-th bit set.
 	 * We may have to add or subtract the modulus.
 	 */
-	finish_mod(a, len, m, (uint32_t)cca >> 31);
-	finish_mod(b, len, m, (uint32_t)ccb >> 31);
+	finish_mod(a, len, m, (br_ssl_u32)cca >> 31);
+	finish_mod(b, len, m, (br_ssl_u32)ccb >> 31);
 }
 
 /* see inner.h */
-uint32_t
-br_i15_moddiv(uint16_t *x, const uint16_t *y, const uint16_t *m, uint16_t m0i,
-	uint16_t *t)
+br_ssl_u32
+br_i15_moddiv(br_ssl_u16 *x, const br_ssl_u16 *y, const br_ssl_u16 *m, br_ssl_u16 m0i,
+	br_ssl_u16 *t)
 {
 	/*
 	 * Algorithm is an extended binary GCD. We maintain four values
@@ -302,8 +302,8 @@ br_i15_moddiv(uint16_t *x, const uint16_t *y, const uint16_t *m, uint16_t m0i,
 	 * other one is the GCD.
 	 */
 	size_t len, k;
-	uint16_t *a, *b, *u, *v;
-	uint32_t num, r;
+	br_ssl_u16 *a, *b, *u, *v;
+	br_ssl_u32 num, r;
 
 	len = (m[0] + 15) >> 4;
 	a = t;
@@ -320,10 +320,10 @@ br_i15_moddiv(uint16_t *x, const uint16_t *y, const uint16_t *m, uint16_t m0i,
 	 */
 	for (num = ((m[0] - (m[0] >> 4)) << 1) + 14; num >= 14; num -= 14) {
 		size_t j;
-		uint32_t c0, c1;
-		uint32_t a0, a1, b0, b1;
-		uint32_t a_hi, b_hi, a_lo, b_lo;
-		int32_t pa, pb, qa, qb;
+		br_ssl_u32 c0, c1;
+		br_ssl_u32 a0, a1, b0, b1;
+		br_ssl_u32 a_hi, b_hi, a_lo, b_lo;
+		br_ssl_i32 pa, pb, qa, qb;
 		int i;
 
 		/*
@@ -333,15 +333,15 @@ br_i15_moddiv(uint16_t *x, const uint16_t *y, const uint16_t *m, uint16_t m0i,
 		 * If a and b are down to one word each, then we use a[0]
 		 * and b[0].
 		 */
-		c0 = (uint32_t)-1;
-		c1 = (uint32_t)-1;
+		c0 = (br_ssl_u32)-1;
+		c1 = (br_ssl_u32)-1;
 		a0 = 0;
 		a1 = 0;
 		b0 = 0;
 		b1 = 0;
 		j = len;
 		while (j -- > 0) {
-			uint32_t aw, bw;
+			br_ssl_u32 aw, bw;
 
 			aw = a[j];
 			bw = b[j];
@@ -350,7 +350,7 @@ br_i15_moddiv(uint16_t *x, const uint16_t *y, const uint16_t *m, uint16_t m0i,
 			b0 ^= (b0 ^ bw) & c0;
 			b1 ^= (b1 ^ bw) & c1;
 			c1 = c0;
-			c0 &= (((aw | bw) + 0xFFFF) >> 16) - (uint32_t)1;
+			c0 &= (((aw | bw) + 0xFFFF) >> 16) - (br_ssl_u32)1;
 		}
 
 		/*
@@ -394,7 +394,7 @@ br_i15_moddiv(uint16_t *x, const uint16_t *y, const uint16_t *m, uint16_t m0i,
 			 * iteration, thus a division by 2 really is a
 			 * non-multiplication by 2.
 			 */
-			uint32_t r, oa, ob, cAB, cBA, cA;
+			br_ssl_u32 r, oa, ob, cAB, cBA, cA;
 
 			/*
 			 * cAB = 1 if b must be subtracted from a
@@ -418,23 +418,23 @@ br_i15_moddiv(uint16_t *x, const uint16_t *y, const uint16_t *m, uint16_t m0i,
 			 */
 			a_lo -= b_lo & -cAB;
 			a_hi -= b_hi & -cAB;
-			pa -= qa & -(int32_t)cAB;
-			pb -= qb & -(int32_t)cAB;
+			pa -= qa & -(br_ssl_i32)cAB;
+			pb -= qb & -(br_ssl_i32)cAB;
 			b_lo -= a_lo & -cBA;
 			b_hi -= a_hi & -cBA;
-			qa -= pa & -(int32_t)cBA;
-			qb -= pb & -(int32_t)cBA;
+			qa -= pa & -(br_ssl_i32)cBA;
+			qb -= pb & -(br_ssl_i32)cBA;
 
 			/*
 			 * Shifting.
 			 */
 			a_lo += a_lo & (cA - 1);
-			pa += pa & ((int32_t)cA - 1);
-			pb += pb & ((int32_t)cA - 1);
+			pa += pa & ((br_ssl_i32)cA - 1);
+			pb += pb & ((br_ssl_i32)cA - 1);
 			a_hi ^= (a_hi ^ (a_hi >> 1)) & -cA;
 			b_lo += b_lo & -cA;
-			qa += qa & -(int32_t)cA;
-			qb += qb & -(int32_t)cA;
+			qa += qa & -(br_ssl_i32)cA;
+			qb += qb & -(br_ssl_i32)cA;
 			b_hi ^= (b_hi ^ (b_hi >> 1)) & (cA - 1);
 		}
 

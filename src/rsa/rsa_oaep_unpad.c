@@ -49,14 +49,14 @@ xor_hash_data(const br_hash_class *dig, void *dst, const void *src, size_t len)
 }
 
 /* see inner.h */
-uint32_t
+br_ssl_u32
 br_rsa_oaep_unpad(const br_hash_class *dig,
 	const void *label, size_t label_len,
 	void *data, size_t *len)
 {
 	size_t u, k, hlen;
 	unsigned char *buf;
-	uint32_t r, s, zlen;
+	br_ssl_u32 r, s, zlen;
 
 	hlen = br_digest_size(dig);
 	k = *len;
@@ -111,7 +111,7 @@ br_rsa_oaep_unpad(const br_hash_class *dig,
 	s = 0;
 	zlen = 0;
 	for (u = hlen + 1; u < k; u ++) {
-		uint32_t w, nz;
+		br_ssl_u32 w, nz;
 
 		w = buf[u];
 
@@ -127,7 +127,7 @@ br_rsa_oaep_unpad(const br_hash_class *dig,
 	/*
 	 * Padding is correct only if s == 1, _and_ zlen >= hlen.
 	 */
-	s &= GE(zlen, (uint32_t)hlen);
+	s &= GE(zlen, (br_ssl_u32)hlen);
 
 	/*
 	 * At that point, padding was verified, and we are now allowed

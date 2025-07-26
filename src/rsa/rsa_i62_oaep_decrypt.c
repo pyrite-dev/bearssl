@@ -27,12 +27,12 @@
 #if BR_INT128 || BR_UMUL128
 
 /* see bearssl_rsa.h */
-uint32_t
+br_ssl_u32
 br_rsa_i62_oaep_decrypt(const br_hash_class *dig,
 	const void *label, size_t label_len,
 	const br_rsa_private_key *sk, void *data, size_t *len)
 {
-	uint32_t r;
+	br_ssl_u32 r;
 
 	if (*len != ((sk->n_bitlen + 7) >> 3)) {
 		return 0;

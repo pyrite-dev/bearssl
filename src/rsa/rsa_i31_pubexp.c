@@ -28,7 +28,7 @@
  * Recompute public exponent, based on factor p and reduced private
  * exponent dp.
  */
-static uint32_t
+static br_ssl_u32
 get_pubexp(const unsigned char *pbuf, size_t plen,
 	const unsigned char *dpbuf, size_t dplen)
 {
@@ -43,10 +43,10 @@ get_pubexp(const unsigned char *pbuf, size_t plen,
 	 * reduction function); then, we use moddiv.
 	 */
 
-	uint32_t tmp[6 * ((BR_MAX_RSA_FACTOR + 61) / 31)];
-	uint32_t *p, *dp, *x;
+	br_ssl_u32 tmp[6 * ((BR_MAX_RSA_FACTOR + 61) / 31)];
+	br_ssl_u32 *p, *dp, *x;
 	size_t len;
-	uint32_t e;
+	br_ssl_u32 e;
 
 	/*
 	 * Compute actual factor length (in bytes) and check that it fits
@@ -130,21 +130,21 @@ get_pubexp(const unsigned char *pbuf, size_t plen,
 	 * Take care that the bit_length function returns an encoded
 	 * bit length.
 	 */
-	e = (uint32_t)x[1] | ((uint32_t)x[2] << 31);
+	e = (br_ssl_u32)x[1] | ((br_ssl_u32)x[2] << 31);
 	e &= -LT(br_i31_bit_length(x + 1, len - 1), 34);
 	e &= -(e & 1);
 	return e;
 }
 
 /* see bearssl_rsa.h */
-uint32_t
+br_ssl_u32
 br_rsa_i31_compute_pubexp(const br_rsa_private_key *sk)
 {
 	/*
 	 * Get the public exponent from both p and q. This is the right
 	 * exponent if we get twice the same value.
 	 */
-	uint32_t ep, eq;
+	br_ssl_u32 ep, eq;
 
 	ep = get_pubexp(sk->p, sk->plen, sk->dp, sk->dplen);
 	eq = get_pubexp(sk->q, sk->qlen, sk->dq, sk->dqlen);

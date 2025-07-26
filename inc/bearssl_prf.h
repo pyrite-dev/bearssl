@@ -26,7 +26,7 @@
 #define BR_BEARSSL_PRF_H__
 
 #include <stddef.h>
-#include <stdint.h>
+#include "bearssl_int.h"
 
 #ifdef __cplusplus
 extern "C" {

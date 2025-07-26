@@ -1,57 +1,57 @@
 /* Automatically generated code; do not modify directly. */
 
 #include <stddef.h>
-#include <stdint.h>
+#include "bearssl_int.h"
 
 typedef struct {
-	uint32_t *dp;
-	uint32_t *rp;
+	br_ssl_u32 *dp;
+	br_ssl_u32 *rp;
 	const unsigned char *ip;
 } t0_context;
 
-static uint32_t
+static br_ssl_u32
 t0_parse7E_unsigned(const unsigned char **p)
 {
-	uint32_t x;
+	br_ssl_u32 x;
 
 	x = 0;
 	for (;;) {
 		unsigned y;
 
 		y = *(*p) ++;
-		x = (x << 7) | (uint32_t)(y & 0x7F);
+		x = (x << 7) | (br_ssl_u32)(y & 0x7F);
 		if (y < 0x80) {
 			return x;
 		}
 	}
 }
 
-static int32_t
+static br_ssl_i32
 t0_parse7E_signed(const unsigned char **p)
 {
 	int neg;
-	uint32_t x;
+	br_ssl_u32 x;
 
 	neg = ((**p) >> 6) & 1;
-	x = (uint32_t)-neg;
+	x = (br_ssl_u32)-neg;
 	for (;;) {
 		unsigned y;
 
 		y = *(*p) ++;
-		x = (x << 7) | (uint32_t)(y & 0x7F);
+		x = (x << 7) | (br_ssl_u32)(y & 0x7F);
 		if (y < 0x80) {
 			if (neg) {
-				return -(int32_t)~x - 1;
+				return -(br_ssl_i32)~x - 1;
 			} else {
-				return (int32_t)x;
+				return (br_ssl_i32)x;
 			}
 		}
 	}
 }
 
-#define T0_VBYTE(x, n)   (unsigned char)((((uint32_t)(x) >> (n)) & 0x7F) | 0x80)
-#define T0_FBYTE(x, n)   (unsigned char)(((uint32_t)(x) >> (n)) & 0x7F)
-#define T0_SBYTE(x)      (unsigned char)((((uint32_t)(x) >> 28) + 0xF8) ^ 0xF8)
+#define T0_VBYTE(x, n)   (unsigned char)((((br_ssl_u32)(x) >> (n)) & 0x7F) | 0x80)
+#define T0_FBYTE(x, n)   (unsigned char)(((br_ssl_u32)(x) >> (n)) & 0x7F)
+#define T0_SBYTE(x)      (unsigned char)((((br_ssl_u32)(x) >> 28) + 0xF8) ^ 0xF8)
 #define T0_INT1(x)       T0_FBYTE(x, 0)
 #define T0_INT2(x)       T0_VBYTE(x, 7), T0_FBYTE(x, 0)
 #define T0_INT3(x)       T0_VBYTE(x, 14), T0_VBYTE(x, 7), T0_FBYTE(x, 0)
@@ -170,7 +170,7 @@ static const unsigned char t0_codeblock[] = {
 	0x01, 0x20, 0x0B, 0x10, 0x00
 };
 
-static const uint16_t t0_caddr[] = {
+static const br_ssl_u16 t0_caddr[] = {
 	0,
 	5,
 	10,
@@ -198,11 +198,11 @@ static const uint16_t t0_caddr[] = {
 
 #define T0_ENTER(ip, rp, slot)   do { \
 		const unsigned char *t0_newip; \
-		uint32_t t0_lnum; \
+		br_ssl_u32 t0_lnum; \
 		t0_newip = &t0_codeblock[t0_caddr[(slot) - T0_INTERPRETED]]; \
 		t0_lnum = t0_parse7E_unsigned(&t0_newip); \
 		(rp) += t0_lnum; \
-		*((rp) ++) = (uint32_t)((ip) - &t0_codeblock[0]) + (t0_lnum << 16); \
+		*((rp) ++) = (br_ssl_u32)((ip) - &t0_codeblock[0]) + (t0_lnum << 16); \
 		(ip) = t0_newip; \
 	} while (0)
 
@@ -222,45 +222,45 @@ T0_DEFENTRY(br_pem_decoder_init_main, 38)
 void
 br_pem_decoder_run(void *t0ctx)
 {
-	uint32_t *dp, *rp;
+	br_ssl_u32 *dp, *rp;
 	const unsigned char *ip;
 
 #define T0_LOCAL(x)    (*(rp - 2 - (x)))
 #define T0_POP()       (*-- dp)
-#define T0_POPi()      (*(int32_t *)(-- dp))
+#define T0_POPi()      (*(br_ssl_i32 *)(-- dp))
 #define T0_PEEK(x)     (*(dp - 1 - (x)))
-#define T0_PEEKi(x)    (*(int32_t *)(dp - 1 - (x)))
+#define T0_PEEKi(x)    (*(br_ssl_i32 *)(dp - 1 - (x)))
 #define T0_PUSH(v)     do { *dp = (v); dp ++; } while (0)
-#define T0_PUSHi(v)    do { *(int32_t *)dp = (v); dp ++; } while (0)
+#define T0_PUSHi(v)    do { *(br_ssl_i32 *)dp = (v); dp ++; } while (0)
 #define T0_RPOP()      (*-- rp)
-#define T0_RPOPi()     (*(int32_t *)(-- rp))
+#define T0_RPOPi()     (*(br_ssl_i32 *)(-- rp))
 #define T0_RPUSH(v)    do { *rp = (v); rp ++; } while (0)
-#define T0_RPUSHi(v)   do { *(int32_t *)rp = (v); rp ++; } while (0)
+#define T0_RPUSHi(v)   do { *(br_ssl_i32 *)rp = (v); rp ++; } while (0)
 #define T0_ROLL(x)     do { \
 	size_t t0len = (size_t)(x); \
-	uint32_t t0tmp = *(dp - 1 - t0len); \
+	br_ssl_u32 t0tmp = *(dp - 1 - t0len); \
 	memmove(dp - t0len - 1, dp - t0len, t0len * sizeof *dp); \
 	*(dp - 1) = t0tmp; \
 } while (0)
 #define T0_SWAP()      do { \
-	uint32_t t0tmp = *(dp - 2); \
+	br_ssl_u32 t0tmp = *(dp - 2); \
 	*(dp - 2) = *(dp - 1); \
 	*(dp - 1) = t0tmp; \
 } while (0)
 #define T0_ROT()       do { \
-	uint32_t t0tmp = *(dp - 3); \
+	br_ssl_u32 t0tmp = *(dp - 3); \
 	*(dp - 3) = *(dp - 2); \
 	*(dp - 2) = *(dp - 1); \
 	*(dp - 1) = t0tmp; \
 } while (0)
 #define T0_NROT()       do { \
-	uint32_t t0tmp = *(dp - 1); \
+	br_ssl_u32 t0tmp = *(dp - 1); \
 	*(dp - 1) = *(dp - 2); \
 	*(dp - 2) = *(dp - 3); \
 	*(dp - 3) = t0tmp; \
 } while (0)
 #define T0_PICK(x)      do { \
-	uint32_t t0depth = (x); \
+	br_ssl_u32 t0depth = (x); \
 	T0_PUSH(T0_PEEK(t0depth)); \
 } while (0)
 #define T0_CO()         do { \
@@ -273,13 +273,13 @@ br_pem_decoder_run(void *t0ctx)
 	ip = ((t0_context *)t0ctx)->ip;
 	goto t0_next;
 	for (;;) {
-		uint32_t t0x;
+		br_ssl_u32 t0x;
 
 	t0_next:
 		t0x = T0_NEXT(&ip);
 		if (t0x < T0_INTERPRETED) {
 			switch (t0x) {
-				int32_t t0off;
+				br_ssl_i32 t0off;
 
 			case 0: /* ret */
 				t0x = T0_RPOP();
@@ -319,8 +319,8 @@ br_pem_decoder_run(void *t0ctx)
 			case 7: {
 				/* + */
 
-	uint32_t b = T0_POP();
-	uint32_t a = T0_POP();
+	br_ssl_u32 b = T0_POP();
+	br_ssl_u32 a = T0_POP();
 	T0_PUSH(a + b);
 
 				}
@@ -328,8 +328,8 @@ br_pem_decoder_run(void *t0ctx)
 			case 8: {
 				/* - */
 
-	uint32_t b = T0_POP();
-	uint32_t a = T0_POP();
+	br_ssl_u32 b = T0_POP();
+	br_ssl_u32 a = T0_POP();
 	T0_PUSH(a - b);
 
 				}
@@ -337,9 +337,9 @@ br_pem_decoder_run(void *t0ctx)
 			case 9: {
 				/* < */
 
-	int32_t b = T0_POPi();
-	int32_t a = T0_POPi();
-	T0_PUSH(-(uint32_t)(a < b));
+	br_ssl_i32 b = T0_POPi();
+	br_ssl_i32 a = T0_POPi();
+	T0_PUSH(-(br_ssl_u32)(a < b));
 
 				}
 				break;
@@ -347,7 +347,7 @@ br_pem_decoder_run(void *t0ctx)
 				/* << */
 
 	int c = (int)T0_POPi();
-	uint32_t x = T0_POP();
+	br_ssl_u32 x = T0_POP();
 	T0_PUSH(x << c);
 
 				}
@@ -355,36 +355,36 @@ br_pem_decoder_run(void *t0ctx)
 			case 11: {
 				/* <= */
 
-	int32_t b = T0_POPi();
-	int32_t a = T0_POPi();
-	T0_PUSH(-(uint32_t)(a <= b));
+	br_ssl_i32 b = T0_POPi();
+	br_ssl_i32 a = T0_POPi();
+	T0_PUSH(-(br_ssl_u32)(a <= b));
 
 				}
 				break;
 			case 12: {
 				/* <> */
 
-	uint32_t b = T0_POP();
-	uint32_t a = T0_POP();
-	T0_PUSH(-(uint32_t)(a != b));
+	br_ssl_u32 b = T0_POP();
+	br_ssl_u32 a = T0_POP();
+	T0_PUSH(-(br_ssl_u32)(a != b));
 
 				}
 				break;
 			case 13: {
 				/* = */
 
-	uint32_t b = T0_POP();
-	uint32_t a = T0_POP();
-	T0_PUSH(-(uint32_t)(a == b));
+	br_ssl_u32 b = T0_POP();
+	br_ssl_u32 a = T0_POP();
+	T0_PUSH(-(br_ssl_u32)(a == b));
 
 				}
 				break;
 			case 14: {
 				/* >= */
 
-	int32_t b = T0_POPi();
-	int32_t a = T0_POPi();
-	T0_PUSH(-(uint32_t)(a >= b));
+	br_ssl_i32 b = T0_POPi();
+	br_ssl_i32 a = T0_POPi();
+	T0_PUSH(-(br_ssl_u32)(a >= b));
 
 				}
 				break;
@@ -392,7 +392,7 @@ br_pem_decoder_run(void *t0ctx)
 				/* >> */
 
 	int c = (int)T0_POPi();
-	int32_t x = T0_POPi();
+	br_ssl_i32 x = T0_POPi();
 	T0_PUSHi(x >> c);
 
 				}
@@ -400,8 +400,8 @@ br_pem_decoder_run(void *t0ctx)
 			case 16: {
 				/* and */
 
-	uint32_t b = T0_POP();
-	uint32_t a = T0_POP();
+	br_ssl_u32 b = T0_POP();
+	br_ssl_u32 a = T0_POP();
 	T0_PUSH(a & b);
 
 				}
@@ -444,8 +444,8 @@ br_pem_decoder_run(void *t0ctx)
 			case 22: {
 				/* from-base64 */
 
-	uint32_t c = T0_POP();
-	uint32_t p, q, r, z;
+	br_ssl_u32 c = T0_POP();
+	br_ssl_u32 p, q, r, z;
 	p = c - 0x41;
 	q = c - 0x61;
 	r = c - 0x30;
@@ -456,7 +456,7 @@ br_pem_decoder_run(void *t0ctx)
 		| (64 & -EQ(c, 0x2B))
 		| (65 & -EQ(c, 0x2F))
 		| EQ(c, 0x3D);
-	T0_PUSHi((int32_t)z - 2);
+	T0_PUSHi((br_ssl_i32)z - 2);
 
 				}
 				break;

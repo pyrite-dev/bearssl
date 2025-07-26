@@ -39,9 +39,9 @@ br_aes_ct_cbcenc_run(const br_aes_ct_cbcenc_keys *ctx,
 	void *iv, void *data, size_t len)
 {
 	unsigned char *buf, *ivbuf;
-	uint32_t q[8];
-	uint32_t iv0, iv1, iv2, iv3;
-	uint32_t sk_exp[120];
+	br_ssl_u32 q[8];
+	br_ssl_u32 iv0, iv1, iv2, iv3;
+	br_ssl_u32 sk_exp[120];
 
 	q[1] = 0;
 	q[3] = 0;

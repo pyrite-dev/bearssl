@@ -37,9 +37,9 @@ key_schedule_128(unsigned char *sk, const unsigned char *key)
 {
 	long cc;
 
-	static const uint32_t fmod[] = { 0x11B, 0x11B, 0x11B, 0x11B };
+	static const br_ssl_u32 fmod[] = { 0x11B, 0x11B, 0x11B, 0x11B };
 #if BR_POWER8_LE
-	static const uint32_t idx2be[] = {
+	static const br_ssl_u32 idx2be[] = {
 		0x03020100, 0x07060504, 0x0B0A0908, 0x0F0E0D0C
 	};
 #endif
@@ -148,7 +148,7 @@ key_schedule_192(unsigned char *sk, const unsigned char *key)
 	long cc;
 
 #if BR_POWER8_LE
-	static const uint32_t idx2be[] = {
+	static const br_ssl_u32 idx2be[] = {
 		0x03020100, 0x07060504, 0x0B0A0908, 0x0F0E0D0C
 	};
 #endif
@@ -286,7 +286,7 @@ key_schedule_256(unsigned char *sk, const unsigned char *key)
 	long cc;
 
 #if BR_POWER8_LE
-	static const uint32_t idx2be[] = {
+	static const br_ssl_u32 idx2be[] = {
 		0x03020100, 0x07060504, 0x0B0A0908, 0x0F0E0D0C
 	};
 #endif

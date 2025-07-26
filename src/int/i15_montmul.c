@@ -26,25 +26,25 @@
 
 /* see inner.h */
 void
-br_i15_montymul(uint16_t *d, const uint16_t *x, const uint16_t *y,
-	const uint16_t *m, uint16_t m0i)
+br_i15_montymul(br_ssl_u16 *d, const br_ssl_u16 *x, const br_ssl_u16 *y,
+	const br_ssl_u16 *m, br_ssl_u16 m0i)
 {
 	size_t len, len4, u, v;
-	uint32_t dh;
+	br_ssl_u32 dh;
 
 	len = (m[0] + 15) >> 4;
 	len4 = len & ~(size_t)3;
 	br_i15_zero(d, m[0]);
 	dh = 0;
 	for (u = 0; u < len; u ++) {
-		uint32_t f, xu, r, zh;
+		br_ssl_u32 f, xu, r, zh;
 
 		xu = x[u + 1];
 		f = MUL15((d[1] + MUL15(x[u + 1], y[1])) & 0x7FFF, m0i)
 			& 0x7FFF;
 #if BR_ARMEL_CORTEXM_GCC
 		if (len4 != 0) {
-			uint16_t *limit;
+			br_ssl_u16 *limit;
 
 			limit = d + len4;
 			asm volatile (
@@ -137,7 +137,7 @@ loop%=:                                                            \n\
 #else
 		r = 0;
 		for (v = 0; v < len4; v += 4) {
-			uint32_t z;
+			br_ssl_u32 z;
 
 			z = d[v + 1] + MUL15(xu, y[v + 1])
 				+ MUL15(f, m[v + 1]) + r;
@@ -158,7 +158,7 @@ loop%=:                                                            \n\
 		}
 #endif
 		for (; v < len; v ++) {
-			uint32_t z;
+			br_ssl_u32 z;
 
 			z = d[v + 1] + MUL15(xu, y[v + 1])
 				+ MUL15(f, m[v + 1]) + r;

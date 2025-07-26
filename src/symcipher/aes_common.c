@@ -24,7 +24,7 @@
 
 #include "inner.h"
 
-static const uint32_t Rcon[] = {
+static const br_ssl_u32 Rcon[] = {
 	0x01000000, 0x02000000, 0x04000000, 0x08000000, 0x10000000, 0x20000000,
 	0x40000000, 0x80000000, 0x1B000000, 0x36000000
 };
@@ -57,18 +57,18 @@ const unsigned char br_aes_S[] = {
 	0xB0, 0x54, 0xBB, 0x16
 };
 
-static uint32_t
-SubWord(uint32_t x)
+static br_ssl_u32
+SubWord(br_ssl_u32 x)
 {
-	return ((uint32_t)S[x >> 24] << 24)
-		| ((uint32_t)S[(x >> 16) & 0xFF] << 16)
-		| ((uint32_t)S[(x >> 8) & 0xFF] << 8)
-		| (uint32_t)S[x & 0xFF];
+	return ((br_ssl_u32)S[x >> 24] << 24)
+		| ((br_ssl_u32)S[(x >> 16) & 0xFF] << 16)
+		| ((br_ssl_u32)S[(x >> 8) & 0xFF] << 8)
+		| (br_ssl_u32)S[x & 0xFF];
 }
 
 /* see inner.h */
 unsigned
-br_aes_keysched(uint32_t *skey, const void *key, size_t key_len)
+br_aes_keysched(br_ssl_u32 *skey, const void *key, size_t key_len)
 {
 	unsigned num_rounds;
 	int i, j, k, nk, nkf;
@@ -93,7 +93,7 @@ br_aes_keysched(uint32_t *skey, const void *key, size_t key_len)
 		skey[i] = br_dec32be((const unsigned char *)key + (i << 2));
 	}
 	for (i = nk, j = 0, k = 0; i < nkf; i ++) {
-		uint32_t tmp;
+		br_ssl_u32 tmp;
 
 		tmp = skey[i - 1];
 		if (j == 0) {

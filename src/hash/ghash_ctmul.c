@@ -62,27 +62,27 @@
  */
 
 #define MUL32(h, l, x, y)   do { \
-		uint64_t mul32tmp = MUL(x, y); \
-		(h) = (uint32_t)(mul32tmp >> 32); \
-		(l) = (uint32_t)mul32tmp; \
+		br_ssl_u64 mul32tmp = MUL(x, y); \
+		(h) = (br_ssl_u32)(mul32tmp >> 32); \
+		(l) = (br_ssl_u32)mul32tmp; \
 	} while (0)
 
 static inline void
-bmul(uint32_t *hi, uint32_t *lo, uint32_t x, uint32_t y)
+bmul(br_ssl_u32 *hi, br_ssl_u32 *lo, br_ssl_u32 x, br_ssl_u32 y)
 {
-	uint32_t x0, x1, x2, x3;
-	uint32_t y0, y1, y2, y3;
-	uint32_t a0, a1, a2, a3, a4, a5, a6, a7, a8;
-	uint32_t b0, b1, b2, b3, b4, b5, b6, b7, b8;
+	br_ssl_u32 x0, x1, x2, x3;
+	br_ssl_u32 y0, y1, y2, y3;
+	br_ssl_u32 a0, a1, a2, a3, a4, a5, a6, a7, a8;
+	br_ssl_u32 b0, b1, b2, b3, b4, b5, b6, b7, b8;
 
-	x0 = x & (uint32_t)0x11111111;
-	x1 = x & (uint32_t)0x22222222;
-	x2 = x & (uint32_t)0x44444444;
-	x3 = x & (uint32_t)0x88888888;
-	y0 = y & (uint32_t)0x11111111;
-	y1 = y & (uint32_t)0x22222222;
-	y2 = y & (uint32_t)0x44444444;
-	y3 = y & (uint32_t)0x88888888;
+	x0 = x & (br_ssl_u32)0x11111111;
+	x1 = x & (br_ssl_u32)0x22222222;
+	x2 = x & (br_ssl_u32)0x44444444;
+	x3 = x & (br_ssl_u32)0x88888888;
+	y0 = y & (br_ssl_u32)0x11111111;
+	y1 = y & (br_ssl_u32)0x22222222;
+	y2 = y & (br_ssl_u32)0x44444444;
+	y3 = y & (br_ssl_u32)0x88888888;
 
 	/*
 	 * (x0+W*x1)*(y0+W*y1) -> a0:b0
@@ -118,24 +118,24 @@ bmul(uint32_t *hi, uint32_t *lo, uint32_t x, uint32_t y)
 	MUL32(b7, a7, b7, a7);
 	MUL32(b8, a8, b8, a8);
 
-	a0 &= (uint32_t)0x11111111;
-	a1 &= (uint32_t)0x11111111;
-	a2 &= (uint32_t)0x11111111;
-	a3 &= (uint32_t)0x11111111;
-	a4 &= (uint32_t)0x11111111;
-	a5 &= (uint32_t)0x11111111;
-	a6 &= (uint32_t)0x11111111;
-	a7 &= (uint32_t)0x11111111;
-	a8 &= (uint32_t)0x11111111;
-	b0 &= (uint32_t)0x11111111;
-	b1 &= (uint32_t)0x11111111;
-	b2 &= (uint32_t)0x11111111;
-	b3 &= (uint32_t)0x11111111;
-	b4 &= (uint32_t)0x11111111;
-	b5 &= (uint32_t)0x11111111;
-	b6 &= (uint32_t)0x11111111;
-	b7 &= (uint32_t)0x11111111;
-	b8 &= (uint32_t)0x11111111;
+	a0 &= (br_ssl_u32)0x11111111;
+	a1 &= (br_ssl_u32)0x11111111;
+	a2 &= (br_ssl_u32)0x11111111;
+	a3 &= (br_ssl_u32)0x11111111;
+	a4 &= (br_ssl_u32)0x11111111;
+	a5 &= (br_ssl_u32)0x11111111;
+	a6 &= (br_ssl_u32)0x11111111;
+	a7 &= (br_ssl_u32)0x11111111;
+	a8 &= (br_ssl_u32)0x11111111;
+	b0 &= (br_ssl_u32)0x11111111;
+	b1 &= (br_ssl_u32)0x11111111;
+	b2 &= (br_ssl_u32)0x11111111;
+	b3 &= (br_ssl_u32)0x11111111;
+	b4 &= (br_ssl_u32)0x11111111;
+	b5 &= (br_ssl_u32)0x11111111;
+	b6 &= (br_ssl_u32)0x11111111;
+	b7 &= (br_ssl_u32)0x11111111;
+	b8 &= (br_ssl_u32)0x11111111;
 
 	a2 ^= a0 ^ a1;
 	b2 ^= b0 ^ b1;
@@ -162,32 +162,32 @@ bmul(uint32_t *hi, uint32_t *lo, uint32_t x, uint32_t y)
  */
 
 static inline void
-bmul(uint32_t *hi, uint32_t *lo, uint32_t x, uint32_t y)
+bmul(br_ssl_u32 *hi, br_ssl_u32 *lo, br_ssl_u32 x, br_ssl_u32 y)
 {
-	uint32_t x0, x1, x2, x3;
-	uint32_t y0, y1, y2, y3;
-	uint64_t z0, z1, z2, z3;
-	uint64_t z;
+	br_ssl_u32 x0, x1, x2, x3;
+	br_ssl_u32 y0, y1, y2, y3;
+	br_ssl_u64 z0, z1, z2, z3;
+	br_ssl_u64 z;
 
-	x0 = x & (uint32_t)0x11111111;
-	x1 = x & (uint32_t)0x22222222;
-	x2 = x & (uint32_t)0x44444444;
-	x3 = x & (uint32_t)0x88888888;
-	y0 = y & (uint32_t)0x11111111;
-	y1 = y & (uint32_t)0x22222222;
-	y2 = y & (uint32_t)0x44444444;
-	y3 = y & (uint32_t)0x88888888;
+	x0 = x & (br_ssl_u32)0x11111111;
+	x1 = x & (br_ssl_u32)0x22222222;
+	x2 = x & (br_ssl_u32)0x44444444;
+	x3 = x & (br_ssl_u32)0x88888888;
+	y0 = y & (br_ssl_u32)0x11111111;
+	y1 = y & (br_ssl_u32)0x22222222;
+	y2 = y & (br_ssl_u32)0x44444444;
+	y3 = y & (br_ssl_u32)0x88888888;
 	z0 = MUL(x0, y0) ^ MUL(x1, y3) ^ MUL(x2, y2) ^ MUL(x3, y1);
 	z1 = MUL(x0, y1) ^ MUL(x1, y0) ^ MUL(x2, y3) ^ MUL(x3, y2);
 	z2 = MUL(x0, y2) ^ MUL(x1, y1) ^ MUL(x2, y0) ^ MUL(x3, y3);
 	z3 = MUL(x0, y3) ^ MUL(x1, y2) ^ MUL(x2, y1) ^ MUL(x3, y0);
-	z0 &= (uint64_t)0x1111111111111111;
-	z1 &= (uint64_t)0x2222222222222222;
-	z2 &= (uint64_t)0x4444444444444444;
-	z3 &= (uint64_t)0x8888888888888888;
+	z0 &= (br_ssl_u64)0x1111111111111111;
+	z1 &= (br_ssl_u64)0x2222222222222222;
+	z2 &= (br_ssl_u64)0x4444444444444444;
+	z3 &= (br_ssl_u64)0x8888888888888888;
 	z = z0 | z1 | z2 | z3;
-	*lo = (uint32_t)z;
-	*hi = (uint32_t)(z >> 32);
+	*lo = (br_ssl_u32)z;
+	*hi = (br_ssl_u32)(z >> 32);
 }
 
 #endif
@@ -198,8 +198,8 @@ br_ghash_ctmul(void *y, const void *h, const void *data, size_t len)
 {
 	const unsigned char *buf, *hb;
 	unsigned char *yb;
-	uint32_t yw[4];
-	uint32_t hw[4];
+	br_ssl_u32 yw[4];
+	br_ssl_u32 hw[4];
 
 	/*
 	 * Throughout the loop we handle the y and h values as arrays
@@ -220,8 +220,8 @@ br_ghash_ctmul(void *y, const void *h, const void *data, size_t len)
 		const unsigned char *src;
 		unsigned char tmp[16];
 		int i;
-		uint32_t a[9], b[9], zw[8];
-		uint32_t c0, c1, c2, c3, d0, d1, d2, d3, e0, e1, e2, e3;
+		br_ssl_u32 a[9], b[9], zw[8];
+		br_ssl_u32 c0, c1, c2, c3, d0, d1, d2, d3, e0, e1, e2, e3;
 
 		/*
 		 * Get the next 16-byte block (using zero-padding if
@@ -326,7 +326,7 @@ br_ghash_ctmul(void *y, const void *h, const void *data, size_t len)
 		 * to get back to 128 bits.
 		 */
 		for (i = 0; i < 4; i ++) {
-			uint32_t lw;
+			br_ssl_u32 lw;
 
 			lw = zw[i];
 			zw[i + 4] ^= lw ^ (lw >> 1) ^ (lw >> 2) ^ (lw >> 7);

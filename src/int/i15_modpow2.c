@@ -25,15 +25,15 @@
 #include "inner.h"
 
 /* see inner.h */
-uint32_t
-br_i15_modpow_opt(uint16_t *x,
+br_ssl_u32
+br_i15_modpow_opt(br_ssl_u16 *x,
 	const unsigned char *e, size_t elen,
-	const uint16_t *m, uint16_t m0i, uint16_t *tmp, size_t twlen)
+	const br_ssl_u16 *m, br_ssl_u16 m0i, br_ssl_u16 *tmp, size_t twlen)
 {
 	size_t mlen, mwlen;
-	uint16_t *t1, *t2, *base;
+	br_ssl_u16 *t1, *t2, *base;
 	size_t u, v;
-	uint32_t acc;
+	br_ssl_u32 acc;
 	int acc_len, win_len;
 
 	/*
@@ -55,7 +55,7 @@ br_i15_modpow_opt(uint16_t *x,
 		return 0;
 	}
 	for (win_len = 5; win_len > 1; win_len --) {
-		if ((((uint32_t)1 << win_len) + 1) * mwlen <= twlen) {
+		if ((((br_ssl_u32)1 << win_len) + 1) * mwlen <= twlen) {
 			break;
 		}
 	}
@@ -98,7 +98,7 @@ br_i15_modpow_opt(uint16_t *x,
 	acc_len = 0;
 	while (acc_len > 0 || elen > 0) {
 		int i, k;
-		uint32_t bits;
+		br_ssl_u32 bits;
 
 		/*
 		 * Get the next bits.
@@ -113,7 +113,7 @@ br_i15_modpow_opt(uint16_t *x,
 				k = acc_len;
 			}
 		}
-		bits = (acc >> (acc_len - k)) & (((uint32_t)1 << k) - 1);
+		bits = (acc >> (acc_len - k)) & (((br_ssl_u32)1 << k) - 1);
 		acc_len -= k;
 
 		/*
@@ -133,8 +133,8 @@ br_i15_modpow_opt(uint16_t *x,
 		if (win_len > 1) {
 			br_i15_zero(t2, m[0]);
 			base = t2 + mwlen;
-			for (u = 1; u < ((uint32_t)1 << k); u ++) {
-				uint32_t mask;
+			for (u = 1; u < ((br_ssl_u32)1 << k); u ++) {
+				br_ssl_u32 mask;
 
 				mask = -EQ(u, bits);
 				for (v = 1; v < mwlen; v ++) {

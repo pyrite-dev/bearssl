@@ -26,7 +26,7 @@
 #define BR_BEARSSL_KDF_H__
 
 #include <stddef.h>
-#include <stdint.h>
+#include "bearssl_int.h"
 
 #include "bearssl_hash.h"
 #include "bearssl_hmac.h"
@@ -218,7 +218,7 @@ typedef struct {
 	unsigned char dbuf[200];
 	size_t dptr;
 	size_t rate;
-	uint64_t A[25];
+	br_ssl_u64 A[25];
 #endif
 } br_shake_context;
 

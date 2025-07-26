@@ -56,7 +56,7 @@ br_ccm_init(br_ccm_context *ctx, const br_block_ctrcbc_class **bctx)
 /* see bearssl_block.h */
 int
 br_ccm_reset(br_ccm_context *ctx, const void *nonce, size_t nonce_len,
-	uint64_t aad_len, uint64_t data_len, size_t tag_len)
+	br_ssl_u64 aad_len, br_ssl_u64 data_len, size_t tag_len)
 {
 	unsigned char tmp[16];
 	unsigned u, q;
@@ -107,7 +107,7 @@ br_ccm_reset(br_ccm_context *ctx, const void *nonce, size_t nonce_len,
 	} else if (aad_len >= 0xFF00) {
 		ctx->buf[0] = 0xFF;
 		ctx->buf[1] = 0xFE;
-		br_enc32be(ctx->buf + 2, (uint32_t)aad_len);
+		br_enc32be(ctx->buf + 2, (br_ssl_u32)aad_len);
 		ctx->ptr = 6;
 	} else if (aad_len > 0) {
 		br_enc16be(ctx->buf, (unsigned)aad_len);
@@ -330,12 +330,12 @@ br_ccm_get_tag(br_ccm_context *ctx, void *tag)
 }
 
 /* see bearssl_block.h */
-uint32_t
+br_ssl_u32
 br_ccm_check_tag(br_ccm_context *ctx, const void *tag)
 {
 	unsigned char tmp[16];
 	size_t u, tag_len;
-	uint32_t z;
+	br_ssl_u32 z;
 
 	tag_len = br_ccm_get_tag(ctx, tmp);
 	z = 0;

@@ -27,7 +27,7 @@
 /*
  * Round constants.
  */
-static const uint64_t RC[] = {
+static const br_ssl_u64 RC[] = {
 	0x0000000000000001, 0x0000000000008082,
 	0x800000000000808A, 0x8000000080008000,
 	0x000000000000808B, 0x0000000080000001,
@@ -47,7 +47,7 @@ static const uint64_t RC[] = {
  * blocks whose length is a multiple of 64 bits.
  */
 static void
-xor_block(uint64_t *A, const void *data, size_t rate)
+xor_block(br_ssl_u64 *A, const void *data, size_t rate)
 {
 	size_t u;
 
@@ -61,12 +61,12 @@ xor_block(uint64_t *A, const void *data, size_t rate)
  * multiple of 8 (in bytes); normally, this is the "rate".
  */
 static void
-process_block(uint64_t *A)
+process_block(br_ssl_u64 *A)
 {
-	uint64_t t0, t1, t2, t3, t4;
-	uint64_t tt0, tt1, tt2, tt3;
-	uint64_t t, kt;
-	uint64_t c0, c1, c2, c3, c4, bnn;
+	br_ssl_u64 t0, t1, t2, t3, t4;
+	br_ssl_u64 tt0, tt1, tt2, tt3;
+	br_ssl_u64 t, kt;
+	br_ssl_u64 c0, c1, c2, c3, c4, bnn;
 	int j;
 
 	/*
@@ -472,12 +472,12 @@ br_shake_init(br_shake_context *sc, int security_level)
 	sc->rate = 200 - (size_t)(security_level >> 2);
 	sc->dptr = 0;
 	memset(sc->A, 0, sizeof sc->A);
-	sc->A[ 1] = ~(uint64_t)0;
-	sc->A[ 2] = ~(uint64_t)0;
-	sc->A[ 8] = ~(uint64_t)0;
-	sc->A[12] = ~(uint64_t)0;
-	sc->A[17] = ~(uint64_t)0;
-	sc->A[20] = ~(uint64_t)0;
+	sc->A[ 1] = ~(br_ssl_u64)0;
+	sc->A[ 2] = ~(br_ssl_u64)0;
+	sc->A[ 8] = ~(br_ssl_u64)0;
+	sc->A[12] = ~(br_ssl_u64)0;
+	sc->A[17] = ~(br_ssl_u64)0;
+	sc->A[20] = ~(br_ssl_u64)0;
 }
 
 /* see bearssl_kdf.h */
@@ -545,7 +545,7 @@ br_shake_produce(br_shake_context *sc, void *out, size_t len)
 
 		if (dptr == rate) {
 			unsigned char *dbuf;
-			uint64_t *A;
+			br_ssl_u64 *A;
 
 			A = sc->A;
 			dbuf = sc->dbuf;

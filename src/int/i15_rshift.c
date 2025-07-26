@@ -26,7 +26,7 @@
 
 /* see inner.h */
 void
-br_i15_rshift(uint16_t *x, int count)
+br_i15_rshift(br_ssl_u16 *x, int count)
 {
 	size_t u, len;
 	unsigned r;

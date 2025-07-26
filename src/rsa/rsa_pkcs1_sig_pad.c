@@ -25,10 +25,10 @@
 #include "inner.h"
 
 /* see inner.h */
-uint32_t
+br_ssl_u32
 br_rsa_pkcs1_sig_pad(const unsigned char *hash_oid,
 	const unsigned char *hash, size_t hash_len,
-	uint32_t n_bitlen, unsigned char *x)
+	br_ssl_u32 n_bitlen, unsigned char *x)
 {
 	size_t u, x3, xlen;
 

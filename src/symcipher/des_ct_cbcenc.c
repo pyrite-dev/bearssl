@@ -39,7 +39,7 @@ br_des_ct_cbcenc_run(const br_des_ct_cbcenc_keys *ctx,
 	void *iv, void *data, size_t len)
 {
 	unsigned char *buf, *ivbuf;
-	uint32_t sk_exp[288];
+	br_ssl_u32 sk_exp[288];
 
 	br_des_ct_skey_expand(sk_exp, ctx->num_rounds, ctx->skey);
 	ivbuf = iv;

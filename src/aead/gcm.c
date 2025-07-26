@@ -93,7 +93,7 @@ br_gcm_reset(br_gcm_context *ctx, const void *iv, size_t len)
 		memset(ty, 0, sizeof ty);
 		ctx->gh(ty, ctx->h, iv, len);
 		memset(tmp, 0, 8);
-		br_enc64be(tmp + 8, (uint64_t)len << 3);
+		br_enc64be(tmp + 8, (br_ssl_u64)len << 3);
 		ctx->gh(ty, ctx->h, tmp, 16);
 		memcpy(ctx->j0_1, ty, 12);
 		ctx->j0_2 = br_dec32be(ty + 12);
@@ -121,14 +121,14 @@ br_gcm_aad_inject(br_gcm_context *ctx, const void *data, size_t len)
 		clen = 16 - ptr;
 		if (len < clen) {
 			memcpy(ctx->buf + ptr, data, len);
-			ctx->count_aad += (uint64_t)len;
+			ctx->count_aad += (br_ssl_u64)len;
 			return;
 		}
 		memcpy(ctx->buf + ptr, data, clen);
 		ctx->gh(ctx->y, ctx->h, ctx->buf, 16);
 		data = (const unsigned char *)data + clen;
 		len -= clen;
-		ctx->count_aad += (uint64_t)clen;
+		ctx->count_aad += (br_ssl_u64)clen;
 	}
 
 	/*
@@ -139,7 +139,7 @@ br_gcm_aad_inject(br_gcm_context *ctx, const void *data, size_t len)
 	dlen = len & ~(size_t)15;
 	ctx->gh(ctx->y, ctx->h, data, dlen);
 	memcpy(ctx->buf, (const unsigned char *)data + dlen, len - dlen);
-	ctx->count_aad += (uint64_t)len;
+	ctx->count_aad += (br_ssl_u64)len;
 }
 
 /* see bearssl_aead.h */
@@ -186,7 +186,7 @@ br_gcm_run(br_gcm_context *ctx, int encrypt, void *data, size_t len)
 			ctx->buf[ptr + u] = encrypt ? y : x;
 			buf[u] = y;
 		}
-		ctx->count_ctr += (uint64_t)clen;
+		ctx->count_ctr += (br_ssl_u64)clen;
 		buf += clen;
 		len -= clen;
 		if (ptr + clen < 16) {
@@ -208,7 +208,7 @@ br_gcm_run(br_gcm_context *ctx, int encrypt, void *data, size_t len)
 	}
 	buf += dlen;
 	len -= dlen;
-	ctx->count_ctr += (uint64_t)dlen;
+	ctx->count_ctr += (br_ssl_u64)dlen;
 
 	if (len > 0) {
 		/*
@@ -227,7 +227,7 @@ br_gcm_run(br_gcm_context *ctx, int encrypt, void *data, size_t len)
 			ctx->buf[u] = encrypt ? y : x;
 			buf[u] = y;
 		}
-		ctx->count_ctr += (uint64_t)len;
+		ctx->count_ctr += (br_ssl_u64)len;
 	}
 }
 
@@ -274,7 +274,7 @@ br_gcm_get_tag_trunc(br_gcm_context *ctx, void *tag, size_t len)
 }
 
 /* see bearssl_aead.h */
-uint32_t
+br_ssl_u32
 br_gcm_check_tag_trunc(br_gcm_context *ctx, const void *tag, size_t len)
 {
 	unsigned char tmp[16];
@@ -290,7 +290,7 @@ br_gcm_check_tag_trunc(br_gcm_context *ctx, const void *tag, size_t len)
 }
 
 /* see bearssl_aead.h */
-uint32_t
+br_ssl_u32
 br_gcm_check_tag(br_gcm_context *ctx, const void *tag)
 {
 	return br_gcm_check_tag_trunc(ctx, tag, 16);
@@ -309,10 +309,10 @@ const br_aead_class br_gcm_vtable = {
 		&br_gcm_run,
 	(void (*)(const br_aead_class **, void *))
 		&br_gcm_get_tag,
-	(uint32_t (*)(const br_aead_class **, const void *))
+	(br_ssl_u32 (*)(const br_aead_class **, const void *))
 		&br_gcm_check_tag,
 	(void (*)(const br_aead_class **, void *, size_t))
 		&br_gcm_get_tag_trunc,
-	(uint32_t (*)(const br_aead_class **, const void *, size_t))
+	(br_ssl_u32 (*)(const br_aead_class **, const void *, size_t))
 		&br_gcm_check_tag_trunc
 };

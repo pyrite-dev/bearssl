@@ -26,7 +26,7 @@
 #define BR_BEARSSL_SSL_H__
 
 #include <stddef.h>
-#include <stdint.h>
+#include "bearssl_int.h"
 
 #include "bearssl_block.h"
 #include "bearssl_hash.h"
@@ -444,7 +444,7 @@ typedef struct {
 	/** \brief Pointer to vtable. */
 	const br_sslrec_in_cbc_class *vtable;
 #ifndef BR_DOXYGEN_IGNORE
-	uint64_t seq;
+	br_ssl_u64 seq;
 	union {
 		const br_block_cbcdec_class *vtable;
 		br_aes_gen_cbcdec_keys aes;
@@ -473,7 +473,7 @@ typedef struct {
 	/** \brief Pointer to vtable. */
 	const br_sslrec_out_cbc_class *vtable;
 #ifndef BR_DOXYGEN_IGNORE
-	uint64_t seq;
+	br_ssl_u64 seq;
 	union {
 		const br_block_cbcenc_class *vtable;
 		br_aes_gen_cbcenc_keys aes;
@@ -577,7 +577,7 @@ typedef struct {
 		const br_sslrec_out_gcm_class *out;
 	} vtable;
 #ifndef BR_DOXYGEN_IGNORE
-	uint64_t seq;
+	br_ssl_u64 seq;
 	union {
 		const br_block_ctr_class *vtable;
 		br_aes_gen_ctr_keys aes;
@@ -680,7 +680,7 @@ typedef struct {
 		const br_sslrec_out_chapol_class *out;
 	} vtable;
 #ifndef BR_DOXYGEN_IGNORE
-	uint64_t seq;
+	br_ssl_u64 seq;
 	unsigned char key[32];
 	unsigned char iv[12];
 	br_chacha20_run ichacha;
@@ -782,7 +782,7 @@ typedef struct {
 		const br_sslrec_out_ccm_class *out;
 	} vtable;
 #ifndef BR_DOXYGEN_IGNORE
-	uint64_t seq;
+	br_ssl_u64 seq;
 	union {
 		const br_block_ctrcbc_class *vtable;
 		br_aes_gen_ctrcbc_keys aes;
@@ -813,9 +813,9 @@ typedef struct {
 	/** \brief Session ID length (in bytes, at most 32). */
 	unsigned char session_id_len;
 	/** \brief Protocol version. */
-	uint16_t version;
+	br_ssl_u16 version;
 	/** \brief Cipher suite. */
-	uint16_t cipher_suite;
+	br_ssl_u16 cipher_suite;
 	/** \brief Master secret. */
 	unsigned char master_secret[48];
 } br_ssl_session_parameters;
@@ -862,7 +862,7 @@ typedef struct {
 	 * buffer. It is guaranteed that incoming records at least as big
 	 * as max_frag_len can be processed.
 	 */
-	uint16_t max_frag_len;
+	br_ssl_u16 max_frag_len;
 	unsigned char log_max_frag_len;
 	unsigned char peer_log_max_frag_len;
 
@@ -901,13 +901,13 @@ typedef struct {
 	 * ServerHello). It is up to the handshake handler to adjust this
 	 * field when necessary.
 	 */
-	uint16_t version_in;
+	br_ssl_u16 version_in;
 
 	/*
 	 * 'version_out' is used when the next outgoing record is ready
 	 * to go.
 	 */
-	uint16_t version_out;
+	br_ssl_u16 version_out;
 
 	/*
 	 * Record handler contexts.
@@ -955,9 +955,9 @@ typedef struct {
 	/*
 	 * Supported minimum and maximum versions, and cipher suites.
 	 */
-	uint16_t version_min;
-	uint16_t version_max;
-	uint16_t suites_buf[BR_MAX_CIPHER_SUITES];
+	br_ssl_u16 version_min;
+	br_ssl_u16 version_max;
+	br_ssl_u16 suites_buf[BR_MAX_CIPHER_SUITES];
 	unsigned char suites_num;
 
 	/*
@@ -998,7 +998,7 @@ typedef struct {
 	/*
 	 * Behavioural flags.
 	 */
-	uint32_t flags;
+	br_ssl_u32 flags;
 
 	/*
 	 * Context variables for the handshake processor. The 'pad' must
@@ -1008,12 +1008,12 @@ typedef struct {
 	 * require its length to be at least 256.)
 	 */
 	struct {
-		uint32_t *dp;
-		uint32_t *rp;
+		br_ssl_u32 *dp;
+		br_ssl_u32 *rp;
 		const unsigned char *ip;
 	} cpu;
-	uint32_t dp_stack[32];
-	uint32_t rp_stack[32];
+	br_ssl_u32 dp_stack[32];
+	br_ssl_u32 rp_stack[32];
 	unsigned char pad[512];
 	unsigned char *hbuf_in, *hbuf_out, *saved_hbuf_out;
 	size_t hlen_in, hlen_out;
@@ -1084,8 +1084,8 @@ typedef struct {
 	 * performed, e.g. the peer did not send an ALPN extension).
 	 */
 	const char **protocol_names;
-	uint16_t protocol_names_num;
-	uint16_t selected_protocol;
+	br_ssl_u16 protocol_names_num;
+	br_ssl_u16 selected_protocol;
 
 	/*
 	 * Pointers to implementations; left to NULL for unsupported
@@ -1124,7 +1124,7 @@ typedef struct {
  * \param cc   SSL engine context.
  * \return  the flags.
  */
-static inline uint32_t
+static inline br_ssl_u32
 br_ssl_engine_get_flags(br_ssl_engine_context *cc)
 {
 	return cc->flags;
@@ -1137,7 +1137,7 @@ br_ssl_engine_get_flags(br_ssl_engine_context *cc)
  * \param flags   new value for all flags.
  */
 static inline void
-br_ssl_engine_set_all_flags(br_ssl_engine_context *cc, uint32_t flags)
+br_ssl_engine_set_all_flags(br_ssl_engine_context *cc, br_ssl_u32 flags)
 {
 	cc->flags = flags;
 }
@@ -1152,7 +1152,7 @@ br_ssl_engine_set_all_flags(br_ssl_engine_context *cc, uint32_t flags)
  * \param flags   additional set flags.
  */
 static inline void
-br_ssl_engine_add_flags(br_ssl_engine_context *cc, uint32_t flags)
+br_ssl_engine_add_flags(br_ssl_engine_context *cc, br_ssl_u32 flags)
 {
 	cc->flags |= flags;
 }
@@ -1167,7 +1167,7 @@ br_ssl_engine_add_flags(br_ssl_engine_context *cc, uint32_t flags)
  * \param flags   flags to remove.
  */
 static inline void
-br_ssl_engine_remove_flags(br_ssl_engine_context *cc, uint32_t flags)
+br_ssl_engine_remove_flags(br_ssl_engine_context *cc, br_ssl_u32 flags)
 {
 	cc->flags &= ~flags;
 }
@@ -1178,7 +1178,7 @@ br_ssl_engine_remove_flags(br_ssl_engine_context *cc, uint32_t flags)
  * If this flag is set, then the server will enforce its own cipher suite
  * preference order; otherwise, it follows the client preferences.
  */
-#define BR_OPT_ENFORCE_SERVER_PREFERENCES      ((uint32_t)1 << 0)
+#define BR_OPT_ENFORCE_SERVER_PREFERENCES      ((br_ssl_u32)1 << 0)
 
 /**
  * \brief Behavioural flag: disable renegotiation.
@@ -1187,7 +1187,7 @@ br_ssl_engine_remove_flags(br_ssl_engine_context *cc, uint32_t flags)
  * they won't be honoured if asked for programmatically, and requests from
  * the peer are rejected.
  */
-#define BR_OPT_NO_RENEGOTIATION                ((uint32_t)1 << 1)
+#define BR_OPT_NO_RENEGOTIATION                ((br_ssl_u32)1 << 1)
 
 /**
  * \brief Behavioural flag: tolerate lack of client authentication.
@@ -1207,7 +1207,7 @@ br_ssl_engine_remove_flags(br_ssl_engine_context *cc, uint32_t flags)
  *   - If using full-static ECDH, then a failure to validate the client's
  *     certificate prevents the handshake from succeeding.
  */
-#define BR_OPT_TOLERATE_NO_CLIENT_AUTH         ((uint32_t)1 << 2)
+#define BR_OPT_TOLERATE_NO_CLIENT_AUTH         ((br_ssl_u32)1 << 2)
 
 /**
  * \brief Behavioural flag: fail on application protocol mismatch.
@@ -1233,7 +1233,7 @@ br_ssl_engine_remove_flags(br_ssl_engine_context *cc, uint32_t flags)
  * may still return `NULL` if the client or the server does not send an
  * ALPN extension at all.
  */
-#define BR_OPT_FAIL_ON_ALPN_MISMATCH           ((uint32_t)1 << 3)
+#define BR_OPT_FAIL_ON_ALPN_MISMATCH           ((br_ssl_u32)1 << 3)
 
 /**
  * \brief Set the minimum and maximum supported protocol versions.
@@ -1250,8 +1250,8 @@ static inline void
 br_ssl_engine_set_versions(br_ssl_engine_context *cc,
 	unsigned version_min, unsigned version_max)
 {
-	cc->version_min = (uint16_t)version_min;
-	cc->version_max = (uint16_t)version_max;
+	cc->version_min = (br_ssl_u16)version_min;
+	cc->version_max = (br_ssl_u16)version_max;
 }
 
 /**
@@ -1274,7 +1274,7 @@ br_ssl_engine_set_versions(br_ssl_engine_context *cc,
  * \param suites_num   number of cipher suites.
  */
 void br_ssl_engine_set_suites(br_ssl_engine_context *cc,
-	const uint16_t *suites, size_t suites_num);
+	const br_ssl_u16 *suites, size_t suites_num);
 
 /**
  * \brief Set the X.509 engine.
@@ -1324,7 +1324,7 @@ br_ssl_engine_set_protocol_names(br_ssl_engine_context *ctx,
 	const char **names, size_t num)
 {
 	ctx->protocol_names = names;
-	ctx->protocol_names_num = (uint16_t)num;
+	ctx->protocol_names_num = (br_ssl_u16)num;
 }
 
 /**
@@ -2456,7 +2456,7 @@ struct br_ssl_client_certificate_class_ {
 	 * \param choices      destination structure for the policy choices.
 	 */
 	void (*choose)(const br_ssl_client_certificate_class **pctx,
-		const br_ssl_client_context *cc, uint32_t auth_types,
+		const br_ssl_client_context *cc, br_ssl_u32 auth_types,
 		br_ssl_client_certificate *choices);
 
 	/**
@@ -2501,7 +2501,7 @@ struct br_ssl_client_certificate_class_ {
 	 * \param len    public key point length / X coordinate length.
 	 * \return  1 on success, 0 on error.
 	 */
-	uint32_t (*do_keyx)(const br_ssl_client_certificate_class **pctx,
+	br_ssl_u32 (*do_keyx)(const br_ssl_client_certificate_class **pctx,
 		unsigned char *data, size_t *len);
 
 	/**
@@ -2611,13 +2611,13 @@ struct br_ssl_client_context_ {
 	 * Such padding is nominally unnecessary, but it has been used
 	 * to work around some server implementation bugs.
 	 */
-	uint16_t min_clienthello_len;
+	br_ssl_u16 min_clienthello_len;
 
 	/*
 	 * Bit field for algoithms (hash + signature) supported by the
 	 * server when requesting a client certificate.
 	 */
-	uint32_t hashes;
+	br_ssl_u32 hashes;
 
 	/*
 	 * Server's public key curve.
@@ -2687,7 +2687,7 @@ struct br_ssl_client_context_ {
  * \param cc   client context.
  * \return  the server-supported hash functions and signature algorithms.
  */
-static inline uint32_t
+static inline br_ssl_u32
 br_ssl_client_get_server_hashes(const br_ssl_client_context *cc)
 {
 	return cc->hashes;
@@ -2806,7 +2806,7 @@ void br_ssl_client_set_default_rsapub(br_ssl_client_context *cc);
  * \param len   minimum ClientHello length (in bytes).
  */
 static inline void
-br_ssl_client_set_min_clienthello_len(br_ssl_client_context *cc, uint16_t len)
+br_ssl_client_set_min_clienthello_len(br_ssl_client_context *cc, br_ssl_u16 len)
 {
 	cc->min_clienthello_len = len;
 }
@@ -2977,7 +2977,7 @@ void br_ssl_client_set_single_ec(br_ssl_client_context *cc,
  * that order: RSA key exchange (0), AES-128/GCM (3), AEAD integrity (0),
  * SHA-256 in the TLS PRF (4).
  */
-typedef uint16_t br_suite_translated[2];
+typedef br_ssl_u16 br_suite_translated[2];
 
 #ifndef BR_DOXYGEN_IGNORE
 /*
@@ -3020,7 +3020,7 @@ typedef struct {
 	/**
 	 * \brief Cipher suite to use with that client.
 	 */
-	uint16_t cipher_suite;
+	br_ssl_u16 cipher_suite;
 
 	/**
 	 * \brief Hash function or algorithm for signing the ServerKeyExchange.
@@ -3186,7 +3186,7 @@ struct br_ssl_server_policy_class_ {
 	 * \param len    key exchange data length (in bytes).
 	 * \return  1 on success, 0 on error.
 	 */
-	uint32_t (*do_keyx)(const br_ssl_server_policy_class **pctx,
+	br_ssl_u32 (*do_keyx)(const br_ssl_server_policy_class **pctx,
 		unsigned char *data, size_t *len);
 
 	/**
@@ -3360,7 +3360,7 @@ typedef struct {
 	unsigned char index_key[32];
 	const br_hash_class *hash;
 	int init_done;
-	uint32_t head, tail, root;
+	br_ssl_u32 head, tail, root;
 #endif
 } br_ssl_session_cache_lru;
 
@@ -3409,7 +3409,7 @@ struct br_ssl_server_context_ {
 	/*
 	 * Maximum version from the client.
 	 */
-	uint16_t client_max_version;
+	br_ssl_u16 client_max_version;
 
 	/*
 	 * Session cache.
@@ -3431,18 +3431,18 @@ struct br_ssl_server_context_ {
 	 * x for RSA, x+8 for ECDSA. For newer algorithms, with ID
 	 * 0x08**, bit 16+k is set for algorithm 0x0800+k.
 	 */
-	uint32_t hashes;
+	br_ssl_u32 hashes;
 
 	/*
 	 * Curves supported by the client (bit mask, for named curves).
 	 */
-	uint32_t curves;
+	br_ssl_u32 curves;
 
 	/*
 	 * Context for chain handler.
 	 */
 	const br_ssl_server_policy_class **policy_vtable;
-	uint16_t sign_hash_id;
+	br_ssl_u16 sign_hash_id;
 
 	/*
 	 * For the core handlers, thus avoiding (in most cases) the
@@ -3734,7 +3734,7 @@ br_ssl_server_get_client_suites(const br_ssl_server_context *cc, size_t *num)
  * \param cc   server context.
  * \return  the client-supported hash functions and signature algorithms.
  */
-static inline uint32_t
+static inline br_ssl_u32
 br_ssl_server_get_client_hashes(const br_ssl_server_context *cc)
 {
 	return cc->hashes;
@@ -3748,7 +3748,7 @@ br_ssl_server_get_client_hashes(const br_ssl_server_context *cc)
  * \param cc   server context.
  * \return  the client-supported elliptic curves.
  */
-static inline uint32_t
+static inline br_ssl_u32
 br_ssl_server_get_client_curves(const br_ssl_server_context *cc)
 {
 	return cc->curves;

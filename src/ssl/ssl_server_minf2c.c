@@ -30,7 +30,7 @@ br_ssl_server_init_minf2c(br_ssl_server_context *cc,
 	const br_x509_certificate *chain, size_t chain_len,
 	const br_ec_private_key *sk)
 {
-	static const uint16_t suites[] = {
+	static const br_ssl_u16 suites[] = {
 		BR_TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256
 	};
 

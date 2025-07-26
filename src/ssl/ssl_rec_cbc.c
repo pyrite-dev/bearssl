@@ -80,7 +80,7 @@ cbc_check_length(const br_sslrec_in_cbc_context *cc, size_t rlen)
  * than or equal to 64.
  */
 static void
-cond_rotate(uint32_t ctl, unsigned char *buf, size_t len, size_t num)
+cond_rotate(br_ssl_u32 ctl, unsigned char *buf, size_t len, size_t num)
 {
 	unsigned char tmp[64];
 	size_t u, v;
@@ -104,8 +104,8 @@ cbc_decrypt(br_sslrec_in_cbc_context *cc,
 	 * -- our constant-time primitives operate on 32-bit integers.
 	 */
 	unsigned char *buf;
-	uint32_t u, v, len, blen, min_len, max_len;
-	uint32_t good, pad_len, rot_count, len_withmac, len_nomac;
+	br_ssl_u32 u, v, len, blen, min_len, max_len;
+	br_ssl_u32 good, pad_len, rot_count, len_withmac, len_nomac;
 	unsigned char tmp1[64], tmp2[64];
 	int i;
 	br_hmac_context hc;
@@ -139,8 +139,8 @@ cbc_decrypt(br_sslrec_in_cbc_context *cc,
 	 * length. Take care not to overflow (we use unsigned types).
 	 */
 	pad_len = buf[max_len];
-	good = LE(pad_len, (uint32_t)(max_len - min_len));
-	len = MUX(good, (uint32_t)(max_len - pad_len), min_len);
+	good = LE(pad_len, (br_ssl_u32)(max_len - min_len));
+	len = MUX(good, (br_ssl_u32)(max_len - pad_len), min_len);
 
 	/*
 	 * Check padding contents: all padding bytes must be equal to
@@ -159,7 +159,7 @@ cbc_decrypt(br_sslrec_in_cbc_context *cc,
 	 * min_len and max_len are also adjusted to the minimum and
 	 * maximum lengths of the plaintext alone (without the MAC).
 	 */
-	len_withmac = (uint32_t)len;
+	len_withmac = (br_ssl_u32)len;
 	len_nomac = len_withmac - cc->mac_len;
 	min_len -= cc->mac_len;
 	rot_count = 0;
@@ -182,9 +182,9 @@ cbc_decrypt(br_sslrec_in_cbc_context *cc,
 	 * rotation count fits on 6 bits.
 	 */
 	for (i = 5; i >= 0; i --) {
-		uint32_t rc;
+		br_ssl_u32 rc;
 
-		rc = (uint32_t)1 << i;
+		rc = (br_ssl_u32)1 << i;
 		cond_rotate(rot_count >> i, tmp1, cc->mac_len, rc);
 		rot_count &= ~rc;
 	}

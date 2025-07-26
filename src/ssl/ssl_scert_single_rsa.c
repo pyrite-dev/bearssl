@@ -70,7 +70,7 @@ sr_choose(const br_ssl_server_policy_class **pctx,
 	return 0;
 }
 
-static uint32_t
+static br_ssl_u32
 sr_do_keyx(const br_ssl_server_policy_class **pctx,
 	unsigned char *data, size_t *len)
 {

@@ -30,18 +30,18 @@
 #define TLEN   (4 * U)  /* TLEN is counted in 64-bit words */
 
 /* see bearssl_rsa.h */
-uint32_t
+br_ssl_u32
 br_rsa_i62_private(unsigned char *x, const br_rsa_private_key *sk)
 {
 	const unsigned char *p, *q;
 	size_t plen, qlen;
 	size_t fwlen;
-	uint32_t p0i, q0i;
+	br_ssl_u32 p0i, q0i;
 	size_t xlen, u;
-	uint64_t tmp[TLEN];
+	br_ssl_u64 tmp[TLEN];
 	long z;
-	uint32_t *mp, *mq, *s1, *s2, *t1, *t2, *t3;
-	uint32_t r;
+	br_ssl_u32 *mp, *mq, *s1, *s2, *t1, *t2, *t3;
+	br_ssl_u32 r;
 
 	/*
 	 * Compute the actual lengths of p and q, in bytes.
@@ -91,13 +91,13 @@ br_rsa_i62_private(unsigned char *x, const br_rsa_private_key *sk)
 	/*
 	 * Decode q.
 	 */
-	mq = (uint32_t *)tmp;
+	mq = (br_ssl_u32 *)tmp;
 	br_i31_decode(mq, q, qlen);
 
 	/*
 	 * Decode p.
 	 */
-	t1 = (uint32_t *)(tmp + fwlen);
+	t1 = (br_ssl_u32 *)(tmp + fwlen);
 	br_i31_decode(t1, p, plen);
 
 	/*
@@ -105,7 +105,7 @@ br_rsa_i62_private(unsigned char *x, const br_rsa_private_key *sk)
 	 * it with the source value. We use br_i31_mulacc(), since it's
 	 * already used later on.
 	 */
-	t2 = (uint32_t *)(tmp + 2 * fwlen);
+	t2 = (br_ssl_u32 *)(tmp + 2 * fwlen);
 	br_i31_zero(t2, mq[0]);
 	br_i31_mulacc(t2, mq, t1);
 
@@ -118,12 +118,12 @@ br_rsa_i62_private(unsigned char *x, const br_rsa_private_key *sk)
 	 * a value in the correct range. We keep it in r, which is our
 	 * accumulator for the error code.
 	 */
-	t3 = (uint32_t *)(tmp + 4 * fwlen);
+	t3 = (br_ssl_u32 *)(tmp + 4 * fwlen);
 	br_i31_encode(t3, xlen, t2);
 	u = xlen;
 	r = 0;
 	while (u > 0) {
-		uint32_t wn, wx;
+		br_ssl_u32 wn, wx;
 
 		u --;
 		wn = ((unsigned char *)t3)[u];
@@ -134,14 +134,14 @@ br_rsa_i62_private(unsigned char *x, const br_rsa_private_key *sk)
 	/*
 	 * Move the decoded p to another temporary buffer.
 	 */
-	mp = (uint32_t *)(tmp + 2 * fwlen);
+	mp = (br_ssl_u32 *)(tmp + 2 * fwlen);
 	memmove(mp, t1, 2 * fwlen * sizeof *t1);
 
 	/*
 	 * Compute s2 = x^dq mod q.
 	 */
 	q0i = br_i31_ninv31(mq[1]);
-	s2 = (uint32_t *)(tmp + fwlen);
+	s2 = (br_ssl_u32 *)(tmp + fwlen);
 	br_i31_decode_reduce(s2, x, xlen, mq);
 	r &= br_i62_modpow_opt(s2, sk->dq, sk->dqlen, mq, q0i,
 		tmp + 3 * fwlen, TLEN - 3 * fwlen);
@@ -150,7 +150,7 @@ br_rsa_i62_private(unsigned char *x, const br_rsa_private_key *sk)
 	 * Compute s1 = x^dp mod p.
 	 */
 	p0i = br_i31_ninv31(mp[1]);
-	s1 = (uint32_t *)(tmp + 3 * fwlen);
+	s1 = (br_ssl_u32 *)(tmp + 3 * fwlen);
 	br_i31_decode_reduce(s1, x, xlen, mp);
 	r &= br_i62_modpow_opt(s1, sk->dp, sk->dplen, mp, p0i,
 		tmp + 4 * fwlen, TLEN - 4 * fwlen);
@@ -168,8 +168,8 @@ br_rsa_i62_private(unsigned char *x, const br_rsa_private_key *sk)
 	 * inverse of q modulo p), we also tolerate improperly large
 	 * values for this parameter.
 	 */
-	t1 = (uint32_t *)(tmp + 4 * fwlen);
-	t2 = (uint32_t *)(tmp + 5 * fwlen);
+	t1 = (br_ssl_u32 *)(tmp + 4 * fwlen);
+	t2 = (br_ssl_u32 *)(tmp + 5 * fwlen);
 	br_i31_reduce(t2, s2, mp);
 	br_i31_add(s1, mp, br_i31_sub(s1, t2, 1));
 	br_i31_to_monty(s1, mp);

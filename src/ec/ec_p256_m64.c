@@ -77,14 +77,14 @@ api_xoff(int curve, size_t *len)
  */
 
 /* R = 2^256 mod p */
-static const uint64_t F256_R[] = {
+static const br_ssl_u64 F256_R[] = {
 	0x0000000000000001, 0xFFFFFFFF00000000,
 	0xFFFFFFFFFFFFFFFF, 0x00000000FFFFFFFE
 };
 
 /* Curve equation is y^2 = x^3 - 3*x + B. This constant is B*R mod p
    (Montgomery representation of B). */
-static const uint64_t P256_B_MONTY[] = {
+static const br_ssl_u64 P256_B_MONTY[] = {
 	0xD89CDF6229C4BDDF, 0xACF005CD78843090,
 	0xE5A220ABF7212ED6, 0xDC30061D04874834
 };
@@ -93,56 +93,56 @@ static const uint64_t P256_B_MONTY[] = {
  * Addition in the field.
  */
 static inline void
-f256_add(uint64_t *d, const uint64_t *a, const uint64_t *b)
+f256_add(br_ssl_u64 *d, const br_ssl_u64 *a, const br_ssl_u64 *b)
 {
 #if BR_INT128
 	unsigned __int128 w;
-	uint64_t t;
+	br_ssl_u64 t;
 
 	/*
 	 * Do the addition, with an extra carry in t.
 	 */
 	w = (unsigned __int128)a[0] + b[0];
-	d[0] = (uint64_t)w;
+	d[0] = (br_ssl_u64)w;
 	w = (unsigned __int128)a[1] + b[1] + (w >> 64);
-	d[1] = (uint64_t)w;
+	d[1] = (br_ssl_u64)w;
 	w = (unsigned __int128)a[2] + b[2] + (w >> 64);
-	d[2] = (uint64_t)w;
+	d[2] = (br_ssl_u64)w;
 	w = (unsigned __int128)a[3] + b[3] + (w >> 64);
-	d[3] = (uint64_t)w;
-	t = (uint64_t)(w >> 64);
+	d[3] = (br_ssl_u64)w;
+	t = (br_ssl_u64)(w >> 64);
 
 	/*
 	 * Fold carry t, using: 2^256 = 2^224 - 2^192 - 2^96 + 1 mod p.
 	 */
 	w = (unsigned __int128)d[0] + t;
-	d[0] = (uint64_t)w;
+	d[0] = (br_ssl_u64)w;
 	w = (unsigned __int128)d[1] + (w >> 64) - (t << 32);
-	d[1] = (uint64_t)w;
+	d[1] = (br_ssl_u64)w;
 	/* Here, carry "w >> 64" can only be 0 or -1 */
 	w = (unsigned __int128)d[2] - ((w >> 64) & 1);
-	d[2] = (uint64_t)w;
+	d[2] = (br_ssl_u64)w;
 	/* Again, carry is 0 or -1. But there can be carry only if t = 1,
 	   in which case the addition of (t << 32) - t is positive. */
 	w = (unsigned __int128)d[3] - ((w >> 64) & 1) + (t << 32) - t;
-	d[3] = (uint64_t)w;
-	t = (uint64_t)(w >> 64);
+	d[3] = (br_ssl_u64)w;
+	t = (br_ssl_u64)(w >> 64);
 
 	/*
 	 * There can be an extra carry here, which we must fold again.
 	 */
 	w = (unsigned __int128)d[0] + t;
-	d[0] = (uint64_t)w;
+	d[0] = (br_ssl_u64)w;
 	w = (unsigned __int128)d[1] + (w >> 64) - (t << 32);
-	d[1] = (uint64_t)w;
+	d[1] = (br_ssl_u64)w;
 	w = (unsigned __int128)d[2] - ((w >> 64) & 1);
-	d[2] = (uint64_t)w;
-	d[3] += (t << 32) - t - (uint64_t)((w >> 64) & 1);
+	d[2] = (br_ssl_u64)w;
+	d[3] += (t << 32) - t - (br_ssl_u64)((w >> 64) & 1);
 
 #elif BR_UMUL128
 
 	unsigned char cc;
-	uint64_t t;
+	br_ssl_u64 t;
 
 	cc = _addcarry_u64(0, a[0], b[0], &d[0]);
 	cc = _addcarry_u64(cc, a[1], b[1], &d[1]);
@@ -175,55 +175,55 @@ f256_add(uint64_t *d, const uint64_t *a, const uint64_t *b)
  * Subtraction in the field.
  */
 static inline void
-f256_sub(uint64_t *d, const uint64_t *a, const uint64_t *b)
+f256_sub(br_ssl_u64 *d, const br_ssl_u64 *a, const br_ssl_u64 *b)
 {
 #if BR_INT128
 
 	unsigned __int128 w;
-	uint64_t t;
+	br_ssl_u64 t;
 
 	w = (unsigned __int128)a[0] - b[0];
-	d[0] = (uint64_t)w;
+	d[0] = (br_ssl_u64)w;
 	w = (unsigned __int128)a[1] - b[1] - ((w >> 64) & 1);
-	d[1] = (uint64_t)w;
+	d[1] = (br_ssl_u64)w;
 	w = (unsigned __int128)a[2] - b[2] - ((w >> 64) & 1);
-	d[2] = (uint64_t)w;
+	d[2] = (br_ssl_u64)w;
 	w = (unsigned __int128)a[3] - b[3] - ((w >> 64) & 1);
-	d[3] = (uint64_t)w;
-	t = (uint64_t)(w >> 64) & 1;
+	d[3] = (br_ssl_u64)w;
+	t = (br_ssl_u64)(w >> 64) & 1;
 
 	/*
 	 * If there is a borrow (t = 1), then we must add the modulus
 	 * p = 2^256 - 2^224 + 2^192 + 2^96 - 1.
 	 */
 	w = (unsigned __int128)d[0] - t;
-	d[0] = (uint64_t)w;
+	d[0] = (br_ssl_u64)w;
 	w = (unsigned __int128)d[1] + (t << 32) - ((w >> 64) & 1);
-	d[1] = (uint64_t)w;
+	d[1] = (br_ssl_u64)w;
 	/* Here, carry "w >> 64" can only be 0 or +1 */
 	w = (unsigned __int128)d[2] + (w >> 64);
-	d[2] = (uint64_t)w;
+	d[2] = (br_ssl_u64)w;
 	/* Again, carry is 0 or +1 */
 	w = (unsigned __int128)d[3] + (w >> 64) - (t << 32) + t;
-	d[3] = (uint64_t)w;
-	t = (uint64_t)(w >> 64) & 1;
+	d[3] = (br_ssl_u64)w;
+	t = (br_ssl_u64)(w >> 64) & 1;
 
 	/*
 	 * There may be again a borrow, in which case we must add the
 	 * modulus again.
 	 */
 	w = (unsigned __int128)d[0] - t;
-	d[0] = (uint64_t)w;
+	d[0] = (br_ssl_u64)w;
 	w = (unsigned __int128)d[1] + (t << 32) - ((w >> 64) & 1);
-	d[1] = (uint64_t)w;
+	d[1] = (br_ssl_u64)w;
 	w = (unsigned __int128)d[2] + (w >> 64);
-	d[2] = (uint64_t)w;
-	d[3] += (uint64_t)(w >> 64) - (t << 32) + t;
+	d[2] = (br_ssl_u64)w;
+	d[3] += (br_ssl_u64)(w >> 64) - (t << 32) + t;
 
 #elif BR_UMUL128
 
 	unsigned char cc;
-	uint64_t t;
+	br_ssl_u64 t;
 
 	cc = _subborrow_u64(0, a[0], b[0], &d[0]);
 	cc = _subborrow_u64(cc, a[1], b[1], &d[1]);
@@ -256,11 +256,11 @@ f256_sub(uint64_t *d, const uint64_t *a, const uint64_t *b)
  * Montgomery multiplication in the field.
  */
 static void
-f256_montymul(uint64_t *d, const uint64_t *a, const uint64_t *b)
+f256_montymul(br_ssl_u64 *d, const br_ssl_u64 *a, const br_ssl_u64 *b)
 {
 #if BR_INT128
 
-	uint64_t x, f, t0, t1, t2, t3, t4;
+	br_ssl_u64 x, f, t0, t1, t2, t3, t4;
 	unsigned __int128 z, ff;
 	int i;
 
@@ -279,20 +279,20 @@ f256_montymul(uint64_t *d, const uint64_t *a, const uint64_t *b)
 	 */
 	x = a[0];
 	z = (unsigned __int128)b[0] * x;
-	f = (uint64_t)z;
-	z = (unsigned __int128)b[1] * x + (z >> 64) + (uint64_t)(f << 32);
-	t0 = (uint64_t)z;
-	z = (unsigned __int128)b[2] * x + (z >> 64) + (uint64_t)(f >> 32);
-	t1 = (uint64_t)z;
+	f = (br_ssl_u64)z;
+	z = (unsigned __int128)b[1] * x + (z >> 64) + (br_ssl_u64)(f << 32);
+	t0 = (br_ssl_u64)z;
+	z = (unsigned __int128)b[2] * x + (z >> 64) + (br_ssl_u64)(f >> 32);
+	t1 = (br_ssl_u64)z;
 	z = (unsigned __int128)b[3] * x + (z >> 64) + f;
-	t2 = (uint64_t)z;
-	t3 = (uint64_t)(z >> 64);
+	t2 = (br_ssl_u64)z;
+	t3 = (br_ssl_u64)(z >> 64);
 	ff = ((unsigned __int128)f << 64) - ((unsigned __int128)f << 32);
-	z = (unsigned __int128)t2 + (uint64_t)ff;
-	t2 = (uint64_t)z;
+	z = (unsigned __int128)t2 + (br_ssl_u64)ff;
+	t2 = (br_ssl_u64)z;
 	z = (unsigned __int128)t3 + (z >> 64) + (ff >> 64);
-	t3 = (uint64_t)z;
-	t4 = (uint64_t)(z >> 64);
+	t3 = (br_ssl_u64)z;
+	t4 = (br_ssl_u64)(z >> 64);
 
 	/*
 	 * Steps 2 to 4: t <- (t + a[i]*b + f*p) / 2^64
@@ -302,31 +302,31 @@ f256_montymul(uint64_t *d, const uint64_t *a, const uint64_t *b)
 
 		/* t <- (t + x*b - f) / 2^64 */
 		z = (unsigned __int128)b[0] * x + t0;
-		f = (uint64_t)z;
+		f = (br_ssl_u64)z;
 		z = (unsigned __int128)b[1] * x + t1 + (z >> 64);
-		t0 = (uint64_t)z;
+		t0 = (br_ssl_u64)z;
 		z = (unsigned __int128)b[2] * x + t2 + (z >> 64);
-		t1 = (uint64_t)z;
+		t1 = (br_ssl_u64)z;
 		z = (unsigned __int128)b[3] * x + t3 + (z >> 64);
-		t2 = (uint64_t)z;
+		t2 = (br_ssl_u64)z;
 		z = t4 + (z >> 64);
-		t3 = (uint64_t)z;
-		t4 = (uint64_t)(z >> 64);
+		t3 = (br_ssl_u64)z;
+		t4 = (br_ssl_u64)(z >> 64);
 
 		/* t <- t + f*2^32, carry in the upper half of z */
-		z = (unsigned __int128)t0 + (uint64_t)(f << 32);
-		t0 = (uint64_t)z;
-		z = (z >> 64) + (unsigned __int128)t1 + (uint64_t)(f >> 32);
-		t1 = (uint64_t)z;
+		z = (unsigned __int128)t0 + (br_ssl_u64)(f << 32);
+		t0 = (br_ssl_u64)z;
+		z = (z >> 64) + (unsigned __int128)t1 + (br_ssl_u64)(f >> 32);
+		t1 = (br_ssl_u64)z;
 
 		/* t <- t + f*2^192 - f*2^160 + f*2^128 */
 		ff = ((unsigned __int128)f << 64) 
 			- ((unsigned __int128)f << 32) + f;
-		z = (z >> 64) + (unsigned __int128)t2 + (uint64_t)ff;
-		t2 = (uint64_t)z;
+		z = (z >> 64) + (unsigned __int128)t2 + (br_ssl_u64)ff;
+		t2 = (br_ssl_u64)z;
 		z = (unsigned __int128)t3 + (z >> 64) + (ff >> 64);
-		t3 = (uint64_t)z;
-		t4 += (uint64_t)(z >> 64);
+		t3 = (br_ssl_u64)z;
+		t4 += (br_ssl_u64)(z >> 64);
 	}
 
 	/*
@@ -348,12 +348,12 @@ f256_montymul(uint64_t *d, const uint64_t *a, const uint64_t *b)
 	 * get a nonnegative result that fits on 256 bits.
 	 */
 	z = (unsigned __int128)t0 + t4;
-	t0 = (uint64_t)z;
+	t0 = (br_ssl_u64)z;
 	z = (unsigned __int128)t1 - (t4 << 32) + (z >> 64);
-	t1 = (uint64_t)z;
+	t1 = (br_ssl_u64)z;
 	z = (unsigned __int128)t2 - (z >> 127);
-	t2 = (uint64_t)z;
-	t3 = t3 - (uint64_t)(z >> 127) - t4 + (t4 << 32);
+	t2 = (br_ssl_u64)z;
+	t3 = t3 - (br_ssl_u64)(z >> 127) - t4 + (t4 << 32);
 
 	d[0] = t0;
 	d[1] = t1;
@@ -362,8 +362,8 @@ f256_montymul(uint64_t *d, const uint64_t *a, const uint64_t *b)
 
 #elif BR_UMUL128
 
-	uint64_t x, f, t0, t1, t2, t3, t4;
-	uint64_t zl, zh, ffl, ffh;
+	br_ssl_u64 x, f, t0, t1, t2, t3, t4;
+	br_ssl_u64 zl, zh, ffl, ffh;
 	unsigned char k, m;
 	int i;
 
@@ -496,7 +496,7 @@ f256_montymul(uint64_t *d, const uint64_t *a, const uint64_t *b)
  * TODO: see if some extra speed can be gained here.
  */
 static inline void
-f256_montysquare(uint64_t *d, const uint64_t *a)
+f256_montysquare(br_ssl_u64 *d, const br_ssl_u64 *a)
 {
 	f256_montymul(d, a, a);
 }
@@ -505,7 +505,7 @@ f256_montysquare(uint64_t *d, const uint64_t *a)
  * Convert to Montgomery representation.
  */
 static void
-f256_tomonty(uint64_t *d, const uint64_t *a)
+f256_tomonty(br_ssl_u64 *d, const br_ssl_u64 *a)
 {
 	/*
 	 * R2 = 2^512 mod p.
@@ -513,7 +513,7 @@ f256_tomonty(uint64_t *d, const uint64_t *a)
 	 * multiplication of a by R2 is: a*R2/R = a*R mod p, i.e. the
 	 * conversion to Montgomery representation.
 	 */
-	static const uint64_t R2[] = {
+	static const br_ssl_u64 R2[] = {
 		0x0000000000000003,
 		0xFFFFFFFBFFFFFFFF,
 		0xFFFFFFFFFFFFFFFE,
@@ -527,12 +527,12 @@ f256_tomonty(uint64_t *d, const uint64_t *a)
  * Convert from Montgomery representation.
  */
 static void
-f256_frommonty(uint64_t *d, const uint64_t *a)
+f256_frommonty(br_ssl_u64 *d, const br_ssl_u64 *a)
 {
 	/*
 	 * Montgomery multiplication by 1 is division by 2^256 modulo p.
 	 */
-	static const uint64_t one[] = { 1, 0, 0, 0 };
+	static const br_ssl_u64 one[] = { 1, 0, 0, 0 };
 
 	f256_montymul(d, a, one);
 }
@@ -542,7 +542,7 @@ f256_frommonty(uint64_t *d, const uint64_t *a)
  * returns 0 or p. This function uses Montgomery representation.
  */
 static void
-f256_invert(uint64_t *d, const uint64_t *a)
+f256_invert(br_ssl_u64 *d, const br_ssl_u64 *a)
 {
 	/*
 	 * We compute a^(p-2) mod p. The exponent pattern (from high to
@@ -558,7 +558,7 @@ f256_invert(uint64_t *d, const uint64_t *a)
 	 * a^(2^31-1).
 	 */
 
-	uint64_t r[4], t[4];
+	br_ssl_u64 r[4], t[4];
 	int i;
 
 	memcpy(t, a, sizeof t);
@@ -593,11 +593,11 @@ f256_invert(uint64_t *d, const uint64_t *a)
  * if the input is greater than or equal to p.
  */
 static inline void
-f256_final_reduce(uint64_t *a)
+f256_final_reduce(br_ssl_u64 *a)
 {
 #if BR_INT128
 
-	uint64_t t0, t1, t2, t3, cc;
+	br_ssl_u64 t0, t1, t2, t3, cc;
 	unsigned __int128 z;
 
 	/*
@@ -606,14 +606,14 @@ f256_final_reduce(uint64_t *a)
 	 * the value we must return.
 	 */
 	z = (unsigned __int128)a[0] + 1;
-	t0 = (uint64_t)z;
-	z = (unsigned __int128)a[1] + (z >> 64) - ((uint64_t)1 << 32);
-	t1 = (uint64_t)z;
+	t0 = (br_ssl_u64)z;
+	z = (unsigned __int128)a[1] + (z >> 64) - ((br_ssl_u64)1 << 32);
+	t1 = (br_ssl_u64)z;
 	z = (unsigned __int128)a[2] - (z >> 127);
-	t2 = (uint64_t)z;
+	t2 = (br_ssl_u64)z;
 	z = (unsigned __int128)a[3] - (z >> 127) + 0xFFFFFFFF;
-	t3 = (uint64_t)z;
-	cc = -(uint64_t)(z >> 64);
+	t3 = (br_ssl_u64)z;
+	cc = -(br_ssl_u64)(z >> 64);
 
 	a[0] ^= cc & (a[0] ^ t0);
 	a[1] ^= cc & (a[1] ^ t1);
@@ -622,14 +622,14 @@ f256_final_reduce(uint64_t *a)
 
 #elif BR_UMUL128
 
-	uint64_t t0, t1, t2, t3, m;
+	br_ssl_u64 t0, t1, t2, t3, m;
 	unsigned char k;
 
-	k = _addcarry_u64(0, a[0], (uint64_t)1, &t0);
-	k = _addcarry_u64(k, a[1], -((uint64_t)1 << 32), &t1);
-	k = _addcarry_u64(k, a[2], -(uint64_t)1, &t2);
-	k = _addcarry_u64(k, a[3], ((uint64_t)1 << 32) - 2, &t3);
-	m = -(uint64_t)k;
+	k = _addcarry_u64(0, a[0], (br_ssl_u64)1, &t0);
+	k = _addcarry_u64(k, a[1], -((br_ssl_u64)1 << 32), &t1);
+	k = _addcarry_u64(k, a[2], -(br_ssl_u64)1, &t2);
+	k = _addcarry_u64(k, a[3], ((br_ssl_u64)1 << 32) - 2, &t3);
+	m = -(br_ssl_u64)k;
 
 	a[0] ^= m & (a[0] ^ t0);
 	a[1] ^= m & (a[1] ^ t1);
@@ -647,14 +647,14 @@ f256_final_reduce(uint64_t *a)
  *    if Z = 0 then this is the point-at-infinity.
  */
 typedef struct {
-	uint64_t x[4];
-	uint64_t y[4];
+	br_ssl_u64 x[4];
+	br_ssl_u64 y[4];
 } p256_affine;
 
 typedef struct {
-	uint64_t x[4];
-	uint64_t y[4];
-	uint64_t z[4];
+	br_ssl_u64 x[4];
+	br_ssl_u64 y[4];
+	br_ssl_u64 z[4];
 } p256_jacobian;
 
 /*
@@ -665,11 +665,11 @@ typedef struct {
  *
  * The buffer is assumed to have length exactly 65 bytes.
  */
-static uint32_t
+static br_ssl_u32
 point_decode(p256_jacobian *P, const unsigned char *buf)
 {
-	uint64_t x[4], y[4], t[4], x3[4], tt;
-	uint32_t r;
+	br_ssl_u64 x[4], y[4], t[4], x3[4], tt;
+	br_ssl_u32 r;
 
 	/*
 	 * Header byte shall be 0x04.
@@ -707,7 +707,7 @@ point_decode(p256_jacobian *P, const unsigned char *buf)
 	f256_sub(t, t, P256_B_MONTY);
 	f256_final_reduce(t);
 	tt = t[0] | t[1] | t[2] | t[3];
-	r &= EQ((uint32_t)(tt | (tt >> 32)), 0);
+	r &= EQ((br_ssl_u32)(tt | (tt >> 32)), 0);
 
 	/*
 	 * Return the point in Jacobian coordinates (and Montgomery
@@ -729,10 +729,10 @@ point_decode(p256_jacobian *P, const unsigned char *buf)
  * but the buffer contents are indeterminate, and 0 is returned. Otherwise,
  * the encoded point is written in the buffer, and 1 is returned.
  */
-static uint32_t
+static br_ssl_u32
 point_encode(unsigned char *buf, const p256_jacobian *P)
 {
-	uint64_t t1[4], t2[4], z;
+	br_ssl_u64 t1[4], t2[4], z;
 
 	/* Set t1 = 1/z^2 and t2 = 1/z^3. */
 	f256_invert(t2, P->z);
@@ -763,7 +763,7 @@ point_encode(unsigned char *buf, const p256_jacobian *P)
 
 	/* Return success if and only if P->z != 0. */
 	z = P->z[0] | P->z[1] | P->z[2] | P->z[3];
-	return NEQ((uint32_t)(z | z >> 32), 0);
+	return NEQ((br_ssl_u32)(z | z >> 32), 0);
 }
 
 /*
@@ -795,7 +795,7 @@ p256_double(p256_jacobian *P)
 	 *     anyway.
 	 *   - If z = 0 then z' = 0.
 	 */
-	uint64_t t1[4], t2[4], t3[4], t4[4];
+	br_ssl_u64 t1[4], t2[4], t3[4], t4[4];
 
 	/*
 	 * Compute z^2 in t1.
@@ -880,7 +880,7 @@ p256_double(p256_jacobian *P)
  * Note that you can get a returned value of 0 with a correct result,
  * e.g. if P1 and P2 have the same Y coordinate, but distinct X coordinates.
  */
-static uint32_t
+static br_ssl_u32
 p256_add(p256_jacobian *P1, const p256_jacobian *P2)
 {
 	/*
@@ -896,8 +896,8 @@ p256_add(p256_jacobian *P1, const p256_jacobian *P2)
 	 *   y3 = r * (u1 * h^2 - x3) - s1 * h^3
 	 *   z3 = h * z1 * z2
 	 */
-	uint64_t t1[4], t2[4], t3[4], t4[4], t5[4], t6[4], t7[4], tt;
-	uint32_t ret;
+	br_ssl_u64 t1[4], t2[4], t3[4], t4[4], t5[4], t6[4], t7[4], tt;
+	br_ssl_u32 ret;
 
 	/*
 	 * Compute u1 = x1*z2^2 (in t1) and s1 = y1*z2^3 (in t3).
@@ -924,7 +924,7 @@ p256_add(p256_jacobian *P1, const p256_jacobian *P2)
 	f256_sub(t4, t4, t3);
 	f256_final_reduce(t4);
 	tt = t4[0] | t4[1] | t4[2] | t4[3];
-	ret = (uint32_t)(tt | (tt >> 32));
+	ret = (br_ssl_u32)(tt | (tt >> 32));
 	ret = (ret | -ret) >> 31;
 
 	/*
@@ -992,7 +992,7 @@ p256_add(p256_jacobian *P1, const p256_jacobian *P2)
  * Again, a value of 0 may be returned in some cases where the addition
  * result is correct.
  */
-static uint32_t
+static br_ssl_u32
 p256_add_mixed(p256_jacobian *P1, const p256_affine *P2)
 {
 	/*
@@ -1008,8 +1008,8 @@ p256_add_mixed(p256_jacobian *P1, const p256_affine *P2)
 	 *   y3 = r * (u1 * h^2 - x3) - s1 * h^3
 	 *   z3 = h * z1
 	 */
-	uint64_t t1[4], t2[4], t3[4], t4[4], t5[4], t6[4], t7[4], tt;
-	uint32_t ret;
+	br_ssl_u64 t1[4], t2[4], t3[4], t4[4], t5[4], t6[4], t7[4], tt;
+	br_ssl_u32 ret;
 
 	/*
 	 * Compute u1 = x1 (in t1) and s1 = y1 (in t3).
@@ -1034,7 +1034,7 @@ p256_add_mixed(p256_jacobian *P1, const p256_affine *P2)
 	f256_sub(t4, t4, t3);
 	f256_final_reduce(t4);
 	tt = t4[0] | t4[1] | t4[2] | t4[3];
-	ret = (uint32_t)(tt | (tt >> 32));
+	ret = (br_ssl_u32)(tt | (tt >> 32));
 	ret = (ret | -ret) >> 31;
 
 	/*
@@ -1077,7 +1077,7 @@ p256_add_mixed(p256_jacobian *P1, const p256_affine *P2)
  *
  * This function returns the correct result in all cases.
  */
-static uint32_t
+static br_ssl_u32
 p256_add_complete_mixed(p256_jacobian *P1, const p256_affine *P2)
 {
 	/*
@@ -1125,14 +1125,14 @@ p256_add_complete_mixed(p256_jacobian *P1, const p256_affine *P2)
 	 * multiplications of the normal mixed addition in Jacobian
 	 * coordinates, we get a cost of 17 multiplications in total.
 	 */
-	uint64_t t1[4], t2[4], t3[4], t4[4], t5[4], t6[4], t7[4], tt, zz;
+	br_ssl_u64 t1[4], t2[4], t3[4], t4[4], t5[4], t6[4], t7[4], tt, zz;
 	int i;
 
 	/*
 	 * Set zz to -1 if P1 is the point at infinity, 0 otherwise.
 	 */
 	zz = P1->z[0] | P1->z[1] | P1->z[2] | P1->z[3];
-	zz = ((zz | -zz) >> 63) - (uint64_t)1;
+	zz = ((zz | -zz) >> 63) - (br_ssl_u64)1;
 
 	/*
 	 * Compute u1 = x1 (in t1) and s1 = y1 (in t3).
@@ -1162,7 +1162,7 @@ p256_add_complete_mixed(p256_jacobian *P1, const p256_affine *P2)
 	f256_final_reduce(t2);
 	f256_final_reduce(t4);
 	tt = t2[0] | t2[1] | t2[2] | t2[3] | t4[0] | t4[1] | t4[2] | t4[3];
-	tt = ((tt | -tt) >> 63) - (uint64_t)1;
+	tt = ((tt | -tt) >> 63) - (br_ssl_u64)1;
 
 	/*
 	 * Compute u1*h^2 (in t6) and h^3 (in t5);
@@ -1270,7 +1270,7 @@ point_mul_inner(p256_jacobian *R, const p256_affine *W,
 	const unsigned char *k, size_t klen)
 {
 	p256_jacobian Q;
-	uint32_t qz;
+	br_ssl_u32 qz;
 
 	memset(&Q, 0, sizeof Q);
 	qz = 1;
@@ -1280,13 +1280,13 @@ point_mul_inner(p256_jacobian *R, const p256_affine *W,
 
 		bk = *k ++;
 		for (i = 0; i < 2; i ++) {
-			uint32_t bits;
-			uint32_t bnz;
+			br_ssl_u32 bits;
+			br_ssl_u32 bnz;
 			p256_affine T;
 			p256_jacobian U;
-			uint32_t n;
+			br_ssl_u32 n;
 			int j;
-			uint64_t m;
+			br_ssl_u64 m;
 
 			p256_double(&Q);
 			p256_double(&Q);
@@ -1303,7 +1303,7 @@ point_mul_inner(p256_jacobian *R, const p256_affine *W,
 			 */
 			memset(&T, 0, sizeof T);
 			for (n = 0; n < 15; n ++) {
-				m = -(uint64_t)EQ(bits, n + 1);
+				m = -(br_ssl_u64)EQ(bits, n + 1);
 				T.x[0] |= m & W[n].x[0];
 				T.x[1] |= m & W[n].x[1];
 				T.x[2] |= m & W[n].x[2];
@@ -1321,7 +1321,7 @@ point_mul_inner(p256_jacobian *R, const p256_affine *W,
 			 * If qz is still 1, then Q was all-zeros, and this
 			 * is conserved through p256_double().
 			 */
-			m = -(uint64_t)(bnz & qz);
+			m = -(br_ssl_u64)(bnz & qz);
 			for (j = 0; j < 4; j ++) {
 				Q.x[j] |= m & T.x[j];
 				Q.y[j] |= m & T.y[j];
@@ -1403,7 +1403,7 @@ window_to_affine(p256_affine *aff, p256_jacobian *jac, int num)
 	 *      final z = z12345678*z9ABCDE
 	 */
 
-	uint64_t z[16][4];
+	br_ssl_u64 z[16][4];
 	int i, k, s;
 #define zt   (z[15])
 #define zu   (z[14])
@@ -1622,11 +1622,11 @@ p256_mulgen(p256_jacobian *P, const unsigned char *k, size_t klen)
  *
  * Constant-time behaviour: only klen may be observable.
  */
-static uint32_t
+static br_ssl_u32
 check_scalar(const unsigned char *k, size_t klen)
 {
-	uint32_t z;
-	int32_t c;
+	br_ssl_u32 z;
+	br_ssl_i32 c;
 	size_t u;
 
 	if (klen > 32) {
@@ -1639,7 +1639,7 @@ check_scalar(const unsigned char *k, size_t klen)
 	if (klen == 32) {
 		c = 0;
 		for (u = 0; u < klen; u ++) {
-			c |= -(int32_t)EQ0(c) & CMP(k[u], P256_N[u]);
+			c |= -(br_ssl_i32)EQ0(c) & CMP(k[u], P256_N[u]);
 		}
 	} else {
 		c = -1;
@@ -1647,11 +1647,11 @@ check_scalar(const unsigned char *k, size_t klen)
 	return NEQ(z, 0) & LT0(c);
 }
 
-static uint32_t
+static br_ssl_u32
 api_mul(unsigned char *G, size_t Glen,
 	const unsigned char *k, size_t klen, int curve)
 {
-	uint32_t r;
+	br_ssl_u32 r;
 	p256_jacobian P;
 
 	(void)curve;
@@ -1677,7 +1677,7 @@ api_mulgen(unsigned char *R,
 	return 65;
 }
 
-static uint32_t
+static br_ssl_u32
 api_muladd(unsigned char *A, const unsigned char *B, size_t len,
 	const unsigned char *x, size_t xlen,
 	const unsigned char *y, size_t ylen, int curve)
@@ -1711,8 +1711,8 @@ api_muladd(unsigned char *A, const unsigned char *B, size_t len,
 	 */
 
 	p256_jacobian P, Q;
-	uint32_t r, t, s;
-	uint64_t z;
+	br_ssl_u32 r, t, s;
+	br_ssl_u64 z;
 
 	(void)curve;
 	if (len != 65) {
@@ -1733,7 +1733,7 @@ api_muladd(unsigned char *A, const unsigned char *B, size_t len,
 	t = p256_add(&P, &Q);
 	f256_final_reduce(P.z);
 	z = P.z[0] | P.z[1] | P.z[2] | P.z[3];
-	s = EQ((uint32_t)(z | (z >> 32)), 0);
+	s = EQ((br_ssl_u32)(z | (z >> 32)), 0);
 	p256_double(&Q);
 
 	/*
@@ -1753,7 +1753,7 @@ api_muladd(unsigned char *A, const unsigned char *B, size_t len,
 
 /* see bearssl_ec.h */
 const br_ec_impl br_ec_p256_m64 = {
-	(uint32_t)0x00800000,
+	(br_ssl_u32)0x00800000,
 	&api_generator,
 	&api_order,
 	&api_xoff,

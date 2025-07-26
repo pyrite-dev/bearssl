@@ -74,17 +74,17 @@ api_xoff(int curve, size_t *len)
  * propagation costs.
  */
 
-#define MASK51   (((uint64_t)1 << 51) - (uint64_t)1)
+#define MASK51   (((br_ssl_u64)1 << 51) - (br_ssl_u64)1)
 
 /*
  * Swap two field elements, conditionally on a flag.
  */
 static inline void
-f255_cswap(uint64_t *a, uint64_t *b, uint32_t ctl)
+f255_cswap(br_ssl_u64 *a, br_ssl_u64 *b, br_ssl_u32 ctl)
 {
-	uint64_t m, w;
+	br_ssl_u64 m, w;
 
-	m = -(uint64_t)ctl;
+	m = -(br_ssl_u64)ctl;
 	w = m & (a[0] ^ b[0]); a[0] ^= w; b[0] ^= w;
 	w = m & (a[1] ^ b[1]); a[1] ^= w; b[1] ^= w;
 	w = m & (a[2] ^ b[2]); a[2] ^= w; b[2] ^= w;
@@ -96,7 +96,7 @@ f255_cswap(uint64_t *a, uint64_t *b, uint32_t ctl)
  * Addition with no carry propagation. Limbs double in size.
  */
 static inline void
-f255_add(uint64_t *d, const uint64_t *a, const uint64_t *b)
+f255_add(br_ssl_u64 *d, const br_ssl_u64 *a, const br_ssl_u64 *b)
 {
 	d[0] = a[0] + b[0];
 	d[1] = a[1] + b[1];
@@ -113,9 +113,9 @@ f255_add(uint64_t *d, const uint64_t *a, const uint64_t *b)
  * value up to 2^51+19455.
  */
 static inline void
-f255_sub(uint64_t *d, const uint64_t *a, const uint64_t *b)
+f255_sub(br_ssl_u64 *d, const br_ssl_u64 *a, const br_ssl_u64 *b)
 {
-	uint64_t cc, w;
+	br_ssl_u64 cc, w;
 
 	/*
 	 * We compute d = (2^255-19)*1024 + a - b. Since the limbs
@@ -140,7 +140,7 @@ f255_sub(uint64_t *d, const uint64_t *a, const uint64_t *b)
 	w = a[3] - b[3] - cc;
 	d[3] = w & MASK51;
 	cc = -(w >> 51) & 0x3FF;
-	d[4] = ((uint64_t)1 << 61) + a[4] - b[4] - cc;
+	d[4] = ((br_ssl_u64)1 << 61) + a[4] - b[4] - cc;
 
 	/*
 	 * Partial reduction. The intermediate result may be up to
@@ -165,14 +165,14 @@ f255_sub(uint64_t *d, const uint64_t *a, const uint64_t *b)
 #define UMUL51(hi, lo, x, y)   do { \
 		unsigned __int128 umul_tmp; \
 		umul_tmp = (unsigned __int128)(x) * (unsigned __int128)(y); \
-		(hi) = (uint64_t)(umul_tmp >> 51); \
-		(lo) = (uint64_t)umul_tmp & MASK51; \
+		(hi) = (br_ssl_u64)(umul_tmp >> 51); \
+		(lo) = (br_ssl_u64)umul_tmp & MASK51; \
 	} while (0)
 
 #elif BR_UMUL128
 
 #define UMUL51(hi, lo, x, y)   do { \
-		uint64_t umul_hi, umul_lo; \
+		br_ssl_u64 umul_hi, umul_lo; \
 		umul_lo = _umul128((x), (y), &umul_hi); \
 		(hi) = (umul_hi << 13) | (umul_lo >> 51); \
 		(lo) = umul_lo & MASK51; \
@@ -187,9 +187,9 @@ f255_sub(uint64_t *d, const uint64_t *a, const uint64_t *b)
  * on 51 bits each.
  */
 static inline void
-f255_mul(uint64_t *d, uint64_t *a, uint64_t *b)
+f255_mul(br_ssl_u64 *d, br_ssl_u64 *a, br_ssl_u64 *b)
 {
-	uint64_t t[10], hi, lo, w, cc;
+	br_ssl_u64 t[10], hi, lo, w, cc;
 
 	/*
 	 * Perform cross products, accumulating values without carry
@@ -282,9 +282,9 @@ f255_mul(uint64_t *d, uint64_t *a, uint64_t *b)
  * Input must have limbs of 60 bits at most.
  */
 static inline void
-f255_mul_a24(uint64_t *d, const uint64_t *a)
+f255_mul_a24(br_ssl_u64 *d, const br_ssl_u64 *a)
 {
-	uint64_t t[5], cc, w;
+	br_ssl_u64 t[5], cc, w;
 
 	/*
 	 * 121665 = 15 * 8111. We first multiply by 15, with carry
@@ -334,9 +334,9 @@ f255_mul_a24(uint64_t *d, const uint64_t *a)
  * which may be slightly above 2^51.
  */
 static inline void
-f255_final_reduce(uint64_t *a)
+f255_final_reduce(br_ssl_u64 *a)
 {
-	uint64_t t[5], cc, w;
+	br_ssl_u64 t[5], cc, w;
 
 	/*
 	 * We add 19. If the result (in t[]) is below 2^255, then a[]
@@ -372,13 +372,13 @@ f255_final_reduce(uint64_t *a)
 	a[4] ^= cc & (a[4] ^ t[4]);
 }
 
-static uint32_t
+static br_ssl_u32
 api_mul(unsigned char *G, size_t Glen,
 	const unsigned char *kb, size_t kblen, int curve)
 {
 	unsigned char k[32];
-	uint64_t x1[5], x2[5], z2[5], x3[5], z3[5];
-	uint32_t swap;
+	br_ssl_u64 x1[5], x2[5], z2[5], x3[5], z3[5];
+	br_ssl_u32 swap;
 	int i;
 
 	(void)curve;
@@ -404,7 +404,7 @@ api_mul(unsigned char *G, size_t Glen,
 
 	/*
 	 * We can use memset() to clear values, because exact-width types
-	 * like uint64_t are guaranteed to have no padding bits or
+	 * like br_ssl_u64 are guaranteed to have no padding bits or
 	 * trap representations.
 	 */
 	memset(x2, 0, sizeof x2);
@@ -426,9 +426,9 @@ api_mul(unsigned char *G, size_t Glen,
 	swap = 0;
 
 	for (i = 254; i >= 0; i --) {
-		uint64_t a[5], aa[5], b[5], bb[5], e[5];
-		uint64_t c[5], d[5], da[5], cb[5];
-		uint32_t kt;
+		br_ssl_u64 a[5], aa[5], b[5], bb[5], e[5];
+		br_ssl_u64 c[5], d[5], da[5], cb[5];
+		br_ssl_u32 kt;
 
 		kt = (k[31 - (i >> 3)] >> (i & 7)) & 1;
 		swap ^= kt;
@@ -554,7 +554,7 @@ api_mulgen(unsigned char *R,
 	return Glen;
 }
 
-static uint32_t
+static br_ssl_u32
 api_muladd(unsigned char *A, const unsigned char *B, size_t len,
 	const unsigned char *x, size_t xlen,
 	const unsigned char *y, size_t ylen, int curve)
@@ -577,7 +577,7 @@ api_muladd(unsigned char *A, const unsigned char *B, size_t len,
 
 /* see bearssl_ec.h */
 const br_ec_impl br_ec_c25519_m62 = {
-	(uint32_t)0x20000000,
+	(br_ssl_u32)0x20000000,
 	&api_generator,
 	&api_order,
 	&api_xoff,

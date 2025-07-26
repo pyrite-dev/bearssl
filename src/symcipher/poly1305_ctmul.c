@@ -33,7 +33,7 @@
  * may be slightly larger (but by a very small amount only).
  */
 static void
-poly1305_inner(uint32_t *acc, const uint32_t *r, const void *data, size_t len)
+poly1305_inner(br_ssl_u32 *acc, const br_ssl_u32 *r, const void *data, size_t len)
 {
 	/*
 	 * Implementation notes: we split the 130-bit values into five
@@ -47,9 +47,9 @@ poly1305_inner(uint32_t *acc, const uint32_t *r, const void *data, size_t len)
 	 * low words with a factor of 5; that is, x*2^130 = x*5 mod p.
 	 */
 	const unsigned char *buf;
-	uint32_t a0, a1, a2, a3, a4;
-	uint32_t r0, r1, r2, r3, r4;
-	uint32_t u1, u2, u3, u4;
+	br_ssl_u32 a0, a1, a2, a3, a4;
+	br_ssl_u32 r0, r1, r2, r3, r4;
+	br_ssl_u32 u1, u2, u3, u4;
 
 	r0 = r[0];
 	r1 = r[1];
@@ -70,8 +70,8 @@ poly1305_inner(uint32_t *acc, const uint32_t *r, const void *data, size_t len)
 
 	buf = data;
 	while (len > 0) {
-		uint64_t w0, w1, w2, w3, w4;
-		uint64_t c;
+		br_ssl_u64 w0, w1, w2, w3, w4;
+		br_ssl_u64 c;
 		unsigned char tmp[16];
 
 		/*
@@ -97,7 +97,7 @@ poly1305_inner(uint32_t *acc, const uint32_t *r, const void *data, size_t len)
 		/*
 		 * Compute multiplication.
 		 */
-#define M(x, y)   ((uint64_t)(x) * (uint64_t)(y))
+#define M(x, y)   ((br_ssl_u64)(x) * (br_ssl_u64)(y))
 
 		w0 = M(a0, r0) + M(a1, u4) + M(a2, u3) + M(a3, u2) + M(a4, u1);
 		w1 = M(a0, r1) + M(a1, r0) + M(a2, u4) + M(a3, u3) + M(a4, u2);
@@ -115,20 +115,20 @@ poly1305_inner(uint32_t *acc, const uint32_t *r, const void *data, size_t len)
 		 * some carry propagation.
 		 */
 		c = w0 >> 26;
-		a0 = (uint32_t)w0 & 0x3FFFFFF;
+		a0 = (br_ssl_u32)w0 & 0x3FFFFFF;
 		w1 += c;
 		c = w1 >> 26;
-		a1 = (uint32_t)w1 & 0x3FFFFFF;
+		a1 = (br_ssl_u32)w1 & 0x3FFFFFF;
 		w2 += c;
 		c = w2 >> 26;
-		a2 = (uint32_t)w2 & 0x3FFFFFF;
+		a2 = (br_ssl_u32)w2 & 0x3FFFFFF;
 		w3 += c;
 		c = w3 >> 26;
-		a3 = (uint32_t)w3 & 0x3FFFFFF;
+		a3 = (br_ssl_u32)w3 & 0x3FFFFFF;
 		w4 += c;
 		c = w4 >> 26;
-		a4 = (uint32_t)w4 & 0x3FFFFFF;
-		a0 += (uint32_t)c * 5;
+		a4 = (br_ssl_u32)w4 & 0x3FFFFFF;
+		a0 += (br_ssl_u32)c * 5;
 		a1 += a0 >> 26;
 		a0 &= 0x3FFFFFF;
 
@@ -150,8 +150,8 @@ br_poly1305_ctmul_run(const void *key, const void *iv,
 	void *tag, br_chacha20_run ichacha, int encrypt)
 {
 	unsigned char pkey[32], foot[16];
-	uint32_t r[5], acc[5], cc, ctl, hi;
-	uint64_t w;
+	br_ssl_u32 r[5], acc[5], cc, ctl, hi;
+	br_ssl_u64 w;
 	int i;
 
 	/*
@@ -195,8 +195,8 @@ br_poly1305_ctmul_run(const void *key, const void *iv,
 	 * Process the additional authenticated data, ciphertext, and
 	 * footer in due order.
 	 */
-	br_enc64le(foot, (uint64_t)aad_len);
-	br_enc64le(foot + 8, (uint64_t)len);
+	br_enc64le(foot, (br_ssl_u64)aad_len);
+	br_enc64le(foot + 8, (br_ssl_u64)len);
 	poly1305_inner(acc, r, aad, aad_len);
 	poly1305_inner(acc, r, data, len);
 	poly1305_inner(acc, r, foot, sizeof foot);
@@ -229,7 +229,7 @@ br_poly1305_ctmul_run(const void *key, const void *iv,
 	}
 	cc = 5;
 	for (i = 0; i < 5; i ++) {
-		uint32_t t;
+		br_ssl_u32 t;
 
 		t = (acc[i] + cc);
 		cc = t >> 26;
@@ -242,13 +242,13 @@ br_poly1305_ctmul_run(const void *key, const void *iv,
 	 * 's' value (second half of pkey[]). That addition is done
 	 * modulo 2^128.
 	 */
-	w = (uint64_t)acc[0] + ((uint64_t)acc[1] << 26) + br_dec32le(pkey + 16);
-	br_enc32le((unsigned char *)tag, (uint32_t)w);
-	w = (w >> 32) + ((uint64_t)acc[2] << 20) + br_dec32le(pkey + 20);
-	br_enc32le((unsigned char *)tag + 4, (uint32_t)w);
-	w = (w >> 32) + ((uint64_t)acc[3] << 14) + br_dec32le(pkey + 24);
-	br_enc32le((unsigned char *)tag + 8, (uint32_t)w);
-	hi = (uint32_t)(w >> 32) + (acc[4] << 8) + br_dec32le(pkey + 28);
+	w = (br_ssl_u64)acc[0] + ((br_ssl_u64)acc[1] << 26) + br_dec32le(pkey + 16);
+	br_enc32le((unsigned char *)tag, (br_ssl_u32)w);
+	w = (w >> 32) + ((br_ssl_u64)acc[2] << 20) + br_dec32le(pkey + 20);
+	br_enc32le((unsigned char *)tag + 4, (br_ssl_u32)w);
+	w = (w >> 32) + ((br_ssl_u64)acc[3] << 14) + br_dec32le(pkey + 24);
+	br_enc32le((unsigned char *)tag + 8, (br_ssl_u32)w);
+	hi = (br_ssl_u32)(w >> 32) + (acc[4] << 8) + br_dec32le(pkey + 28);
 	br_enc32le((unsigned char *)tag + 12, hi);
 
 	/*

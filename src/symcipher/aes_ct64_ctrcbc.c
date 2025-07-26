@@ -53,8 +53,8 @@ br_aes_ct64_ctrcbc_ctr(const br_aes_ct64_ctrcbc_keys *ctx,
 {
 	unsigned char *buf;
 	unsigned char *ivbuf;
-	uint32_t iv0, iv1, iv2, iv3;
-	uint64_t sk_exp[120];
+	br_ssl_u32 iv0, iv1, iv2, iv3;
+	br_ssl_u64 sk_exp[120];
 
 	br_aes_ct64_skey_expand(sk_exp, ctx->num_rounds, ctx->skey);
 
@@ -71,8 +71,8 @@ br_aes_ct64_ctrcbc_ctr(const br_aes_ct64_ctrcbc_keys *ctx,
 
 	buf = data;
 	while (len > 0) {
-		uint64_t q[8];
-		uint32_t w[16];
+		br_ssl_u64 q[8];
+		br_ssl_u32 w[16];
 		unsigned char tmp[64];
 		int i, j;
 
@@ -82,7 +82,7 @@ br_aes_ct64_ctrcbc_ctr(const br_aes_ct64_ctrcbc_keys *ctx,
 		 */
 		j = (len >= 64) ? 16 : (int)(len >> 2);
 		for (i = 0; i < j; i += 4) {
-			uint32_t carry;
+			br_ssl_u32 carry;
 
 			w[i + 0] = br_swap32(iv0);
 			w[i + 1] = br_swap32(iv1);
@@ -96,7 +96,7 @@ br_aes_ct64_ctrcbc_ctr(const br_aes_ct64_ctrcbc_keys *ctx,
 			carry &= -(~(iv1 | -iv1) >> 31);
 			iv0 += carry;
 		}
-		memset(w + i, 0, (16 - i) * sizeof(uint32_t));
+		memset(w + i, 0, (16 - i) * sizeof(br_ssl_u32));
 
 		for (i = 0; i < 4; i ++) {
 			br_aes_ct64_interleave_in(
@@ -131,9 +131,9 @@ br_aes_ct64_ctrcbc_mac(const br_aes_ct64_ctrcbc_keys *ctx,
 	void *cbcmac, const void *data, size_t len)
 {
 	const unsigned char *buf;
-	uint32_t cm0, cm1, cm2, cm3;
-	uint64_t q[8];
-	uint64_t sk_exp[120];
+	br_ssl_u32 cm0, cm1, cm2, cm3;
+	br_ssl_u64 q[8];
+	br_ssl_u64 sk_exp[120];
 
 	br_aes_ct64_skey_expand(sk_exp, ctx->num_rounds, ctx->skey);
 
@@ -145,7 +145,7 @@ br_aes_ct64_ctrcbc_mac(const br_aes_ct64_ctrcbc_keys *ctx,
 	buf = data;
 	memset(q, 0, sizeof q);
 	while (len > 0) {
-		uint32_t w[4];
+		br_ssl_u32 w[4];
 
 		w[0] = cm0 ^ br_dec32le(buf +  0);
 		w[1] = cm1 ^ br_dec32le(buf +  4);
@@ -185,10 +185,10 @@ br_aes_ct64_ctrcbc_encrypt(const br_aes_ct64_ctrcbc_keys *ctx,
 
 	unsigned char *buf;
 	unsigned char *ivbuf;
-	uint32_t iv0, iv1, iv2, iv3;
-	uint32_t cm0, cm1, cm2, cm3;
-	uint64_t sk_exp[120];
-	uint64_t q[8];
+	br_ssl_u32 iv0, iv1, iv2, iv3;
+	br_ssl_u32 cm0, cm1, cm2, cm3;
+	br_ssl_u64 sk_exp[120];
+	br_ssl_u64 q[8];
 	int first_iter;
 
 	br_aes_ct64_skey_expand(sk_exp, ctx->num_rounds, ctx->skey);
@@ -216,7 +216,7 @@ br_aes_ct64_ctrcbc_encrypt(const br_aes_ct64_ctrcbc_keys *ctx,
 	first_iter = 1;
 	memset(q, 0, sizeof q);
 	while (len > 0) {
-		uint32_t w[8], carry;
+		br_ssl_u32 w[8], carry;
 
 		/*
 		 * The bitslice implementation expects values in
@@ -324,10 +324,10 @@ br_aes_ct64_ctrcbc_decrypt(const br_aes_ct64_ctrcbc_keys *ctx,
 {
 	unsigned char *buf;
 	unsigned char *ivbuf;
-	uint32_t iv0, iv1, iv2, iv3;
-	uint32_t cm0, cm1, cm2, cm3;
-	uint64_t sk_exp[120];
-	uint64_t q[8];
+	br_ssl_u32 iv0, iv1, iv2, iv3;
+	br_ssl_u32 cm0, cm1, cm2, cm3;
+	br_ssl_u64 sk_exp[120];
+	br_ssl_u64 q[8];
 
 	br_aes_ct64_skey_expand(sk_exp, ctx->num_rounds, ctx->skey);
 
@@ -353,7 +353,7 @@ br_aes_ct64_ctrcbc_decrypt(const br_aes_ct64_ctrcbc_keys *ctx,
 	buf = data;
 	memset(q, 0, sizeof q);
 	while (len > 0) {
-		uint32_t w[8], carry;
+		br_ssl_u32 w[8], carry;
 		unsigned char tmp[16];
 
 		/*

@@ -48,7 +48,7 @@ cc_none2(const br_ssl_client_certificate_class **pctx,
 
 static void
 cc_choose(const br_ssl_client_certificate_class **pctx,
-	const br_ssl_client_context *cc, uint32_t auth_types,
+	const br_ssl_client_context *cc, br_ssl_u32 auth_types,
 	br_ssl_client_certificate *choices)
 {
 	br_ssl_client_certificate_rsa_context *zc;

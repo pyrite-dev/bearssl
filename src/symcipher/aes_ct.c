@@ -26,7 +26,7 @@
 
 /* see inner.h */
 void
-br_aes_ct_bitslice_Sbox(uint32_t *q)
+br_aes_ct_bitslice_Sbox(br_ssl_u32 *q)
 {
 	/*
 	 * This S-box implementation is a straightforward translation of
@@ -38,20 +38,20 @@ br_aes_ct_bitslice_Sbox(uint32_t *q)
 	 * in "reverse" order (x0 is the high bit, x7 is the low bit).
 	 */
 
-	uint32_t x0, x1, x2, x3, x4, x5, x6, x7;
-	uint32_t y1, y2, y3, y4, y5, y6, y7, y8, y9;
-	uint32_t y10, y11, y12, y13, y14, y15, y16, y17, y18, y19;
-	uint32_t y20, y21;
-	uint32_t z0, z1, z2, z3, z4, z5, z6, z7, z8, z9;
-	uint32_t z10, z11, z12, z13, z14, z15, z16, z17;
-	uint32_t t0, t1, t2, t3, t4, t5, t6, t7, t8, t9;
-	uint32_t t10, t11, t12, t13, t14, t15, t16, t17, t18, t19;
-	uint32_t t20, t21, t22, t23, t24, t25, t26, t27, t28, t29;
-	uint32_t t30, t31, t32, t33, t34, t35, t36, t37, t38, t39;
-	uint32_t t40, t41, t42, t43, t44, t45, t46, t47, t48, t49;
-	uint32_t t50, t51, t52, t53, t54, t55, t56, t57, t58, t59;
-	uint32_t t60, t61, t62, t63, t64, t65, t66, t67;
-	uint32_t s0, s1, s2, s3, s4, s5, s6, s7;
+	br_ssl_u32 x0, x1, x2, x3, x4, x5, x6, x7;
+	br_ssl_u32 y1, y2, y3, y4, y5, y6, y7, y8, y9;
+	br_ssl_u32 y10, y11, y12, y13, y14, y15, y16, y17, y18, y19;
+	br_ssl_u32 y20, y21;
+	br_ssl_u32 z0, z1, z2, z3, z4, z5, z6, z7, z8, z9;
+	br_ssl_u32 z10, z11, z12, z13, z14, z15, z16, z17;
+	br_ssl_u32 t0, t1, t2, t3, t4, t5, t6, t7, t8, t9;
+	br_ssl_u32 t10, t11, t12, t13, t14, t15, t16, t17, t18, t19;
+	br_ssl_u32 t20, t21, t22, t23, t24, t25, t26, t27, t28, t29;
+	br_ssl_u32 t30, t31, t32, t33, t34, t35, t36, t37, t38, t39;
+	br_ssl_u32 t40, t41, t42, t43, t44, t45, t46, t47, t48, t49;
+	br_ssl_u32 t50, t51, t52, t53, t54, t55, t56, t57, t58, t59;
+	br_ssl_u32 t60, t61, t62, t63, t64, t65, t66, t67;
+	br_ssl_u32 s0, s1, s2, s3, s4, s5, s6, s7;
 
 	x0 = q[7];
 	x1 = q[6];
@@ -203,14 +203,14 @@ br_aes_ct_bitslice_Sbox(uint32_t *q)
 
 /* see inner.h */
 void
-br_aes_ct_ortho(uint32_t *q)
+br_aes_ct_ortho(br_ssl_u32 *q)
 {
 #define SWAPN(cl, ch, s, x, y)   do { \
-		uint32_t a, b; \
+		br_ssl_u32 a, b; \
 		a = (x); \
 		b = (y); \
-		(x) = (a & (uint32_t)cl) | ((b & (uint32_t)cl) << (s)); \
-		(y) = ((a & (uint32_t)ch) >> (s)) | (b & (uint32_t)ch); \
+		(x) = (a & (br_ssl_u32)cl) | ((b & (br_ssl_u32)cl) << (s)); \
+		(y) = ((a & (br_ssl_u32)ch) >> (s)) | (b & (br_ssl_u32)ch); \
 	} while (0)
 
 #define SWAP2(x, y)   SWAPN(0x55555555, 0xAAAAAAAA, 1, x, y)
@@ -237,10 +237,10 @@ static const unsigned char Rcon[] = {
 	0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1B, 0x36
 };
 
-static uint32_t
-sub_word(uint32_t x)
+static br_ssl_u32
+sub_word(br_ssl_u32 x)
 {
-	uint32_t q[8];
+	br_ssl_u32 q[8];
 	int i;
 
 	for (i = 0; i < 8; i ++) {
@@ -254,12 +254,12 @@ sub_word(uint32_t x)
 
 /* see inner.h */
 unsigned
-br_aes_ct_keysched(uint32_t *comp_skey, const void *key, size_t key_len)
+br_aes_ct_keysched(br_ssl_u32 *comp_skey, const void *key, size_t key_len)
 {
 	unsigned num_rounds;
 	int i, j, k, nk, nkf;
-	uint32_t tmp;
-	uint32_t skey[120];
+	br_ssl_u32 tmp;
+	br_ssl_u32 skey[120];
 
 	switch (key_len) {
 	case 16:
@@ -310,14 +310,14 @@ br_aes_ct_keysched(uint32_t *comp_skey, const void *key, size_t key_len)
 
 /* see inner.h */
 void
-br_aes_ct_skey_expand(uint32_t *skey,
-	unsigned num_rounds, const uint32_t *comp_skey)
+br_aes_ct_skey_expand(br_ssl_u32 *skey,
+	unsigned num_rounds, const br_ssl_u32 *comp_skey)
 {
 	unsigned u, v, n;
 
 	n = (num_rounds + 1) << 2;
 	for (u = 0, v = 0; u < n; u ++, v += 2) {
-		uint32_t x, y;
+		br_ssl_u32 x, y;
 
 		x = y = comp_skey[u];
 		x &= 0x55555555;

@@ -27,26 +27,26 @@
 #define CH(X, Y, Z)    ((((Y) ^ (Z)) & (X)) ^ (Z))
 #define MAJ(X, Y, Z)   (((Y) & (Z)) | (((Y) | (Z)) & (X)))
 
-#define ROTR(x, n)    (((uint32_t)(x) << (32 - (n))) | ((uint32_t)(x) >> (n)))
+#define ROTR(x, n)    (((br_ssl_u32)(x) << (32 - (n))) | ((br_ssl_u32)(x) >> (n)))
 
 #define BSG2_0(x)      (ROTR(x, 2) ^ ROTR(x, 13) ^ ROTR(x, 22))
 #define BSG2_1(x)      (ROTR(x, 6) ^ ROTR(x, 11) ^ ROTR(x, 25))
-#define SSG2_0(x)      (ROTR(x, 7) ^ ROTR(x, 18) ^ (uint32_t)((x) >> 3))
-#define SSG2_1(x)      (ROTR(x, 17) ^ ROTR(x, 19) ^ (uint32_t)((x) >> 10))
+#define SSG2_0(x)      (ROTR(x, 7) ^ ROTR(x, 18) ^ (br_ssl_u32)((x) >> 3))
+#define SSG2_1(x)      (ROTR(x, 17) ^ ROTR(x, 19) ^ (br_ssl_u32)((x) >> 10))
 
 /* see inner.h */
-const uint32_t br_sha224_IV[8] = {
+const br_ssl_u32 br_sha224_IV[8] = {
 	0xC1059ED8, 0x367CD507, 0x3070DD17, 0xF70E5939,
 	0xFFC00B31, 0x68581511, 0x64F98FA7, 0xBEFA4FA4
 };
 
 /* see inner.h */
-const uint32_t br_sha256_IV[8] = {
+const br_ssl_u32 br_sha256_IV[8] = {
 	0x6A09E667, 0xBB67AE85, 0x3C6EF372, 0xA54FF53A,
 	0x510E527F, 0x9B05688C, 0x1F83D9AB, 0x5BE0CD19
 };
 
-static const uint32_t K[64] = {
+static const br_ssl_u32 K[64] = {
 	0x428A2F98, 0x71374491, 0xB5C0FBCF, 0xE9B5DBA5,
 	0x3956C25B, 0x59F111F1, 0x923F82A4, 0xAB1C5ED5,
 	0xD807AA98, 0x12835B01, 0x243185BE, 0x550C7DC3,
@@ -67,11 +67,11 @@ static const uint32_t K[64] = {
 
 /* see inner.h */
 void
-br_sha2small_round(const unsigned char *buf, uint32_t *val)
+br_sha2small_round(const unsigned char *buf, br_ssl_u32 *val)
 {
 
 #define SHA2_STEP(A, B, C, D, E, F, G, H, j)   do { \
-		uint32_t T1, T2; \
+		br_ssl_u32 T1, T2; \
 		T1 = H + BSG2_1(E) + CH(E, F, G) + K[j] + w[j]; \
 		T2 = BSG2_0(A) + MAJ(A, B, C); \
 		D += T1; \
@@ -79,8 +79,8 @@ br_sha2small_round(const unsigned char *buf, uint32_t *val)
 	} while (0)
 
 	int i;
-	uint32_t a, b, c, d, e, f, g, h;
-	uint32_t w[64];
+	br_ssl_u32 a, b, c, d, e, f, g, h;
+	br_ssl_u32 w[64];
 
 	br_range_dec32be(w, 16, buf);
 	for (i = 16; i < 64; i ++) {
@@ -127,7 +127,7 @@ br_sha2small_round(const unsigned char *buf, uint32_t *val)
 	} while (0)
 
 #define SHA2_STEPn(n, a, b, c, d, e, f, g, h, pc)   do { \
-		uint32_t t1, t2; \
+		br_ssl_u32 t1, t2; \
 		SHA2_MEXP ## n(pc); \
 		t1 = h + BSG2_1(e) + CH(e, f, g) \
 			+ K[pcount + (pc)] + W[(pc) & 0x0F]; \
@@ -141,8 +141,8 @@ br_sha2small_round(const unsigned char *buf, uint32_t *val)
 #define SHA2_STEP2(a, b, c, d, e, f, g, h, pc) \
 	SHA2_STEPn(2, a, b, c, d, e, f, g, h, pc)
 
-	uint32_t A, B, C, D, E, F, G, H;
-	uint32_t W[16];
+	br_ssl_u32 A, B, C, D, E, F, G, H;
+	br_ssl_u32 W[16];
 	unsigned pcount;
 
 	A = val[0];
@@ -207,7 +207,7 @@ sha2small_update(br_sha224_context *cc, const void *data, size_t len)
 
 	buf = data;
 	ptr = (size_t)cc->count & 63;
-	cc->count += (uint64_t)len;
+	cc->count += (br_ssl_u64)len;
 	while (len > 0) {
 		size_t clen;
 
@@ -230,7 +230,7 @@ static void
 sha2small_out(const br_sha224_context *cc, void *dst, int num)
 {
 	unsigned char buf[64];
-	uint32_t val[8];
+	br_ssl_u32 val[8];
 	size_t ptr;
 
 	ptr = (size_t)cc->count & 63;
@@ -273,7 +273,7 @@ br_sha224_out(const br_sha224_context *cc, void *dst)
 }
 
 /* see bearssl.h */
-uint64_t
+br_ssl_u64
 br_sha224_state(const br_sha224_context *cc, void *dst)
 {
 	br_range_enc32be(dst, cc->val, 8);
@@ -282,7 +282,7 @@ br_sha224_state(const br_sha224_context *cc, void *dst)
 
 /* see bearssl.h */
 void
-br_sha224_set_state(br_sha224_context *cc, const void *stb, uint64_t count)
+br_sha224_set_state(br_sha224_context *cc, const void *stb, br_ssl_u64 count)
 {
 	br_range_dec32be(cc->val, 8, stb);
 	cc->count = count;
@@ -317,8 +317,8 @@ const br_hash_class br_sha224_vtable = {
 	(void (*)(const br_hash_class **,
 		const void *, size_t))&br_sha224_update,
 	(void (*)(const br_hash_class *const *, void *))&br_sha224_out,
-	(uint64_t (*)(const br_hash_class *const *, void *))&br_sha224_state,
-	(void (*)(const br_hash_class **, const void *, uint64_t))
+	(br_ssl_u64 (*)(const br_hash_class *const *, void *))&br_sha224_state,
+	(void (*)(const br_hash_class **, const void *, br_ssl_u64))
 		&br_sha224_set_state
 };
 
@@ -335,7 +335,7 @@ const br_hash_class br_sha256_vtable = {
 	(void (*)(const br_hash_class **,
 		const void *, size_t))&br_sha256_update,
 	(void (*)(const br_hash_class *const *, void *))&br_sha256_out,
-	(uint64_t (*)(const br_hash_class *const *, void *))&br_sha256_state,
-	(void (*)(const br_hash_class **, const void *, uint64_t))
+	(br_ssl_u64 (*)(const br_hash_class *const *, void *))&br_sha256_state,
+	(void (*)(const br_hash_class **, const void *, br_ssl_u64))
 		&br_sha256_set_state
 };

@@ -47,9 +47,9 @@ BR_TARGETS_X86_UP
 
 /* see bearssl_block.h */
 BR_TARGET("sse2,sse4.1,aes")
-uint32_t
+br_ssl_u32
 br_aes_x86ni_ctr_run(const br_aes_x86ni_ctr_keys *ctx,
-	const void *iv, uint32_t cc, void *data, size_t len)
+	const void *iv, br_ssl_u32 cc, void *data, size_t len)
 {
 	unsigned char *buf;
 	unsigned char ivbuf[16];
@@ -178,7 +178,7 @@ br_aes_x86ni_ctr_run(const br_aes_x86ni_ctr_keys *ctx,
 			for (u = 0; u < len; u ++) {
 				buf[u] ^= tmp[u];
 			}
-			cc += (uint32_t)len >> 4;
+			cc += (br_ssl_u32)len >> 4;
 			break;
 		}
 	}
@@ -194,8 +194,8 @@ const br_block_ctr_class br_aes_x86ni_ctr_vtable = {
 	4,
 	(void (*)(const br_block_ctr_class **, const void *, size_t))
 		&br_aes_x86ni_ctr_init,
-	(uint32_t (*)(const br_block_ctr_class *const *,
-		const void *, uint32_t, void *, size_t))
+	(br_ssl_u32 (*)(const br_block_ctr_class *const *,
+		const void *, br_ssl_u32, void *, size_t))
 		&br_aes_x86ni_ctr_run
 };
 

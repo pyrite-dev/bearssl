@@ -25,10 +25,10 @@
 #include "inner.h"
 
 /* see inner.h */
-uint16_t
-br_i15_ninv15(uint16_t x)
+br_ssl_u16
+br_i15_ninv15(br_ssl_u16 x)
 {
-	uint32_t y;
+	br_ssl_u32 y;
 
 	y = 2 - x;
 	y = MUL15(y, 2 - MUL15(x, y));

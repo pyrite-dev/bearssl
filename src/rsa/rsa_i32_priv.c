@@ -27,16 +27,16 @@
 #define U   (1 + (BR_MAX_RSA_FACTOR >> 5))
 
 /* see bearssl_rsa.h */
-uint32_t
+br_ssl_u32
 br_rsa_i32_private(unsigned char *x, const br_rsa_private_key *sk)
 {
 	const unsigned char *p, *q;
 	size_t plen, qlen;
-	uint32_t tmp[6 * U];
-	uint32_t *mp, *mq, *s1, *s2, *t1, *t2, *t3;
-	uint32_t p0i, q0i;
+	br_ssl_u32 tmp[6 * U];
+	br_ssl_u32 *mp, *mq, *s1, *s2, *t1, *t2, *t3;
+	br_ssl_u32 p0i, q0i;
 	size_t xlen, u;
-	uint32_t r;
+	br_ssl_u32 r;
 
 	/*
 	 * All our temporary buffers are from the tmp[] array.
@@ -92,7 +92,7 @@ br_rsa_i32_private(unsigned char *x, const br_rsa_private_key *sk)
 	u = xlen;
 	r = 0;
 	while (u > 0) {
-		uint32_t wn, wx;
+		br_ssl_u32 wn, wx;
 
 		u --;
 		wn = ((unsigned char *)(t2 + 2 * U))[u];

@@ -90,15 +90,15 @@
 
 #define LRU_ENTRY_LEN       100
 
-#define ADDR_NULL   ((uint32_t)-1)
+#define ADDR_NULL   ((br_ssl_u32)-1)
 
 #define GETSET(name, off) \
-static inline uint32_t get_ ## name(br_ssl_session_cache_lru *cc, uint32_t x) \
+static inline br_ssl_u32 get_ ## name(br_ssl_session_cache_lru *cc, br_ssl_u32 x) \
 { \
 	return br_dec32be(cc->store + x + (off)); \
 } \
 static inline void set_ ## name(br_ssl_session_cache_lru *cc, \
-	uint32_t x, uint32_t val) \
+	br_ssl_u32 x, br_ssl_u32 val) \
 { \
 	br_enc32be(cc->store + x + (off), val); \
 }
@@ -144,11 +144,11 @@ mask_id(br_ssl_session_cache_lru *cc,
  * last followed link. If the found node is the root, or if the tree is
  * empty, then '*addr_link' is set to ADDR_NULL.
  */
-static uint32_t
+static br_ssl_u32
 find_node(br_ssl_session_cache_lru *cc, const unsigned char *id,
-	uint32_t *addr_link)
+	br_ssl_u32 *addr_link)
 {
-	uint32_t x, y;
+	br_ssl_u32 x, y;
 
 	x = cc->root;
 	y = ADDR_NULL;
@@ -191,16 +191,16 @@ find_node(br_ssl_session_cache_lru *cc, const unsigned char *id,
  * of node 'x', so it cannot be the tree root. Thus, '*al' can be set
  * to ADDR_NULL only when no node is found and ADDR_NULL is returned.
  */
-static uint32_t
-find_replacement_node(br_ssl_session_cache_lru *cc, uint32_t x, uint32_t *al)
+static br_ssl_u32
+find_replacement_node(br_ssl_session_cache_lru *cc, br_ssl_u32 x, br_ssl_u32 *al)
 {
-	uint32_t y1, y2;
+	br_ssl_u32 y1, y2;
 
 	y1 = get_left(cc, x);
 	if (y1 != ADDR_NULL) {
 		y2 = x + TREE_LEFT_OFF;
 		for (;;) {
-			uint32_t z;
+			br_ssl_u32 z;
 
 			z = get_right(cc, y1);
 			if (z == ADDR_NULL) {
@@ -215,7 +215,7 @@ find_replacement_node(br_ssl_session_cache_lru *cc, uint32_t x, uint32_t *al)
 	if (y1 != ADDR_NULL) {
 		y2 = x + TREE_RIGHT_OFF;
 		for (;;) {
-			uint32_t z;
+			br_ssl_u32 z;
 
 			z = get_left(cc, y1);
 			if (z == ADDR_NULL) {
@@ -235,7 +235,7 @@ find_replacement_node(br_ssl_session_cache_lru *cc, uint32_t x, uint32_t *al)
  * ADDR_NULL, then this sets the tree root to 'x'.
  */
 static inline void
-set_link(br_ssl_session_cache_lru *cc, uint32_t alx, uint32_t x)
+set_link(br_ssl_session_cache_lru *cc, br_ssl_u32 alx, br_ssl_u32 x)
 {
 	if (alx == ADDR_NULL) {
 		cc->root = x;
@@ -249,9 +249,9 @@ set_link(br_ssl_session_cache_lru *cc, uint32_t alx, uint32_t x)
  * node 'x' is not part of the tree.
  */
 static void
-remove_node(br_ssl_session_cache_lru *cc, uint32_t x)
+remove_node(br_ssl_session_cache_lru *cc, br_ssl_u32 x)
 {
-	uint32_t alx, y, aly;
+	br_ssl_u32 alx, y, aly;
 
 	/*
 	 * Removal algorithm:
@@ -284,7 +284,7 @@ remove_node(br_ssl_session_cache_lru *cc, uint32_t x)
 	y = find_replacement_node(cc, x, &aly);
 
 	if (y != ADDR_NULL) {
-		uint32_t z;
+		br_ssl_u32 z;
 
 		/*
 		 * The unlinked replacement node may have one child (but
@@ -325,7 +325,7 @@ lru_save(const br_ssl_session_cache_class **ctx,
 {
 	br_ssl_session_cache_lru *cc;
 	unsigned char id[SESSION_ID_LEN];
-	uint32_t x, alx;
+	br_ssl_u32 x, alx;
 
 	cc = (br_ssl_session_cache_lru *)ctx;
 
@@ -431,7 +431,7 @@ lru_load(const br_ssl_session_cache_class **ctx,
 {
 	br_ssl_session_cache_lru *cc;
 	unsigned char id[SESSION_ID_LEN];
-	uint32_t x;
+	br_ssl_u32 x;
 
 	(void)server_ctx;
 	cc = (br_ssl_session_cache_lru *)ctx;
@@ -463,7 +463,7 @@ lru_load(const br_ssl_session_cache_class **ctx,
 			 * Found node is not at list head, so move
 			 * it to the head.
 			 */
-			uint32_t p, n;
+			br_ssl_u32 p, n;
 
 			p = get_prev(cc, x);
 			n = get_next(cc, x);
@@ -509,7 +509,7 @@ void br_ssl_session_cache_lru_forget(
 	br_ssl_session_cache_lru *cc, const unsigned char *id)
 {
 	unsigned char mid[SESSION_ID_LEN];
-	uint32_t addr;
+	br_ssl_u32 addr;
 
 	/*
 	 * If the cache is not initialised yet, then it is empty, and

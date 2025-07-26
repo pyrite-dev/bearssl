@@ -27,7 +27,7 @@
 #if BR_INT128 || BR_UMUL128
 
 /* see bearssl_rsa.h */
-uint32_t
+br_ssl_u32
 br_rsa_i62_pss_vrfy(const unsigned char *x, size_t xlen,
 	const br_hash_class *hf_data, const br_hash_class *hf_mgf1,
 	const void *hash, size_t salt_len, const br_rsa_public_key *pk)

@@ -27,7 +27,7 @@
 /* see bearssl_rsa.h */
 size_t
 br_rsa_i15_compute_privexp(void *d,
-	const br_rsa_private_key *sk, uint32_t e)
+	const br_rsa_private_key *sk, br_ssl_u32 e)
 {
 	/*
 	 * We want to invert e modulo phi = (p-1)(q-1). This first
@@ -58,11 +58,11 @@ br_rsa_i15_compute_privexp(void *d,
 	 *     the above implies d < r + e*((phi-r)/e) = phi
 	 */
 
-	uint16_t tmp[4 * ((BR_MAX_RSA_FACTOR + 14) / 15) + 12];
-	uint16_t *p, *q, *k, *m, *z, *phi;
+	br_ssl_u16 tmp[4 * ((BR_MAX_RSA_FACTOR + 14) / 15) + 12];
+	br_ssl_u16 *p, *q, *k, *m, *z, *phi;
 	const unsigned char *pbuf, *qbuf;
 	size_t plen, qlen, u, len, dlen;
-	uint32_t r, a, b, u0, v0, u1, v1, he, hr;
+	br_ssl_u32 r, a, b, u0, v0, u1, v1, he, hr;
 	int i;
 
 	/*
@@ -144,7 +144,7 @@ br_rsa_i15_compute_privexp(void *d,
 		 * must be lower than 2^15, and the new remainder r
 		 * is lower than e.
 		 */
-		uint32_t hi, lo;
+		br_ssl_u32 hi, lo;
 
 		hi = r >> 17;
 		lo = (r << 15) + phi[u];
@@ -246,9 +246,9 @@ br_rsa_i15_compute_privexp(void *d,
 	hr = (r + 1) >> 1;
 	he = (e >> 1) + 1;
 	for (i = 0; i < 62; i ++) {
-		uint32_t oa, ob, agtb, bgta;
-		uint32_t sab, sba, da, db;
-		uint32_t ctl;
+		br_ssl_u32 oa, ob, agtb, bgta;
+		br_ssl_u32 sab, sba, da, db;
+		br_ssl_u32 ctl;
 
 		oa = a & 1;                  /* 1 if a is odd */
 		ob = b & 1;                  /* 1 if b is odd */

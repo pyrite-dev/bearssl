@@ -26,7 +26,7 @@
 
 #define S   br_aes_S
 
-static const uint32_t Ssm0[] = {
+static const br_ssl_u32 Ssm0[] = {
 	0xC66363A5, 0xF87C7C84, 0xEE777799, 0xF67B7B8D, 0xFFF2F20D, 0xD66B6BBD,
 	0xDE6F6FB1, 0x91C5C554, 0x60303050, 0x02010103, 0xCE6767A9, 0x562B2B7D,
 	0xE7FEFE19, 0xB5D7D762, 0x4DABABE6, 0xEC76769A, 0x8FCACA45, 0x1F82829D,
@@ -72,8 +72,8 @@ static const uint32_t Ssm0[] = {
 	0x7BB0B0CB, 0xA85454FC, 0x6DBBBBD6, 0x2C16163A
 };
 
-static inline uint32_t
-rotr(uint32_t x, int n)
+static inline br_ssl_u32
+rotr(br_ssl_u32 x, int n)
 {
 	return (x << (32 - n)) | (x >> n);
 }
@@ -86,11 +86,11 @@ rotr(uint32_t x, int n)
 
 /* see bearssl.h */
 void
-br_aes_big_encrypt(unsigned num_rounds, const uint32_t *skey, void *data)
+br_aes_big_encrypt(unsigned num_rounds, const br_ssl_u32 *skey, void *data)
 {
 	unsigned char *buf;
-	uint32_t s0, s1, s2, s3;
-	uint32_t t0, t1, t2, t3;
+	br_ssl_u32 s0, s1, s2, s3;
+	br_ssl_u32 t0, t1, t2, t3;
 	unsigned u;
 
 	buf = data;
@@ -103,7 +103,7 @@ br_aes_big_encrypt(unsigned num_rounds, const uint32_t *skey, void *data)
 	s2 ^= skey[2];
 	s3 ^= skey[3];
 	for (u = 1; u < num_rounds; u ++) {
-		uint32_t v0, v1, v2, v3;
+		br_ssl_u32 v0, v1, v2, v3;
 
 		v0 = SboxExt0(s0 >> 24)
 			^ SboxExt1((s1 >> 16) & 0xFF)
@@ -130,22 +130,22 @@ br_aes_big_encrypt(unsigned num_rounds, const uint32_t *skey, void *data)
 		s2 ^= skey[(u << 2) + 2];
 		s3 ^= skey[(u << 2) + 3];
 	}
-	t0 = ((uint32_t)S[s0 >> 24] << 24)
-		| ((uint32_t)S[(s1 >> 16) & 0xFF] << 16)
-		| ((uint32_t)S[(s2 >> 8) & 0xFF] << 8)
-		| (uint32_t)S[s3 & 0xFF];
-	t1 = ((uint32_t)S[s1 >> 24] << 24)
-		| ((uint32_t)S[(s2 >> 16) & 0xFF] << 16)
-		| ((uint32_t)S[(s3 >> 8) & 0xFF] << 8)
-		| (uint32_t)S[s0 & 0xFF];
-	t2 = ((uint32_t)S[s2 >> 24] << 24)
-		| ((uint32_t)S[(s3 >> 16) & 0xFF] << 16)
-		| ((uint32_t)S[(s0 >> 8) & 0xFF] << 8)
-		| (uint32_t)S[s1 & 0xFF];
-	t3 = ((uint32_t)S[s3 >> 24] << 24)
-		| ((uint32_t)S[(s0 >> 16) & 0xFF] << 16)
-		| ((uint32_t)S[(s1 >> 8) & 0xFF] << 8)
-		| (uint32_t)S[s2 & 0xFF];
+	t0 = ((br_ssl_u32)S[s0 >> 24] << 24)
+		| ((br_ssl_u32)S[(s1 >> 16) & 0xFF] << 16)
+		| ((br_ssl_u32)S[(s2 >> 8) & 0xFF] << 8)
+		| (br_ssl_u32)S[s3 & 0xFF];
+	t1 = ((br_ssl_u32)S[s1 >> 24] << 24)
+		| ((br_ssl_u32)S[(s2 >> 16) & 0xFF] << 16)
+		| ((br_ssl_u32)S[(s3 >> 8) & 0xFF] << 8)
+		| (br_ssl_u32)S[s0 & 0xFF];
+	t2 = ((br_ssl_u32)S[s2 >> 24] << 24)
+		| ((br_ssl_u32)S[(s3 >> 16) & 0xFF] << 16)
+		| ((br_ssl_u32)S[(s0 >> 8) & 0xFF] << 8)
+		| (br_ssl_u32)S[s1 & 0xFF];
+	t3 = ((br_ssl_u32)S[s3 >> 24] << 24)
+		| ((br_ssl_u32)S[(s0 >> 16) & 0xFF] << 16)
+		| ((br_ssl_u32)S[(s1 >> 8) & 0xFF] << 8)
+		| (br_ssl_u32)S[s2 & 0xFF];
 	s0 = t0 ^ skey[num_rounds << 2];
 	s1 = t1 ^ skey[(num_rounds << 2) + 1];
 	s2 = t2 ^ skey[(num_rounds << 2) + 2];

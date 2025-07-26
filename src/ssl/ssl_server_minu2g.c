@@ -30,7 +30,7 @@ br_ssl_server_init_minu2g(br_ssl_server_context *cc,
 	const br_x509_certificate *chain, size_t chain_len,
 	const br_ec_private_key *sk)
 {
-	static const uint16_t suites[] = {
+	static const br_ssl_u16 suites[] = {
 		BR_TLS_ECDH_RSA_WITH_AES_128_GCM_SHA256
 	};
 

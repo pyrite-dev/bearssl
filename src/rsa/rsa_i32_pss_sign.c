@@ -25,7 +25,7 @@
 #include "inner.h"
 
 /* see bearssl_rsa.h */
-uint32_t
+br_ssl_u32
 br_rsa_i32_pss_sign(const br_prng_class **rng,
 	const br_hash_class *hf_data, const br_hash_class *hf_mgf1,
 	const unsigned char *hash, size_t salt_len,

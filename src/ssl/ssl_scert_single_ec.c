@@ -77,12 +77,12 @@ se_choose(const br_ssl_server_policy_class **pctx,
 	return 0;
 }
 
-static uint32_t
+static br_ssl_u32
 se_do_keyx(const br_ssl_server_policy_class **pctx,
 	unsigned char *data, size_t *len)
 {
 	br_ssl_server_policy_ec_context *pc;
-	uint32_t r;
+	br_ssl_u32 r;
 	size_t xoff, xlen;
 
 	pc = (br_ssl_server_policy_ec_context *)pctx;

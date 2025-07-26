@@ -29,13 +29,13 @@
  * The header word is untouched.
  */
 static void
-mkrand(const br_prng_class **rng, uint32_t *x, uint32_t esize)
+mkrand(const br_prng_class **rng, br_ssl_u32 *x, br_ssl_u32 esize)
 {
 	size_t u, len;
 	unsigned m;
 
 	len = (esize + 31) >> 5;
-	(*rng)->generate(rng, x + 1, len * sizeof(uint32_t));
+	(*rng)->generate(rng, x + 1, len * sizeof(br_ssl_u32));
 	for (u = 1; u < len; u ++) {
 		x[u] &= 0x7FFFFFFF;
 	}
@@ -103,11 +103,11 @@ static const unsigned char SMALL_PRIMES[] = {
  *
  * This function assumes that x is odd.
  */
-static uint32_t
-trial_divisions(const uint32_t *x, uint32_t *t)
+static br_ssl_u32
+trial_divisions(const br_ssl_u32 *x, br_ssl_u32 *t)
 {
-	uint32_t *y;
-	uint32_t x0i;
+	br_ssl_u32 *y;
+	br_ssl_u32 x0i;
 
 	y = t;
 	t += 1 + ((x[0] + 31) >> 5);
@@ -123,9 +123,9 @@ trial_divisions(const uint32_t *x, uint32_t *t)
  * Returned value is 1 on success (all rounds completed successfully),
  * 0 otherwise.
  */
-static uint32_t
-miller_rabin(const br_prng_class **rng, const uint32_t *x, int n,
-	uint32_t *t, size_t tlen, br_i31_modpow_opt_type mp31)
+static br_ssl_u32
+miller_rabin(const br_prng_class **rng, const br_ssl_u32 *x, int n,
+	br_ssl_u32 *t, size_t tlen, br_i31_modpow_opt_type mp31)
 {
 	/*
 	 * Since x = 3 mod 4, the Miller-Rabin test is simple:
@@ -145,9 +145,9 @@ miller_rabin(const br_prng_class **rng, const uint32_t *x, int n,
 	 */
 	unsigned char *xm1d2;
 	size_t xlen, xm1d2_len, xm1d2_len_u32, u;
-	uint32_t asize;
+	br_ssl_u32 asize;
 	unsigned cc;
-	uint32_t x0i;
+	br_ssl_u32 x0i;
 
 	/*
 	 * Compute (x-1)/2 (encoded).
@@ -175,8 +175,8 @@ miller_rabin(const br_prng_class **rng, const uint32_t *x, int n,
 	asize = x[0] - 1 - EQ0(x[0] & 31);
 	x0i = br_i31_ninv31(x[1]);
 	while (n -- > 0) {
-		uint32_t *a, *t2;
-		uint32_t eq1, eqm1;
+		br_ssl_u32 *a, *t2;
+		br_ssl_u32 eq1, eqm1;
 		size_t t2len;
 
 		/*
@@ -232,8 +232,8 @@ miller_rabin(const br_prng_class **rng, const uint32_t *x, int n,
  * bit length. The two top bits and the two bottom bits are set to 1.
  */
 static void
-mkprime(const br_prng_class **rng, uint32_t *x, uint32_t esize,
-	uint32_t pubexp, uint32_t *t, size_t tlen, br_i31_modpow_opt_type mp31)
+mkprime(const br_prng_class **rng, br_ssl_u32 *x, br_ssl_u32 esize,
+	br_ssl_u32 pubexp, br_ssl_u32 *t, size_t tlen, br_i31_modpow_opt_type mp31)
 {
 	size_t len;
 
@@ -241,7 +241,7 @@ mkprime(const br_prng_class **rng, uint32_t *x, uint32_t esize,
 	len = (esize + 31) >> 5;
 	for (;;) {
 		size_t u;
-		uint32_t m3, m5, m7, m11;
+		br_ssl_u32 m3, m5, m7, m11;
 		int rounds, s7, s11;
 
 		/*
@@ -275,7 +275,7 @@ mkprime(const br_prng_class **rng, uint32_t *x, uint32_t esize,
 		s7 = 0;
 		s11 = 0;
 		for (u = 0; u < len; u ++) {
-			uint32_t w, w3, w5, w7, w11;
+			br_ssl_u32 w, w3, w5, w7, w11;
 
 			w = x[1 + u];
 			w3 = (w & 0xFFFF) + (w >> 16);     /* max: 98302 */
@@ -398,11 +398,11 @@ mkprime(const br_prng_class **rng, uint32_t *x, uint32_t esize,
  * The temporary buffer (t) must have room for at least 4 integers of
  * the size of p.
  */
-static uint32_t
-invert_pubexp(uint32_t *d, const uint32_t *m, uint32_t e, uint32_t *t)
+static br_ssl_u32
+invert_pubexp(br_ssl_u32 *d, const br_ssl_u32 *m, br_ssl_u32 e, br_ssl_u32 *t)
 {
-	uint32_t *f;
-	uint32_t r;
+	br_ssl_u32 *f;
+	br_ssl_u32 r;
 
 	f = t;
 	t += 1 + ((m[0] + 31) >> 5);
@@ -428,7 +428,7 @@ invert_pubexp(uint32_t *d, const uint32_t *m, uint32_t e, uint32_t *t)
 	 * is odd, and we must add m to d in order to get the correct
 	 * result.
 	 */
-	br_i31_add(d, m, (uint32_t)(1 - (d[1] & 1)));
+	br_i31_add(d, m, (br_ssl_u32)(1 - (d[1] & 1)));
 
 	return r;
 }
@@ -454,20 +454,20 @@ bufswap(void *b1, void *b2, size_t len)
 }
 
 /* see inner.h */
-uint32_t
+br_ssl_u32
 br_rsa_i31_keygen_inner(const br_prng_class **rng,
 	br_rsa_private_key *sk, void *kbuf_priv,
 	br_rsa_public_key *pk, void *kbuf_pub,
-	unsigned size, uint32_t pubexp, br_i31_modpow_opt_type mp31)
+	unsigned size, br_ssl_u32 pubexp, br_i31_modpow_opt_type mp31)
 {
-	uint32_t esize_p, esize_q;
+	br_ssl_u32 esize_p, esize_q;
 	size_t plen, qlen, tlen;
-	uint32_t *p, *q, *t;
+	br_ssl_u32 *p, *q, *t;
 	union {
-		uint32_t t32[TEMPS];
-		uint64_t t64[TEMPS >> 1];  /* for 64-bit alignment */
+		br_ssl_u32 t32[TEMPS];
+		br_ssl_u64 t64[TEMPS >> 1];  /* for 64-bit alignment */
 	} tmp;
-	uint32_t r;
+	br_ssl_u32 r;
 
 	if (size < BR_MIN_RSA_SIZE || size > BR_MAX_RSA_SIZE) {
 		return 0;
@@ -518,7 +518,7 @@ br_rsa_i31_keygen_inner(const br_prng_class **rng,
 	p = tmp.t32;
 	q = p + 1 + plen;
 	t = q + 1 + qlen;
-	tlen = ((sizeof tmp.t32) / sizeof(uint32_t)) - (2 + plen + qlen);
+	tlen = ((sizeof tmp.t32) / sizeof(br_ssl_u32)) - (2 + plen + qlen);
 
 	/*
 	 * When looking for primes p and q, we temporarily divide

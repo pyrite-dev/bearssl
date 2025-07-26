@@ -30,7 +30,7 @@
  *   - R^2 mod p (R = 2^(31k) for the smallest k such that R >= p)
  */
 
-static const uint32_t C255_P[] = {
+static const br_ssl_u32 C255_P[] = {
 	0x00000107,
 	0x7FFFFFED, 0x7FFFFFFF, 0x7FFFFFFF, 0x7FFFFFFF, 0x7FFFFFFF,
 	0x7FFFFFFF, 0x7FFFFFFF, 0x7FFFFFFF, 0x0000007F
@@ -38,13 +38,13 @@ static const uint32_t C255_P[] = {
 
 #define P0I   0x286BCA1B
 
-static const uint32_t C255_R2[] = {
+static const br_ssl_u32 C255_R2[] = {
 	0x00000107,
 	0x00000000, 0x02D20000, 0x00000000, 0x00000000, 0x00000000,
 	0x00000000, 0x00000000, 0x00000000, 0x00000000
 };
 
-static const uint32_t C255_A24[] = {
+static const br_ssl_u32 C255_A24[] = {
 	0x00000107,
 	0x53000000, 0x0000468B, 0x00000000, 0x00000000, 0x00000000,
 	0x00000000, 0x00000000, 0x00000000, 0x00000000
@@ -54,9 +54,9 @@ static const uint32_t C255_A24[] = {
 #include <stdio.h>
 #include <stdlib.h>
 static void
-print_int_mont(const char *name, const uint32_t *x)
+print_int_mont(const char *name, const br_ssl_u32 *x)
 {
-	uint32_t y[10];
+	br_ssl_u32 y[10];
 	unsigned char tmp[32];
 	size_t u;
 
@@ -110,13 +110,13 @@ api_xoff(int curve, size_t *len)
 }
 
 static void
-cswap(uint32_t *a, uint32_t *b, uint32_t ctl)
+cswap(br_ssl_u32 *a, br_ssl_u32 *b, br_ssl_u32 ctl)
 {
 	int i;
 
 	ctl = -ctl;
 	for (i = 0; i < 10; i ++) {
-		uint32_t aw, bw, tw;
+		br_ssl_u32 aw, bw, tw;
 
 		aw = a[i];
 		bw = b[i];
@@ -127,10 +127,10 @@ cswap(uint32_t *a, uint32_t *b, uint32_t ctl)
 }
 
 static void
-c255_add(uint32_t *d, const uint32_t *a, const uint32_t *b)
+c255_add(br_ssl_u32 *d, const br_ssl_u32 *a, const br_ssl_u32 *b)
 {
-	uint32_t ctl;
-	uint32_t t[10];
+	br_ssl_u32 ctl;
+	br_ssl_u32 t[10];
 
 	memcpy(t, a, sizeof t);
 	ctl = br_i31_add(t, b, 1);
@@ -140,9 +140,9 @@ c255_add(uint32_t *d, const uint32_t *a, const uint32_t *b)
 }
 
 static void
-c255_sub(uint32_t *d, const uint32_t *a, const uint32_t *b)
+c255_sub(br_ssl_u32 *d, const br_ssl_u32 *a, const br_ssl_u32 *b)
 {
-	uint32_t t[10];
+	br_ssl_u32 t[10];
 
 	memcpy(t, a, sizeof t);
 	br_i31_add(t, C255_P, br_i31_sub(t, b, 1));
@@ -150,9 +150,9 @@ c255_sub(uint32_t *d, const uint32_t *a, const uint32_t *b)
 }
 
 static void
-c255_mul(uint32_t *d, const uint32_t *a, const uint32_t *b)
+c255_mul(br_ssl_u32 *d, const br_ssl_u32 *a, const br_ssl_u32 *b)
 {
-	uint32_t t[10];
+	br_ssl_u32 t[10];
 
 	br_i31_montymul(t, a, b, C255_P, P0I);
 	memcpy(d, t, sizeof t);
@@ -172,15 +172,15 @@ byteswap(unsigned char *G)
 	}
 }
 
-static uint32_t
+static br_ssl_u32
 api_mul(unsigned char *G, size_t Glen,
 	const unsigned char *kb, size_t kblen, int curve)
 {
-	uint32_t x1[10], x2[10], x3[10], z2[10], z3[10];
-	uint32_t a[10], aa[10], b[10], bb[10];
-	uint32_t c[10], d[10], e[10], da[10], cb[10];
+	br_ssl_u32 x1[10], x2[10], x3[10], z2[10], z3[10];
+	br_ssl_u32 a[10], aa[10], b[10], bb[10];
+	br_ssl_u32 c[10], d[10], e[10], da[10], cb[10];
 	unsigned char k[32];
-	uint32_t swap;
+	br_ssl_u32 swap;
 	int i;
 
 	(void)curve;
@@ -245,7 +245,7 @@ api_mul(unsigned char *G, size_t Glen,
 
 	swap = 0;
 	for (i = 254; i >= 0; i --) {
-		uint32_t kt;
+		br_ssl_u32 kt;
 
 		kt = (k[31 - (i >> 3)] >> (i & 7)) & 1;
 		swap ^= kt;
@@ -357,7 +357,7 @@ api_mulgen(unsigned char *R,
 	return Glen;
 }
 
-static uint32_t
+static br_ssl_u32
 api_muladd(unsigned char *A, const unsigned char *B, size_t len,
 	const unsigned char *x, size_t xlen,
 	const unsigned char *y, size_t ylen, int curve)
@@ -380,7 +380,7 @@ api_muladd(unsigned char *A, const unsigned char *B, size_t len,
 
 /* see bearssl_ec.h */
 const br_ec_impl br_ec_c25519_i31 = {
-	(uint32_t)0x20000000,
+	(br_ssl_u32)0x20000000,
 	&api_generator,
 	&api_order,
 	&api_xoff,

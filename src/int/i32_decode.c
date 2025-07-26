@@ -26,7 +26,7 @@
 
 /* see inner.h */
 void
-br_i32_decode(uint32_t *x, const void *src, size_t len)
+br_i32_decode(br_ssl_u32 *x, const void *src, size_t len)
 {
 	const unsigned char *buf;
 	size_t u, v;
@@ -36,7 +36,7 @@ br_i32_decode(uint32_t *x, const void *src, size_t len)
 	v = 1;
 	for (;;) {
 		if (u < 4) {
-			uint32_t w;
+			br_ssl_u32 w;
 
 			if (u < 2) {
 				if (u == 0) {
@@ -48,7 +48,7 @@ br_i32_decode(uint32_t *x, const void *src, size_t len)
 				if (u == 2) {
 					w = br_dec16be(buf);
 				} else {
-					w = ((uint32_t)buf[0] << 16)
+					w = ((br_ssl_u32)buf[0] << 16)
 						| br_dec16be(buf + 1);
 				}
 			}

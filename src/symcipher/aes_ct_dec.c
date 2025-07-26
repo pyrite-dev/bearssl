@@ -26,7 +26,7 @@
 
 /* see inner.h */
 void
-br_aes_ct_bitslice_invSbox(uint32_t *q)
+br_aes_ct_bitslice_invSbox(br_ssl_u32 *q)
 {
 	/*
 	 * AES S-box is:
@@ -46,7 +46,7 @@ br_aes_ct_bitslice_invSbox(uint32_t *q)
 	 * already quite faster than CBC encryption because we can
 	 * process two blocks in parallel.
 	 */
-	uint32_t q0, q1, q2, q3, q4, q5, q6, q7;
+	br_ssl_u32 q0, q1, q2, q3, q4, q5, q6, q7;
 
 	q0 = ~q[0];
 	q1 = ~q[1];
@@ -86,7 +86,7 @@ br_aes_ct_bitslice_invSbox(uint32_t *q)
 }
 
 static void
-add_round_key(uint32_t *q, const uint32_t *sk)
+add_round_key(br_ssl_u32 *q, const br_ssl_u32 *sk)
 {
 	int i;
 
@@ -96,12 +96,12 @@ add_round_key(uint32_t *q, const uint32_t *sk)
 }
 
 static void
-inv_shift_rows(uint32_t *q)
+inv_shift_rows(br_ssl_u32 *q)
 {
 	int i;
 
 	for (i = 0; i < 8; i ++) {
-		uint32_t x;
+		br_ssl_u32 x;
 
 		x = q[i];
 		q[i] = (x & 0x000000FF)
@@ -111,17 +111,17 @@ inv_shift_rows(uint32_t *q)
 	}
 }
 
-static inline uint32_t
-rotr16(uint32_t x)
+static inline br_ssl_u32
+rotr16(br_ssl_u32 x)
 {
 	return (x << 16) | (x >> 16);
 }
 
 static void
-inv_mix_columns(uint32_t *q)
+inv_mix_columns(br_ssl_u32 *q)
 {
-	uint32_t q0, q1, q2, q3, q4, q5, q6, q7;
-	uint32_t r0, r1, r2, r3, r4, r5, r6, r7;
+	br_ssl_u32 q0, q1, q2, q3, q4, q5, q6, q7;
+	br_ssl_u32 r0, r1, r2, r3, r4, r5, r6, r7;
 
 	q0 = q[0];
 	q1 = q[1];
@@ -153,7 +153,7 @@ inv_mix_columns(uint32_t *q)
 /* see inner.h */
 void
 br_aes_ct_bitslice_decrypt(unsigned num_rounds,
-	const uint32_t *skey, uint32_t *q)
+	const br_ssl_u32 *skey, br_ssl_u32 *q)
 {
 	unsigned u;
 

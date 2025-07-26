@@ -31,8 +31,8 @@
 #define MUL128(hi, lo, x, y)   do { \
 		unsigned __int128 mul128tmp; \
 		mul128tmp = (unsigned __int128)(x) * (unsigned __int128)(y); \
-		(hi) = (uint64_t)(mul128tmp >> 64); \
-		(lo) = (uint64_t)mul128tmp; \
+		(hi) = (br_ssl_u64)(mul128tmp >> 64); \
+		(lo) = (br_ssl_u64)mul128tmp; \
 	} while (0)
 
 #elif BR_UMUL128
@@ -45,8 +45,8 @@
 
 #endif
 
-#define MASK42   ((uint64_t)0x000003FFFFFFFFFF)
-#define MASK44   ((uint64_t)0x00000FFFFFFFFFFF)
+#define MASK42   ((br_ssl_u64)0x000003FFFFFFFFFF)
+#define MASK44   ((br_ssl_u64)0x00000FFFFFFFFFFF)
 
 /*
  * The "accumulator" word is nominally a 130-bit value. We split it into
@@ -105,11 +105,11 @@
  */
 
 static void
-poly1305_inner_big(uint64_t *acc, uint64_t *r, const void *data, size_t len)
+poly1305_inner_big(br_ssl_u64 *acc, br_ssl_u64 *r, const void *data, size_t len)
 {
 
 #define MX(hi, lo, m0, m1, m2)   do { \
-		uint64_t mxhi, mxlo; \
+		br_ssl_u64 mxhi, mxlo; \
 		MUL128(mxhi, mxlo, a0, m0); \
 		(hi) = mxhi; \
 		(lo) = mxlo >> 20; \
@@ -122,8 +122,8 @@ poly1305_inner_big(uint64_t *acc, uint64_t *r, const void *data, size_t len)
 	} while (0)
 
 	const unsigned char *buf;
-	uint64_t a0, a1, a2;
-	uint64_t r0, r1, r2, t1, t2, u2;
+	br_ssl_u64 a0, a1, a2;
+	br_ssl_u64 r0, r1, r2, t1, t2, u2;
 
 	r0 = r[0];
 	r1 = r[1];
@@ -137,8 +137,8 @@ poly1305_inner_big(uint64_t *acc, uint64_t *r, const void *data, size_t len)
 	buf = data;
 
 	while (len > 0) {
-		uint64_t v0, v1, v2;
-		uint64_t c0, c1, c2, d0, d1, d2;
+		br_ssl_u64 v0, v1, v2;
+		br_ssl_u64 c0, c1, c2, d0, d1, d2;
 
 		v0 = br_dec64le(buf + 0);
 		v1 = br_dec64le(buf + 8);
@@ -147,7 +147,7 @@ poly1305_inner_big(uint64_t *acc, uint64_t *r, const void *data, size_t len)
 		v0 &= MASK44;
 		a0 += v0;
 		a1 += v1;
-		a2 += v2 + ((uint64_t)1 << 40);
+		a2 += v2 + ((br_ssl_u64)1 << 40);
 		MX(d0, c0, r0, u2, t1);
 		MX(d1, c1, r1, r0, t2);
 		MX(d2, c2, r2, r1, r0);
@@ -162,7 +162,7 @@ poly1305_inner_big(uint64_t *acc, uint64_t *r, const void *data, size_t len)
 		v0 &= MASK44;
 		a0 += v0;
 		a1 += v1;
-		a2 += v2 + ((uint64_t)1 << 40);
+		a2 += v2 + ((br_ssl_u64)1 << 40);
 		MX(d0, c0, r0, u2, t1);
 		MX(d1, c1, r1, r0, t2);
 		MX(d2, c2, r2, r1, r0);
@@ -177,7 +177,7 @@ poly1305_inner_big(uint64_t *acc, uint64_t *r, const void *data, size_t len)
 		v0 &= MASK44;
 		a0 += v0;
 		a1 += v1;
-		a2 += v2 + ((uint64_t)1 << 40);
+		a2 += v2 + ((br_ssl_u64)1 << 40);
 		MX(d0, c0, r0, u2, t1);
 		MX(d1, c1, r1, r0, t2);
 		MX(d2, c2, r2, r1, r0);
@@ -192,7 +192,7 @@ poly1305_inner_big(uint64_t *acc, uint64_t *r, const void *data, size_t len)
 		v0 &= MASK44;
 		a0 += v0;
 		a1 += v1;
-		a2 += v2 + ((uint64_t)1 << 40);
+		a2 += v2 + ((br_ssl_u64)1 << 40);
 		MX(d0, c0, r0, u2, t1);
 		MX(d1, c1, r1, r0, t2);
 		MX(d2, c2, r2, r1, r0);
@@ -218,11 +218,11 @@ poly1305_inner_big(uint64_t *acc, uint64_t *r, const void *data, size_t len)
 }
 
 static void
-poly1305_inner_small(uint64_t *acc, uint64_t *r, const void *data, size_t len)
+poly1305_inner_small(br_ssl_u64 *acc, br_ssl_u64 *r, const void *data, size_t len)
 {
 	const unsigned char *buf;
-	uint64_t a0, a1, a2;
-	uint64_t r0, r1, r2, t1, t2, u2;
+	br_ssl_u64 a0, a1, a2;
+	br_ssl_u64 r0, r1, r2, t1, t2, u2;
 
 	r0 = r[0];
 	r1 = r[1];
@@ -236,8 +236,8 @@ poly1305_inner_small(uint64_t *acc, uint64_t *r, const void *data, size_t len)
 	buf = data;
 
 	while (len > 0) {
-		uint64_t v0, v1, v2;
-		uint64_t c0, c1, c2, d0, d1, d2;
+		br_ssl_u64 v0, v1, v2;
+		br_ssl_u64 c0, c1, c2, d0, d1, d2;
 		unsigned char tmp[16];
 
 		if (len < 16) {
@@ -255,10 +255,10 @@ poly1305_inner_small(uint64_t *acc, uint64_t *r, const void *data, size_t len)
 
 		a0 += v0;
 		a1 += v1;
-		a2 += v2 + ((uint64_t)1 << 40);
+		a2 += v2 + ((br_ssl_u64)1 << 40);
 
 #define MX(hi, lo, m0, m1, m2)   do { \
-		uint64_t mxhi, mxlo; \
+		br_ssl_u64 mxhi, mxlo; \
 		MUL128(mxhi, mxlo, a0, m0); \
 		(hi) = mxhi; \
 		(lo) = mxlo >> 20; \
@@ -296,7 +296,7 @@ poly1305_inner_small(uint64_t *acc, uint64_t *r, const void *data, size_t len)
 }
 
 static inline void
-poly1305_inner(uint64_t *acc, uint64_t *r, const void *data, size_t len)
+poly1305_inner(br_ssl_u64 *acc, br_ssl_u64 *r, const void *data, size_t len)
 {
 	if (len >= 64) {
 		size_t len2;
@@ -318,10 +318,10 @@ br_poly1305_ctmulq_run(const void *key, const void *iv,
 	void *tag, br_chacha20_run ichacha, int encrypt)
 {
 	unsigned char pkey[32], foot[16];
-	uint64_t r[6], acc[3], r0, r1;
-	uint32_t v0, v1, v2, v3, v4;
-	uint64_t w0, w1, w2, w3;
-	uint32_t ctl;
+	br_ssl_u64 r[6], acc[3], r0, r1;
+	br_ssl_u32 v0, v1, v2, v3, v4;
+	br_ssl_u64 w0, w1, w2, w3;
+	br_ssl_u32 ctl;
 
 	/*
 	 * Compute the MAC key. The 'r' value is the first 16 bytes of
@@ -363,12 +363,12 @@ br_poly1305_ctmulq_run(const void *key, const void *iv,
 	r0 = br_dec64le(pkey +  0);
 	r1 = br_dec64le(pkey +  8);
 	r[0] = r0 << 20;
-	r[1] = ((r0 >> 24) | (r1 << 40)) & ~(uint64_t)0xFFFFF;
-	r[2] = (r1 >> 4) & ~(uint64_t)0xFFFFF;
+	r[1] = ((r0 >> 24) | (r1 << 40)) & ~(br_ssl_u64)0xFFFFF;
+	r[2] = (r1 >> 4) & ~(br_ssl_u64)0xFFFFF;
 	r1 = 20 * (r[1] >> 20);
 	r[3] = r1 << 20;
 	r[5] = 20 * r[2];
-	r[4] = (r[5] + (r1 >> 24)) & ~(uint64_t)0xFFFFF;
+	r[4] = (r[5] + (r1 >> 24)) & ~(br_ssl_u64)0xFFFFF;
 
 	/*
 	 * Accumulator is 0.
@@ -381,8 +381,8 @@ br_poly1305_ctmulq_run(const void *key, const void *iv,
 	 * Process the additional authenticated data, ciphertext, and
 	 * footer in due order.
 	 */
-	br_enc64le(foot, (uint64_t)aad_len);
-	br_enc64le(foot + 8, (uint64_t)len);
+	br_enc64le(foot, (br_ssl_u64)aad_len);
+	br_enc64le(foot + 8, (br_ssl_u64)len);
 	poly1305_inner(acc, r, aad, aad_len);
 	poly1305_inner(acc, r, data, len);
 	poly1305_inner_small(acc, r, foot, sizeof foot);
@@ -411,11 +411,11 @@ br_poly1305_ctmulq_run(const void *key, const void *iv,
 	 * in constant-time, between 'acc' and 'acc-p'. We encode the
 	 * value over four 32-bit integers to finish the operation.
 	 */
-	v0 = (uint32_t)acc[0];
-	v1 = (uint32_t)(acc[0] >> 32) | ((uint32_t)acc[1] << 12);
-	v2 = (uint32_t)(acc[1] >> 20) | ((uint32_t)acc[2] << 24);
-	v3 = (uint32_t)(acc[2] >> 8);
-	v4 = (uint32_t)(acc[2] >> 40);
+	v0 = (br_ssl_u32)acc[0];
+	v1 = (br_ssl_u32)(acc[0] >> 32) | ((br_ssl_u32)acc[1] << 12);
+	v2 = (br_ssl_u32)(acc[1] >> 20) | ((br_ssl_u32)acc[2] << 24);
+	v3 = (br_ssl_u32)(acc[2] >> 8);
+	v4 = (br_ssl_u32)(acc[2] >> 40);
 
 	ctl = GT(v0, 0xFFFFFFFA);
 	ctl &= EQ(v1, 0xFFFFFFFF);
@@ -431,14 +431,14 @@ br_poly1305_ctmulq_run(const void *key, const void *iv,
 	 * Add the "s" value. This is done modulo 2^128. Don't forget
 	 * carry propagation...
 	 */
-	w0 = (uint64_t)v0 + (uint64_t)br_dec32le(pkey + 16);
-	w1 = (uint64_t)v1 + (uint64_t)br_dec32le(pkey + 20) + (w0 >> 32);
-	w2 = (uint64_t)v2 + (uint64_t)br_dec32le(pkey + 24) + (w1 >> 32);
-	w3 = (uint64_t)v3 + (uint64_t)br_dec32le(pkey + 28) + (w2 >> 32);
-	v0 = (uint32_t)w0;
-	v1 = (uint32_t)w1;
-	v2 = (uint32_t)w2;
-	v3 = (uint32_t)w3;
+	w0 = (br_ssl_u64)v0 + (br_ssl_u64)br_dec32le(pkey + 16);
+	w1 = (br_ssl_u64)v1 + (br_ssl_u64)br_dec32le(pkey + 20) + (w0 >> 32);
+	w2 = (br_ssl_u64)v2 + (br_ssl_u64)br_dec32le(pkey + 24) + (w1 >> 32);
+	w3 = (br_ssl_u64)v3 + (br_ssl_u64)br_dec32le(pkey + 28) + (w2 >> 32);
+	v0 = (br_ssl_u32)w0;
+	v1 = (br_ssl_u32)w1;
+	v2 = (br_ssl_u32)w2;
+	v3 = (br_ssl_u32)w3;
 
 	/*
 	 * Encode the tag.

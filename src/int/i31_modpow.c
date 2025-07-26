@@ -26,12 +26,12 @@
 
 /* see inner.h */
 void
-br_i31_modpow(uint32_t *x,
+br_i31_modpow(br_ssl_u32 *x,
 	const unsigned char *e, size_t elen,
-	const uint32_t *m, uint32_t m0i, uint32_t *t1, uint32_t *t2)
+	const br_ssl_u32 *m, br_ssl_u32 m0i, br_ssl_u32 *t1, br_ssl_u32 *t2)
 {
 	size_t mlen;
-	uint32_t k;
+	br_ssl_u32 k;
 
 	/*
 	 * 'mlen' is the length of m[] expressed in bytes (including
@@ -53,8 +53,8 @@ br_i31_modpow(uint32_t *x,
 	br_i31_to_monty(t1, m);
 	br_i31_zero(x, m[0]);
 	x[1] = 1;
-	for (k = 0; k < ((uint32_t)elen << 3); k ++) {
-		uint32_t ctl;
+	for (k = 0; k < ((br_ssl_u32)elen << 3); k ++) {
+		br_ssl_u32 ctl;
 
 		ctl = (e[elen - 1 - (k >> 3)] >> (k & 7)) & 1;
 		br_i31_montymul(t2, x, t1, m, m0i);

@@ -31,7 +31,7 @@ br_mgf1_xor(void *data, size_t len,
 {
 	unsigned char *buf;
 	size_t u, hlen;
-	uint32_t c;
+	br_ssl_u32 c;
 
 	buf = data;
 	hlen = br_digest_size(dig);

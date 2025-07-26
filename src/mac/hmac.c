@@ -84,7 +84,7 @@ br_hmac_init(br_hmac_context *ctx,
 	dig = kc->dig_vtable;
 	blen = block_size(dig);
 	dig->init(&ctx->dig.vtable);
-	dig->set_state(&ctx->dig.vtable, kc->ksi, (uint64_t)blen);
+	dig->set_state(&ctx->dig.vtable, kc->ksi, (br_ssl_u64)blen);
 	memcpy(ctx->kso, kc->kso, sizeof kc->kso);
 	hlen = br_digest_size(dig);
 	if (out_len > 0 && out_len < hlen) {
@@ -113,7 +113,7 @@ br_hmac_out(const br_hmac_context *ctx, void *out)
 	dig->out(&ctx->dig.vtable, tmp);
 	blen = block_size(dig);
 	dig->init(&hc.vtable);
-	dig->set_state(&hc.vtable, ctx->kso, (uint64_t)blen);
+	dig->set_state(&hc.vtable, ctx->kso, (br_ssl_u64)blen);
 	hlen = br_digest_size(dig);
 	dig->update(&hc.vtable, tmp, hlen);
 	dig->out(&hc.vtable, tmp);

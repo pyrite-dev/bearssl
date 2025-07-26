@@ -26,11 +26,11 @@
 
 /* see inner.h */
 void
-br_i15_decode(uint16_t *x, const void *src, size_t len)
+br_i15_decode(br_ssl_u16 *x, const void *src, size_t len)
 {
 	const unsigned char *buf;
 	size_t v;
-	uint32_t acc;
+	br_ssl_u32 acc;
 	int acc_len;
 
 	buf = src;
@@ -38,7 +38,7 @@ br_i15_decode(uint16_t *x, const void *src, size_t len)
 	acc = 0;
 	acc_len = 0;
 	while (len -- > 0) {
-		uint32_t b;
+		br_ssl_u32 b;
 
 		b = buf[len];
 		acc |= (b << acc_len);

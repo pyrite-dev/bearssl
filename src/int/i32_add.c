@@ -25,16 +25,16 @@
 #include "inner.h"
 
 /* see inner.h */
-uint32_t
-br_i32_add(uint32_t *a, const uint32_t *b, uint32_t ctl)
+br_ssl_u32
+br_i32_add(br_ssl_u32 *a, const br_ssl_u32 *b, br_ssl_u32 ctl)
 {
-	uint32_t cc;
+	br_ssl_u32 cc;
 	size_t u, m;
 
 	cc = 0;
 	m = (a[0] + 63) >> 5;
 	for (u = 1; u < m; u ++) {
-		uint32_t aw, bw, naw;
+		br_ssl_u32 aw, bw, naw;
 
 		aw = a[u];
 		bw = b[u];

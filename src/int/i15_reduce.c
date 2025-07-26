@@ -26,9 +26,9 @@
 
 /* see inner.h */
 void
-br_i15_reduce(uint16_t *x, const uint16_t *a, const uint16_t *m)
+br_i15_reduce(br_ssl_u16 *x, const br_ssl_u16 *a, const br_ssl_u16 *m)
 {
-	uint32_t m_bitlen, a_bitlen;
+	br_ssl_u32 m_bitlen, a_bitlen;
 	size_t mlen, alen, u;
 
 	m_bitlen = m[0];

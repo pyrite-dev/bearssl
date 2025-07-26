@@ -25,11 +25,11 @@
 #include "inner.h"
 
 /* see bearssl_rsa.h */
-uint32_t
+br_ssl_u32
 br_rsa_ssl_decrypt(br_rsa_private core, const br_rsa_private_key *sk,
 	unsigned char *data, size_t len)
 {
-	uint32_t x;
+	br_ssl_u32 x;
 	size_t u;
 
 	/*

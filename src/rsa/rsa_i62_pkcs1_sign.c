@@ -27,7 +27,7 @@
 #if BR_INT128 || BR_UMUL128
 
 /* see bearssl_rsa.h */
-uint32_t
+br_ssl_u32
 br_rsa_i62_pkcs1_sign(const unsigned char *hash_oid,
 	const unsigned char *hash, size_t hash_len,
 	const br_rsa_private_key *sk, unsigned char *x)

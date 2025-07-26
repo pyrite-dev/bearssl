@@ -391,7 +391,7 @@ br_aes_pwr8_ctrcbc_init(br_aes_pwr8_ctrcbc_keys *ctx,
 		vcipherlast(x3, x3, 14)
 
 #if BR_POWER8_LE
-static const uint32_t idx2be[] = {
+static const br_ssl_u32 idx2be[] = {
 	0x03020100, 0x07060504, 0x0B0A0908, 0x0F0E0D0C
 };
 #define BYTESWAP_INIT     lxvw4x(47, 0, %[idx2be])
@@ -405,10 +405,10 @@ static const uint32_t idx2be[] = {
 #define BYTESWAP_REG
 #endif
 
-static const uint32_t ctrinc[] = {
+static const br_ssl_u32 ctrinc[] = {
 	0, 0, 0, 1
 };
-static const uint32_t ctrinc_x4[] = {
+static const br_ssl_u32 ctrinc_x4[] = {
 	0, 0, 0, 4
 };
 #define INCR_128_INIT      lxvw4x(60, 0, %[ctrinc])
@@ -824,12 +824,12 @@ br_aes_pwr8_ctrcbc_decrypt(const br_aes_pwr8_ctrcbc_keys *ctx,
 static inline void
 incr_ctr(void *dst, const void *src)
 {
-	uint64_t hi, lo;
+	br_ssl_u64 hi, lo;
 
 	hi = br_dec64be(src);
 	lo = br_dec64be((const unsigned char *)src + 8);
 	lo ++;
-	hi += ((lo | -lo) >> 63) ^ (uint64_t)1;
+	hi += ((lo | -lo) >> 63) ^ (br_ssl_u64)1;
 	br_enc64be(dst, hi);
 	br_enc64be((unsigned char *)dst + 8, lo);
 }

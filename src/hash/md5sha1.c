@@ -54,7 +54,7 @@ br_md5sha1_update(br_md5sha1_context *cc, const void *data, size_t len)
 		ptr += clen;
 		buf += clen;
 		len -= clen;
-		cc->count += (uint64_t)clen;
+		cc->count += (br_ssl_u64)clen;
 		if (ptr == 64) {
 			br_md5_round(cc->buf, cc->val_md5);
 			br_sha1_round(cc->buf, cc->val_sha1);
@@ -68,11 +68,11 @@ void
 br_md5sha1_out(const br_md5sha1_context *cc, void *dst)
 {
 	unsigned char buf[64];
-	uint32_t val_md5[4];
-	uint32_t val_sha1[5];
+	br_ssl_u32 val_md5[4];
+	br_ssl_u32 val_sha1[5];
 	size_t ptr;
 	unsigned char *out;
-	uint64_t count;
+	br_ssl_u64 count;
 
 	count = cc->count;
 	ptr = (size_t)count & 63;
@@ -99,7 +99,7 @@ br_md5sha1_out(const br_md5sha1_context *cc, void *dst)
 }
 
 /* see bearssl.h */
-uint64_t
+br_ssl_u64
 br_md5sha1_state(const br_md5sha1_context *cc, void *dst)
 {
 	unsigned char *out;
@@ -112,7 +112,7 @@ br_md5sha1_state(const br_md5sha1_context *cc, void *dst)
 
 /* see bearssl.h */
 void
-br_md5sha1_set_state(br_md5sha1_context *cc, const void *stb, uint64_t count)
+br_md5sha1_set_state(br_md5sha1_context *cc, const void *stb, br_ssl_u64 count)
 {
 	const unsigned char *buf;
 
@@ -134,8 +134,8 @@ const br_hash_class br_md5sha1_vtable = {
 		&br_md5sha1_update,
 	(void (*)(const br_hash_class *const *, void *))
 		&br_md5sha1_out,
-	(uint64_t (*)(const br_hash_class *const *, void *))
+	(br_ssl_u64 (*)(const br_hash_class *const *, void *))
 		&br_md5sha1_state,
-	(void (*)(const br_hash_class **, const void *, uint64_t))
+	(void (*)(const br_hash_class **, const void *, br_ssl_u64))
 		&br_md5sha1_set_state
 };

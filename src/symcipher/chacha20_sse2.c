@@ -62,17 +62,17 @@ BR_TARGETS_X86_UP
 
 /* see bearssl_block.h */
 BR_TARGET("sse2")
-uint32_t
+br_ssl_u32
 br_chacha20_sse2_run(const void *key,
-	const void *iv, uint32_t cc, void *data, size_t len)
+	const void *iv, br_ssl_u32 cc, void *data, size_t len)
 {
 	unsigned char *buf;
-	uint32_t ivtmp[4];
+	br_ssl_u32 ivtmp[4];
 	__m128i kw0, kw1;
 	__m128i iw, cw;
 	__m128i one;
 
-	static const uint32_t CW[] = {
+	static const br_ssl_u32 CW[] = {
 		0x61707865, 0x3320646e, 0x79622d32, 0x6b206574
 	};
 
@@ -219,8 +219,8 @@ br_chacha20_sse2_run(const void *key,
 	 * _mm_extract_epi32() requires SSE4.1. We prefer to stick to
 	 * raw SSE2, thus we use _mm_extract_epi16().
 	 */
-	return (uint32_t)_mm_extract_epi16(iw, 0)
-		| ((uint32_t)_mm_extract_epi16(iw, 1) << 16);
+	return (br_ssl_u32)_mm_extract_epi16(iw, 0)
+		| ((br_ssl_u32)_mm_extract_epi16(iw, 1) << 16);
 }
 
 BR_TARGETS_X86_DOWN

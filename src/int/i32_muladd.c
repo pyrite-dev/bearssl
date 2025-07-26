@@ -26,13 +26,13 @@
 
 /* see inner.h */
 void
-br_i32_muladd_small(uint32_t *x, uint32_t z, const uint32_t *m)
+br_i32_muladd_small(br_ssl_u32 *x, br_ssl_u32 z, const br_ssl_u32 *m)
 {
-	uint32_t m_bitlen;
+	br_ssl_u32 m_bitlen;
 	size_t u, mlen;
-	uint32_t a0, a1, b0, hi, g, q, tb;
-	uint32_t chf, clow, under, over;
-	uint64_t cc;
+	br_ssl_u32 a0, a1, b0, hi, g, q, tb;
+	br_ssl_u32 chf, clow, under, over;
+	br_ssl_u64 cc;
 
 	/*
 	 * We can test on the modulus bit length since we accept to
@@ -106,16 +106,16 @@ br_i32_muladd_small(uint32_t *x, uint32_t z, const uint32_t *m)
 	cc = 0;
 	tb = 1;
 	for (u = 1; u <= mlen; u ++) {
-		uint32_t mw, zw, xw, nxw;
-		uint64_t zl;
+		br_ssl_u32 mw, zw, xw, nxw;
+		br_ssl_u64 zl;
 
 		mw = m[u];
 		zl = MUL(mw, q) + cc;
-		cc = (uint32_t)(zl >> 32);
-		zw = (uint32_t)zl;
+		cc = (br_ssl_u32)(zl >> 32);
+		zw = (br_ssl_u32)zl;
 		xw = x[u];
 		nxw = xw - zw;
-		cc += (uint64_t)GT(nxw, xw);
+		cc += (br_ssl_u64)GT(nxw, xw);
 		x[u] = nxw;
 		tb = MUX(EQ(nxw, mw), tb, GT(nxw, mw));
 	}
@@ -129,8 +129,8 @@ br_i32_muladd_small(uint32_t *x, uint32_t z, const uint32_t *m)
 	 * Otherwise, we may have overestimated, which will show as
 	 * cc > hi (thus a negative result). Correction is adding m once.
 	 */
-	chf = (uint32_t)(cc >> 32);
-	clow = (uint32_t)cc;
+	chf = (br_ssl_u32)(cc >> 32);
+	clow = (br_ssl_u32)cc;
 	over = chf | GT(clow, hi);
 	under = ~over & (tb | (~chf & LT(clow, hi)));
 	br_i32_add(x, m, over);

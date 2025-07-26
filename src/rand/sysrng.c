@@ -54,9 +54,9 @@ seeder_rdrand(const br_prng_class **ctx)
 	unsigned char tmp[32];
 	size_t u;
 
-	for (u = 0; u < sizeof tmp; u += sizeof(uint32_t)) {
+	for (u = 0; u < sizeof tmp; u += sizeof(br_ssl_u32)) {
 		int j;
-		uint32_t x;
+		br_ssl_u32 x;
 
 		/*
 		 * We use the 32-bit intrinsic so that code is compatible
@@ -81,7 +81,7 @@ seeder_rdrand(const br_prng_class **ctx)
 		 * of entropy are really overkill).
 		 */
 		for (j = 0; j < 10; j ++) {
-			if (_rdrand32_step(&x) && x != 0 && x != (uint32_t)-1) {
+			if (_rdrand32_step(&x) && x != 0 && x != (br_ssl_u32)-1) {
 				goto next_word;
 			}
 		}

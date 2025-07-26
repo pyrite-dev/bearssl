@@ -26,7 +26,7 @@
 
 /* see inner.h */
 void
-br_i15_mulacc(uint16_t *d, const uint16_t *a, const uint16_t *b)
+br_i15_mulacc(br_ssl_u16 *d, const br_ssl_u16 *a, const br_ssl_u16 *b)
 {
 	size_t alen, blen, u;
 	unsigned dl, dh;
@@ -40,19 +40,19 @@ br_i15_mulacc(uint16_t *d, const uint16_t *a, const uint16_t *b)
 	 */
 	dl = (a[0] & 15) + (b[0] & 15);
 	dh = (a[0] >> 4) + (b[0] >> 4);
-	d[0] = (dh << 4) + dl + (~(uint32_t)(dl - 15) >> 31);
+	d[0] = (dh << 4) + dl + (~(br_ssl_u32)(dl - 15) >> 31);
 
 	for (u = 0; u < blen; u ++) {
-		uint32_t f;
+		br_ssl_u32 f;
 		size_t v;
-		uint32_t cc;
+		br_ssl_u32 cc;
 
 		f = b[1 + u];
 		cc = 0;
 		for (v = 0; v < alen; v ++) {
-			uint32_t z;
+			br_ssl_u32 z;
 
-			z = (uint32_t)d[1 + u + v] + MUL15(f, a[1 + v]) + cc;
+			z = (br_ssl_u32)d[1 + u + v] + MUL15(f, a[1 + v]) + cc;
 			cc = z >> 15;
 			d[1 + u + v] = z & 0x7FFF;
 		}

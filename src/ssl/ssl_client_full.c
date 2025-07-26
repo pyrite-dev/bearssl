@@ -49,7 +49,7 @@ br_ssl_client_init_full(br_ssl_client_context *cc,
 	 * -- AES-128 is preferred over AES-256 (AES-128 is already
 	 *    strong enough, and AES-256 is 40% more expensive).
 	 */
-	static const uint16_t suites[] = {
+	static const br_ssl_u16 suites[] = {
 		BR_TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
 		BR_TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,
 		BR_TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,

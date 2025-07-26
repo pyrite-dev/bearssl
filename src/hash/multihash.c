@@ -52,7 +52,7 @@ get_state_offset(int id)
 		 * eight 64-bit words for their state.
 		 */
 		return offsetof(br_multihash_context, val_64)
-			+ ((size_t)(id - 5) * (8 * sizeof(uint64_t)));
+			+ ((size_t)(id - 5) * (8 * sizeof(br_ssl_u64)));
 	} else {
 		/*
 		 * MD5 has id 1, SHA-1 has id 2, SHA-224 has id 3 and
@@ -65,7 +65,7 @@ get_state_offset(int id)
 		x = id - 1;
 		x = ((x + (x & (x >> 1))) << 2) + (x >> 1);
 		return offsetof(br_multihash_context, val_32)
-			+ x * sizeof(uint32_t);
+			+ x * sizeof(br_ssl_u32);
 	}
 }
 
@@ -121,7 +121,7 @@ br_multihash_update(br_multihash_context *ctx, const void *data, size_t len)
 		ptr += clen;
 		buf += clen;
 		len -= clen;
-		ctx->count += (uint64_t)clen;
+		ctx->count += (br_ssl_u64)clen;
 		if (ptr == 128) {
 			int i;
 
@@ -159,8 +159,8 @@ br_multihash_out(const br_multihash_context *ctx, int id, void *dst)
 		return 0;
 	}
 	state = (const unsigned char *)ctx + get_state_offset(id);
-	hc->set_state(&g.vtable, state, ctx->count & ~(uint64_t)127);
-	hc->update(&g.vtable, ctx->buf, ctx->count & (uint64_t)127);
+	hc->set_state(&g.vtable, state, ctx->count & ~(br_ssl_u64)127);
+	hc->update(&g.vtable, ctx->buf, ctx->count & (br_ssl_u64)127);
 	hc->out(&g.vtable, dst);
 	return (hc->desc >> BR_HASHDESC_OUT_OFF) & BR_HASHDESC_OUT_MASK;
 }

@@ -26,7 +26,7 @@
 
 /* see inner.h */
 void
-br_i32_encode(void *dst, size_t len, const uint32_t *x)
+br_i32_encode(void *dst, size_t len, const br_ssl_u32 *x)
 {
 	unsigned char *buf;
 	size_t k;

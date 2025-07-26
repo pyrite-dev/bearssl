@@ -37,7 +37,7 @@ br_des_tab_cbcdec_init(br_des_tab_cbcdec_keys *ctx,
 		int i;
 
 		for (i = 0; i < 48; i += 2) {
-			uint32_t t;
+			br_ssl_u32 t;
 
 			t = ctx->skey[i];
 			ctx->skey[i] = ctx->skey[94 - i];

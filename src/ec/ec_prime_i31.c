@@ -30,28 +30,28 @@
  * representation).
  */
 
-static const uint32_t P256_P[] = {
+static const br_ssl_u32 P256_P[] = {
 	0x00000108,
 	0x7FFFFFFF, 0x7FFFFFFF, 0x7FFFFFFF, 0x00000007,
 	0x00000000, 0x00000000, 0x00000040, 0x7FFFFF80,
 	0x000000FF
 };
 
-static const uint32_t P256_R2[] = {
+static const br_ssl_u32 P256_R2[] = {
 	0x00000108,
 	0x00014000, 0x00018000, 0x00000000, 0x7FF40000,
 	0x7FEFFFFF, 0x7FF7FFFF, 0x7FAFFFFF, 0x005FFFFF,
 	0x00000000
 };
 
-static const uint32_t P256_B[] = {
+static const br_ssl_u32 P256_B[] = {
 	0x00000108,
 	0x6FEE1803, 0x6229C4BD, 0x21B139BE, 0x327150AA,
 	0x3567802E, 0x3F7212ED, 0x012E4355, 0x782DD38D,
 	0x0000000E
 };
 
-static const uint32_t P384_P[] = {
+static const br_ssl_u32 P384_P[] = {
 	0x0000018C,
 	0x7FFFFFFF, 0x00000001, 0x00000000, 0x7FFFFFF8,
 	0x7FFFFFEF, 0x7FFFFFFF, 0x7FFFFFFF, 0x7FFFFFFF,
@@ -59,7 +59,7 @@ static const uint32_t P384_P[] = {
 	0x00000FFF
 };
 
-static const uint32_t P384_R2[] = {
+static const br_ssl_u32 P384_R2[] = {
 	0x0000018C,
 	0x00000000, 0x00000080, 0x7FFFFE00, 0x000001FF,
 	0x00000800, 0x00000000, 0x7FFFE000, 0x00001FFF,
@@ -67,7 +67,7 @@ static const uint32_t P384_R2[] = {
 	0x00000000
 };
 
-static const uint32_t P384_B[] = {
+static const br_ssl_u32 P384_B[] = {
 	0x0000018C,
 	0x6E666840, 0x070D0392, 0x5D810231, 0x7651D50C,
 	0x17E218D6, 0x1B192002, 0x44EFE441, 0x3A524E2B,
@@ -75,7 +75,7 @@ static const uint32_t P384_B[] = {
 	0x000008A5
 };
 
-static const uint32_t P521_P[] = {
+static const br_ssl_u32 P521_P[] = {
 	0x00000219,
 	0x7FFFFFFF, 0x7FFFFFFF, 0x7FFFFFFF, 0x7FFFFFFF,
 	0x7FFFFFFF, 0x7FFFFFFF, 0x7FFFFFFF, 0x7FFFFFFF,
@@ -84,7 +84,7 @@ static const uint32_t P521_P[] = {
 	0x01FFFFFF
 };
 
-static const uint32_t P521_R2[] = {
+static const br_ssl_u32 P521_R2[] = {
 	0x00000219,
 	0x00001000, 0x00000000, 0x00000000, 0x00000000,
 	0x00000000, 0x00000000, 0x00000000, 0x00000000,
@@ -93,7 +93,7 @@ static const uint32_t P521_R2[] = {
 	0x00000000
 };
 
-static const uint32_t P521_B[] = {
+static const br_ssl_u32 P521_B[] = {
 	0x00000219,
 	0x540FC00A, 0x228FEA35, 0x2C34F1EF, 0x67BF107A,
 	0x46FC1CD5, 0x1605E9DD, 0x6937B165, 0x272A3D8F,
@@ -103,10 +103,10 @@ static const uint32_t P521_B[] = {
 };
 
 typedef struct {
-	const uint32_t *p;
-	const uint32_t *b;
-	const uint32_t *R2;
-	uint32_t p0i;
+	const br_ssl_u32 *p;
+	const br_ssl_u32 *b;
+	const br_ssl_u32 *R2;
+	br_ssl_u32 p0i;
 	size_t point_len;
 } curve_params;
 
@@ -131,7 +131,7 @@ id_to_curve(int curve)
  * -- for the point at infinity, z = 0
  */
 typedef struct {
-	uint32_t c[3][I31_LEN];
+	br_ssl_u32 c[3][I31_LEN];
 } jacobian;
 
 /*
@@ -210,7 +210,7 @@ typedef struct {
  *
  * Cost: 8 multiplications
  */
-static const uint16_t code_double[] = {
+static const br_ssl_u16 code_double[] = {
 	/*
 	 * Compute z^2 (in t1).
 	 */
@@ -316,7 +316,7 @@ static const uint16_t code_double[] = {
  *
  * Cost: 16 multiplications
  */
-static const uint16_t code_add[] = {
+static const br_ssl_u16 code_add[] = {
 	/*
 	 * Compute u1 = x1*z2^2 (in t1) and s1 = y1*z2^3 (in t3).
 	 */
@@ -384,7 +384,7 @@ static const uint16_t code_add[] = {
  * converted to Montgomery coordinates yet).
  * -- P2x, P2y and P2z are set to, respectively, R^2, b*R and 1.
  */
-static const uint16_t code_check[] = {
+static const br_ssl_u16 code_check[] = {
 
 	/* Convert x and y to Montgomery representation. */
 	MMUL(t1, P1x, P2x),
@@ -421,7 +421,7 @@ static const uint16_t code_check[] = {
  * Conversion back to affine coordinates. This code snippet assumes that
  * the z coordinate of P2 is set to 1 (not in Montgomery representation).
  */
-static const uint16_t code_affine[] = {
+static const br_ssl_u16 code_affine[] = {
 
 	/* Save z*R in t1. */
 	MSET(t1, P1z),
@@ -448,12 +448,12 @@ static const uint16_t code_affine[] = {
 	ENDCODE
 };
 
-static uint32_t
+static br_ssl_u32
 run_code(jacobian *P1, const jacobian *P2,
-	const curve_params *cc, const uint16_t *code)
+	const curve_params *cc, const br_ssl_u16 *code)
 {
-	uint32_t r;
-	uint32_t t[13][I31_LEN];
+	br_ssl_u32 r;
+	br_ssl_u32 t[13][I31_LEN];
 	size_t u;
 
 	r = 1;
@@ -461,8 +461,8 @@ run_code(jacobian *P1, const jacobian *P2,
 	/*
 	 * Copy the two operands in the dedicated registers.
 	 */
-	memcpy(t[P1x], P1->c, 3 * I31_LEN * sizeof(uint32_t));
-	memcpy(t[P2x], P2->c, 3 * I31_LEN * sizeof(uint32_t));
+	memcpy(t[P1x], P1->c, 3 * I31_LEN * sizeof(br_ssl_u32));
+	memcpy(t[P2x], P2->c, 3 * I31_LEN * sizeof(br_ssl_u32));
 
 	/*
 	 * Run formulas.
@@ -479,12 +479,12 @@ run_code(jacobian *P1, const jacobian *P2,
 		b = op & 0x0F;
 		op >>= 12;
 		switch (op) {
-			uint32_t ctl;
+			br_ssl_u32 ctl;
 			size_t plen;
 			unsigned char tp[(BR_MAX_EC_SIZE + 7) >> 3];
 
 		case 0:
-			memcpy(t[d], t[a], I31_LEN * sizeof(uint32_t));
+			memcpy(t[d], t[a], I31_LEN * sizeof(br_ssl_u32));
 			break;
 		case 1:
 			ctl = br_i31_add(t[d], t[a], 1);
@@ -513,12 +513,12 @@ run_code(jacobian *P1, const jacobian *P2,
 	/*
 	 * Copy back result.
 	 */
-	memcpy(P1->c, t[P1x], 3 * I31_LEN * sizeof(uint32_t));
+	memcpy(P1->c, t[P1x], 3 * I31_LEN * sizeof(br_ssl_u32));
 	return r;
 }
 
 static void
-set_one(uint32_t *x, const uint32_t *p)
+set_one(br_ssl_u32 *x, const br_ssl_u32 *p)
 {
 	size_t plen;
 
@@ -541,7 +541,7 @@ point_double(jacobian *P, const curve_params *cc)
 	run_code(P, P, cc, code_double);
 }
 
-static inline uint32_t
+static inline br_ssl_u32
 point_add(jacobian *P1, const jacobian *P2, const curve_params *cc)
 {
 	return run_code(P1, P2, cc, code_add);
@@ -565,7 +565,7 @@ point_mul(jacobian *P, const unsigned char *x, size_t xlen,
 	 * ladder. We therefore need to maintain a flag that controls
 	 * this situation.
 	 */
-	uint32_t qz;
+	br_ssl_u32 qz;
 	jacobian P2, P3, Q, T, U;
 
 	memcpy(&P2, P, sizeof P2);
@@ -579,14 +579,14 @@ point_mul(jacobian *P, const unsigned char *x, size_t xlen,
 		int k;
 
 		for (k = 6; k >= 0; k -= 2) {
-			uint32_t bits;
-			uint32_t bnz;
+			br_ssl_u32 bits;
+			br_ssl_u32 bnz;
 
 			point_double(&Q, cc);
 			point_double(&Q, cc);
 			memcpy(&T, P, sizeof T);
 			memcpy(&U, &Q, sizeof U);
-			bits = (*x >> k) & (uint32_t)3;
+			bits = (*x >> k) & (br_ssl_u32)3;
 			bnz = NEQ(bits, 0);
 			CCOPY(EQ(bits, 2), &T, &P2, sizeof T);
 			CCOPY(EQ(bits, 3), &T, &P3, sizeof T);
@@ -605,7 +605,7 @@ point_mul(jacobian *P, const unsigned char *x, size_t xlen,
  * the point at infinity. If the point is invalid then this returns 0, but
  * the coordinates are still set to properly formed field elements.
  */
-static uint32_t
+static br_ssl_u32
 point_decode(jacobian *P, const void *src, size_t len, const curve_params *cc)
 {
 	/*
@@ -627,7 +627,7 @@ point_decode(jacobian *P, const void *src, size_t len, const curve_params *cc)
 	 */
 	const unsigned char *buf;
 	size_t plen, zlen;
-	uint32_t r;
+	br_ssl_u32 r;
 	jacobian Q;
 
 	buf = src;
@@ -645,13 +645,13 @@ point_decode(jacobian *P, const void *src, size_t len, const curve_params *cc)
 	r &= EQ(buf[0], 0x04);
 	/* obsolete
 	r &= EQ(buf[0], 0x04) | (EQ(buf[0] & 0xFE, 0x06)
-		& ~(uint32_t)(buf[0] ^ buf[plen << 1]));
+		& ~(br_ssl_u32)(buf[0] ^ buf[plen << 1]));
 	*/
 
 	/*
 	 * Convert coordinates and check that the point is valid.
 	 */
-	zlen = ((cc->p[0] + 63) >> 5) * sizeof(uint32_t);
+	zlen = ((cc->p[0] + 63) >> 5) * sizeof(br_ssl_u32);
 	memcpy(Q.c[0], cc->R2, zlen);
 	memcpy(Q.c[1], cc->b, zlen);
 	set_one(Q.c[2], cc->p);
@@ -668,7 +668,7 @@ static void
 point_encode(void *dst, const jacobian *P, const curve_params *cc)
 {
 	unsigned char *buf;
-	uint32_t xbl;
+	br_ssl_u32 xbl;
 	size_t plen;
 	jacobian Q, T;
 
@@ -726,11 +726,11 @@ api_xoff(int curve, size_t *len)
 	return 1;
 }
 
-static uint32_t
+static br_ssl_u32
 api_mul(unsigned char *G, size_t Glen,
 	const unsigned char *x, size_t xlen, int curve)
 {
-	uint32_t r;
+	br_ssl_u32 r;
 	const curve_params *cc;
 	jacobian P;
 
@@ -757,12 +757,12 @@ api_mulgen(unsigned char *R,
 	return Glen;
 }
 
-static uint32_t
+static br_ssl_u32
 api_muladd(unsigned char *A, const unsigned char *B, size_t len,
 	const unsigned char *x, size_t xlen,
 	const unsigned char *y, size_t ylen, int curve)
 {
-	uint32_t r, t, z;
+	br_ssl_u32 r, t, z;
 	const curve_params *cc;
 	jacobian P, Q;
 
@@ -816,7 +816,7 @@ api_muladd(unsigned char *A, const unsigned char *B, size_t len,
 
 /* see bearssl_ec.h */
 const br_ec_impl br_ec_prime_i31 = {
-	(uint32_t)0x03800000,
+	(br_ssl_u32)0x03800000,
 	&api_generator,
 	&api_order,
 	&api_xoff,

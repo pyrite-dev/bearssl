@@ -87,7 +87,7 @@ api_xoff(int curve, size_t *len)
 	}
 }
 
-static uint32_t
+static br_ssl_u32
 api_mul(unsigned char *G, size_t Glen,
 	const unsigned char *kb, size_t kblen, int curve)
 {
@@ -131,7 +131,7 @@ api_mulgen(unsigned char *R,
 	}
 }
 
-static uint32_t
+static br_ssl_u32
 api_muladd(unsigned char *A, const unsigned char *B, size_t len,
 	const unsigned char *x, size_t xlen,
 	const unsigned char *y, size_t ylen, int curve)
@@ -161,7 +161,7 @@ api_muladd(unsigned char *A, const unsigned char *B, size_t len,
 
 /* see bearssl_ec.h */
 const br_ec_impl br_ec_all_m31 = {
-	(uint32_t)0x23800000,
+	(br_ssl_u32)0x23800000,
 	&api_generator,
 	&api_order,
 	&api_xoff,

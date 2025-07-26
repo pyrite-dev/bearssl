@@ -34,7 +34,7 @@
 /*
  * Modulus: 2^130-5.
  */
-static const uint16_t P1305[] = {
+static const br_ssl_u16 P1305[] = {
 	0x008A,
 	0x7FFB, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x03FF
 };
@@ -48,7 +48,7 @@ static const uint16_t P1305[] = {
  * R^2 mod p, for conversion to Montgomery representation (R = 2^135,
  * since we use 9 words of 15 bits each, and 15*9 = 135).
  */
-static const uint16_t R2[] = {
+static const br_ssl_u16 R2[] = {
 	0x008A,
 	0x6400, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000
 };
@@ -58,15 +58,15 @@ static const uint16_t R2[] = {
  * is in Montgomery representation, while the "a" array is not.
  */
 static void
-poly1305_inner(uint16_t *a, const uint16_t *r, const void *data, size_t len)
+poly1305_inner(br_ssl_u16 *a, const br_ssl_u16 *r, const void *data, size_t len)
 {
 	const unsigned char *buf;
 
 	buf = data;
 	while (len > 0) {
 		unsigned char tmp[16], rev[16];
-		uint16_t b[10];
-		uint32_t ctl;
+		br_ssl_u16 b[10];
+		br_ssl_u32 ctl;
 		int i;
 
 		/*
@@ -131,7 +131,7 @@ br_poly1305_i15_run(const void *key, const void *iv,
 	void *tag, br_chacha20_run ichacha, int encrypt)
 {
 	unsigned char pkey[32], foot[16];
-	uint16_t t[10], r[10], acc[10];
+	br_ssl_u16 t[10], r[10], acc[10];
 
 	/*
 	 * Compute the MAC key. The 'r' value is the first 16 bytes of
@@ -187,8 +187,8 @@ br_poly1305_i15_run(const void *key, const void *iv,
 	 * Process the additional authenticated data, ciphertext, and
 	 * footer in due order.
 	 */
-	br_enc64le(foot, (uint64_t)aad_len);
-	br_enc64le(foot + 8, (uint64_t)len);
+	br_enc64le(foot, (br_ssl_u64)aad_len);
+	br_enc64le(foot + 8, (br_ssl_u64)len);
 	poly1305_inner(acc, r, aad, aad_len);
 	poly1305_inner(acc, r, data, len);
 	poly1305_inner(acc, r, foot, sizeof foot);

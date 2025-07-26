@@ -25,7 +25,7 @@
 #include "inner.h"
 
 /* see bearssl_rsa.h */
-uint32_t
+br_ssl_u32
 br_rsa_pkcs1_sig_unpad(const unsigned char *sig, size_t sig_len,
 	const unsigned char *hash_oid, size_t hash_len,
 	unsigned char *hash_out)

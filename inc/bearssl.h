@@ -26,7 +26,7 @@
 #define BR_BEARSSL_H__
 
 #include <stddef.h>
-#include <stdint.h>
+#include "bearssl_int.h"
 
 /** \mainpage BearSSL API
  *

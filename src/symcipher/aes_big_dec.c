@@ -52,7 +52,7 @@ static const unsigned char iS[] = {
 	0x55, 0x21, 0x0C, 0x7D
 };
 
-static const uint32_t iSsm0[] = {
+static const br_ssl_u32 iSsm0[] = {
 	0x51F4A750, 0x7E416553, 0x1A17A4C3, 0x3A275E96, 0x3BAB6BCB, 0x1F9D45F1,
 	0xACFA58AB, 0x4BE30393, 0x2030FA55, 0xAD766DF6, 0x88CC7691, 0xF5024C25,
 	0x4FE5D7FC, 0xC52ACBD7, 0x26354480, 0xB562A38F, 0xDEB15A49, 0x25BA1B67,
@@ -141,7 +141,7 @@ mule(unsigned x)
 
 /* see inner.h */
 unsigned
-br_aes_big_keysched_inv(uint32_t *skey, const void *key, size_t key_len)
+br_aes_big_keysched_inv(br_ssl_u32 *skey, const void *key, size_t key_len)
 {
 	unsigned num_rounds;
 	int i, m;
@@ -154,9 +154,9 @@ br_aes_big_keysched_inv(uint32_t *skey, const void *key, size_t key_len)
 	num_rounds = br_aes_keysched(skey, key, key_len);
 	m = (int)(num_rounds << 2);
 	for (i = 4; i < m; i ++) {
-		uint32_t p;
+		br_ssl_u32 p;
 		unsigned p0, p1, p2, p3;
-		uint32_t q0, q1, q2, q3;
+		br_ssl_u32 q0, q1, q2, q3;
 
 		p = skey[i];
 		p0 = p >> 24;
@@ -172,8 +172,8 @@ br_aes_big_keysched_inv(uint32_t *skey, const void *key, size_t key_len)
 	return num_rounds;
 }
 
-static inline uint32_t
-rotr(uint32_t x, int n)
+static inline br_ssl_u32
+rotr(br_ssl_u32 x, int n)
 {
 	return (x << (32 - n)) | (x >> n);
 }
@@ -185,11 +185,11 @@ rotr(uint32_t x, int n)
 
 /* see bearssl.h */
 void
-br_aes_big_decrypt(unsigned num_rounds, const uint32_t *skey, void *data)
+br_aes_big_decrypt(unsigned num_rounds, const br_ssl_u32 *skey, void *data)
 {
 	unsigned char *buf;
-	uint32_t s0, s1, s2, s3;
-	uint32_t t0, t1, t2, t3;
+	br_ssl_u32 s0, s1, s2, s3;
+	br_ssl_u32 t0, t1, t2, t3;
 	unsigned u;
 
 	buf = data;
@@ -202,19 +202,19 @@ br_aes_big_decrypt(unsigned num_rounds, const uint32_t *skey, void *data)
 	s2 ^= skey[(num_rounds << 2) + 2];
 	s3 ^= skey[(num_rounds << 2) + 3];
 	for (u = num_rounds - 1; u > 0; u --) {
-		uint32_t v0 = iSboxExt0(s0 >> 24)
+		br_ssl_u32 v0 = iSboxExt0(s0 >> 24)
 			^ iSboxExt1((s3 >> 16) & 0xFF)
 			^ iSboxExt2((s2 >> 8) & 0xFF)
 			^ iSboxExt3(s1 & 0xFF);
-		uint32_t v1 = iSboxExt0(s1 >> 24)
+		br_ssl_u32 v1 = iSboxExt0(s1 >> 24)
 			^ iSboxExt1((s0 >> 16) & 0xFF)
 			^ iSboxExt2((s3 >> 8) & 0xFF)
 			^ iSboxExt3(s2 & 0xFF);
-		uint32_t v2 = iSboxExt0(s2 >> 24)
+		br_ssl_u32 v2 = iSboxExt0(s2 >> 24)
 			^ iSboxExt1((s1 >> 16) & 0xFF)
 			^ iSboxExt2((s0 >> 8) & 0xFF)
 			^ iSboxExt3(s3 & 0xFF);
-		uint32_t v3 = iSboxExt0(s3 >> 24)
+		br_ssl_u32 v3 = iSboxExt0(s3 >> 24)
 			^ iSboxExt1((s2 >> 16) & 0xFF)
 			^ iSboxExt2((s1 >> 8) & 0xFF)
 			^ iSboxExt3(s0 & 0xFF);
@@ -227,22 +227,22 @@ br_aes_big_decrypt(unsigned num_rounds, const uint32_t *skey, void *data)
 		s2 ^= skey[(u << 2) + 2];
 		s3 ^= skey[(u << 2) + 3];
 	}
-	t0 = ((uint32_t)iS[s0 >> 24] << 24)
-		| ((uint32_t)iS[(s3 >> 16) & 0xFF] << 16)
-		| ((uint32_t)iS[(s2 >> 8) & 0xFF] << 8)
-		| (uint32_t)iS[s1 & 0xFF];
-	t1 = ((uint32_t)iS[s1 >> 24] << 24)
-		| ((uint32_t)iS[(s0 >> 16) & 0xFF] << 16)
-		| ((uint32_t)iS[(s3 >> 8) & 0xFF] << 8)
-		| (uint32_t)iS[s2 & 0xFF];
-	t2 = ((uint32_t)iS[s2 >> 24] << 24)
-		| ((uint32_t)iS[(s1 >> 16) & 0xFF] << 16)
-		| ((uint32_t)iS[(s0 >> 8) & 0xFF] << 8)
-		| (uint32_t)iS[s3 & 0xFF];
-	t3 = ((uint32_t)iS[s3 >> 24] << 24)
-		| ((uint32_t)iS[(s2 >> 16) & 0xFF] << 16)
-		| ((uint32_t)iS[(s1 >> 8) & 0xFF] << 8)
-		| (uint32_t)iS[s0 & 0xFF];
+	t0 = ((br_ssl_u32)iS[s0 >> 24] << 24)
+		| ((br_ssl_u32)iS[(s3 >> 16) & 0xFF] << 16)
+		| ((br_ssl_u32)iS[(s2 >> 8) & 0xFF] << 8)
+		| (br_ssl_u32)iS[s1 & 0xFF];
+	t1 = ((br_ssl_u32)iS[s1 >> 24] << 24)
+		| ((br_ssl_u32)iS[(s0 >> 16) & 0xFF] << 16)
+		| ((br_ssl_u32)iS[(s3 >> 8) & 0xFF] << 8)
+		| (br_ssl_u32)iS[s2 & 0xFF];
+	t2 = ((br_ssl_u32)iS[s2 >> 24] << 24)
+		| ((br_ssl_u32)iS[(s1 >> 16) & 0xFF] << 16)
+		| ((br_ssl_u32)iS[(s0 >> 8) & 0xFF] << 8)
+		| (br_ssl_u32)iS[s3 & 0xFF];
+	t3 = ((br_ssl_u32)iS[s3 >> 24] << 24)
+		| ((br_ssl_u32)iS[(s2 >> 16) & 0xFF] << 16)
+		| ((br_ssl_u32)iS[(s1 >> 8) & 0xFF] << 8)
+		| (br_ssl_u32)iS[s0 & 0xFF];
 	s0 = t0 ^ skey[0];
 	s1 = t1 ^ skey[1];
 	s2 = t2 ^ skey[2];

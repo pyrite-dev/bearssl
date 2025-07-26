@@ -43,7 +43,7 @@ gen_chapol_process(br_sslrec_chapol_context *cc,
 {
 	unsigned char header[13];
 	unsigned char nonce[12];
-	uint64_t seq;
+	br_ssl_u64 seq;
 	size_t u;
 
 	seq = cc->seq ++;

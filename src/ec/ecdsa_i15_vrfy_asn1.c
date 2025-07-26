@@ -27,7 +27,7 @@
 #define FIELD_LEN   ((BR_MAX_EC_SIZE + 7) >> 3)
 
 /* see bearssl_ec.h */
-uint32_t
+br_ssl_u32
 br_ecdsa_i15_vrfy_asn1(const br_ec_impl *impl,
 	const void *hash, size_t hash_len,
 	const br_ec_public_key *pk,

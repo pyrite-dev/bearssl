@@ -26,7 +26,7 @@
 #define BR_BEARSSL_HASH_H__
 
 #include <stddef.h>
-#include <stdint.h>
+#include "bearssl_int.h"
 #include <string.h>
 
 #ifdef __cplusplus
@@ -105,7 +105,7 @@ extern "C" {
  *     resulting from the processing of the last complete input block.
  *     Returned value is the current input length (in bytes).
  *
- *   - `br_xxx_set_state(br_xxx_context *ctx, const void *stb, uint64_t count)`
+ *   - `br_xxx_set_state(br_xxx_context *ctx, const void *stb, br_ssl_u64 count)`
  *
  *     Set the internal state to the provided values. The 'stb' and
  *     'count' values shall match that which was obtained from
@@ -254,7 +254,7 @@ struct br_hash_class_ {
 	 *
 	 * The descriptor may contain a few other flags.
 	 */
-	uint32_t desc;
+	br_ssl_u32 desc;
 
 	/**
 	 * \brief Initialisation method.
@@ -313,7 +313,7 @@ struct br_hash_class_ {
 	 * \param dst   destination buffer for the state.
 	 * \return  the injected total byte length.
 	 */
-	uint64_t (*state)(const br_hash_class *const *ctx, void *dst);
+	br_ssl_u64 (*state)(const br_hash_class *const *ctx, void *dst);
 
 	/**
 	 * \brief Set running state.
@@ -325,29 +325,29 @@ struct br_hash_class_ {
 	 * \param count   injected total byte length.
 	 */
 	void (*set_state)(const br_hash_class **ctx,
-		const void *stb, uint64_t count);
+		const void *stb, br_ssl_u64 count);
 };
 
 #ifndef BR_DOXYGEN_IGNORE
-#define BR_HASHDESC_ID(id)           ((uint32_t)(id) << BR_HASHDESC_ID_OFF)
+#define BR_HASHDESC_ID(id)           ((br_ssl_u32)(id) << BR_HASHDESC_ID_OFF)
 #define BR_HASHDESC_ID_OFF           0
 #define BR_HASHDESC_ID_MASK          0xFF
 
-#define BR_HASHDESC_OUT(size)        ((uint32_t)(size) << BR_HASHDESC_OUT_OFF)
+#define BR_HASHDESC_OUT(size)        ((br_ssl_u32)(size) << BR_HASHDESC_OUT_OFF)
 #define BR_HASHDESC_OUT_OFF          8
 #define BR_HASHDESC_OUT_MASK         0x7F
 
-#define BR_HASHDESC_STATE(size)      ((uint32_t)(size) << BR_HASHDESC_STATE_OFF)
+#define BR_HASHDESC_STATE(size)      ((br_ssl_u32)(size) << BR_HASHDESC_STATE_OFF)
 #define BR_HASHDESC_STATE_OFF        15
 #define BR_HASHDESC_STATE_MASK       0xFF
 
-#define BR_HASHDESC_LBLEN(ls)        ((uint32_t)(ls) << BR_HASHDESC_LBLEN_OFF)
+#define BR_HASHDESC_LBLEN(ls)        ((br_ssl_u32)(ls) << BR_HASHDESC_LBLEN_OFF)
 #define BR_HASHDESC_LBLEN_OFF        23
 #define BR_HASHDESC_LBLEN_MASK       0x0F
 
-#define BR_HASHDESC_MD_PADDING       ((uint32_t)1 << 28)
-#define BR_HASHDESC_MD_PADDING_128   ((uint32_t)1 << 29)
-#define BR_HASHDESC_MD_PADDING_BE    ((uint32_t)1 << 30)
+#define BR_HASHDESC_MD_PADDING       ((br_ssl_u32)1 << 28)
+#define BR_HASHDESC_MD_PADDING_128   ((br_ssl_u32)1 << 29)
+#define BR_HASHDESC_MD_PADDING_BE    ((br_ssl_u32)1 << 30)
 #endif
 
 /*
@@ -393,8 +393,8 @@ typedef struct {
 	const br_hash_class *vtable;
 #ifndef BR_DOXYGEN_IGNORE
 	unsigned char buf[64];
-	uint64_t count;
-	uint32_t val[4];
+	br_ssl_u64 count;
+	br_ssl_u32 val[4];
 #endif
 } br_md5_context;
 
@@ -447,7 +447,7 @@ void br_md5_out(const br_md5_context *ctx, void *out);
  * \param out   destination buffer for the running state.
  * \return  the injected total byte length.
  */
-uint64_t br_md5_state(const br_md5_context *ctx, void *out);
+br_ssl_u64 br_md5_state(const br_md5_context *ctx, void *out);
 
 /**
  * \brief Restore MD5 running state.
@@ -458,7 +458,7 @@ uint64_t br_md5_state(const br_md5_context *ctx, void *out);
  * \param stb     source buffer for the running state.
  * \param count   the injected total byte length.
  */
-void br_md5_set_state(br_md5_context *ctx, const void *stb, uint64_t count);
+void br_md5_set_state(br_md5_context *ctx, const void *stb, br_ssl_u64 count);
 
 /**
  * \brief Symbolic identifier for SHA-1.
@@ -488,8 +488,8 @@ typedef struct {
 	const br_hash_class *vtable;
 #ifndef BR_DOXYGEN_IGNORE
 	unsigned char buf[64];
-	uint64_t count;
-	uint32_t val[5];
+	br_ssl_u64 count;
+	br_ssl_u32 val[5];
 #endif
 } br_sha1_context;
 
@@ -542,7 +542,7 @@ void br_sha1_out(const br_sha1_context *ctx, void *out);
  * \param out   destination buffer for the running state.
  * \return  the injected total byte length.
  */
-uint64_t br_sha1_state(const br_sha1_context *ctx, void *out);
+br_ssl_u64 br_sha1_state(const br_sha1_context *ctx, void *out);
 
 /**
  * \brief Restore SHA-1 running state.
@@ -553,7 +553,7 @@ uint64_t br_sha1_state(const br_sha1_context *ctx, void *out);
  * \param stb     source buffer for the running state.
  * \param count   the injected total byte length.
  */
-void br_sha1_set_state(br_sha1_context *ctx, const void *stb, uint64_t count);
+void br_sha1_set_state(br_sha1_context *ctx, const void *stb, br_ssl_u64 count);
 
 /**
  * \brief Symbolic identifier for SHA-224.
@@ -583,8 +583,8 @@ typedef struct {
 	const br_hash_class *vtable;
 #ifndef BR_DOXYGEN_IGNORE
 	unsigned char buf[64];
-	uint64_t count;
-	uint32_t val[8];
+	br_ssl_u64 count;
+	br_ssl_u32 val[8];
 #endif
 } br_sha224_context;
 
@@ -637,7 +637,7 @@ void br_sha224_out(const br_sha224_context *ctx, void *out);
  * \param out   destination buffer for the running state.
  * \return  the injected total byte length.
  */
-uint64_t br_sha224_state(const br_sha224_context *ctx, void *out);
+br_ssl_u64 br_sha224_state(const br_sha224_context *ctx, void *out);
 
 /**
  * \brief Restore SHA-224 running state.
@@ -649,7 +649,7 @@ uint64_t br_sha224_state(const br_sha224_context *ctx, void *out);
  * \param count   the injected total byte length.
  */
 void br_sha224_set_state(br_sha224_context *ctx,
-	const void *stb, uint64_t count);
+	const void *stb, br_ssl_u64 count);
 
 /**
  * \brief Symbolic identifier for SHA-256.
@@ -737,7 +737,7 @@ void br_sha256_out(const br_sha256_context *ctx, void *out);
  * \param out   destination buffer for the running state.
  * \return  the injected total byte length.
  */
-uint64_t br_sha256_state(const br_sha256_context *ctx, void *out);
+br_ssl_u64 br_sha256_state(const br_sha256_context *ctx, void *out);
 #else
 #define br_sha256_state       br_sha224_state
 #endif
@@ -753,7 +753,7 @@ uint64_t br_sha256_state(const br_sha256_context *ctx, void *out);
  * \param count   the injected total byte length.
  */
 void br_sha256_set_state(br_sha256_context *ctx,
-	const void *stb, uint64_t count);
+	const void *stb, br_ssl_u64 count);
 #else
 #define br_sha256_set_state   br_sha224_set_state
 #endif
@@ -786,8 +786,8 @@ typedef struct {
 	const br_hash_class *vtable;
 #ifndef BR_DOXYGEN_IGNORE
 	unsigned char buf[128];
-	uint64_t count;
-	uint64_t val[8];
+	br_ssl_u64 count;
+	br_ssl_u64 val[8];
 #endif
 } br_sha384_context;
 
@@ -840,7 +840,7 @@ void br_sha384_out(const br_sha384_context *ctx, void *out);
  * \param out   destination buffer for the running state.
  * \return  the injected total byte length.
  */
-uint64_t br_sha384_state(const br_sha384_context *ctx, void *out);
+br_ssl_u64 br_sha384_state(const br_sha384_context *ctx, void *out);
 
 /**
  * \brief Restore SHA-384 running state.
@@ -852,7 +852,7 @@ uint64_t br_sha384_state(const br_sha384_context *ctx, void *out);
  * \param count   the injected total byte length.
  */
 void br_sha384_set_state(br_sha384_context *ctx,
-	const void *stb, uint64_t count);
+	const void *stb, br_ssl_u64 count);
 
 /**
  * \brief Symbolic identifier for SHA-512.
@@ -940,7 +940,7 @@ void br_sha512_out(const br_sha512_context *ctx, void *out);
  * \param out   destination buffer for the running state.
  * \return  the injected total byte length.
  */
-uint64_t br_sha512_state(const br_sha512_context *ctx, void *out);
+br_ssl_u64 br_sha512_state(const br_sha512_context *ctx, void *out);
 #else
 #define br_sha512_state   br_sha384_state
 #endif
@@ -956,7 +956,7 @@ uint64_t br_sha512_state(const br_sha512_context *ctx, void *out);
  * \param count   the injected total byte length.
  */
 void br_sha512_set_state(br_sha512_context *ctx,
-	const void *stb, uint64_t count);
+	const void *stb, br_ssl_u64 count);
 #else
 #define br_sha512_set_state   br_sha384_set_state
 #endif
@@ -999,9 +999,9 @@ typedef struct {
 	const br_hash_class *vtable;
 #ifndef BR_DOXYGEN_IGNORE
 	unsigned char buf[64];
-	uint64_t count;
-	uint32_t val_md5[4];
-	uint32_t val_sha1[5];
+	br_ssl_u64 count;
+	br_ssl_u32 val_md5[4];
+	br_ssl_u32 val_sha1[5];
 #endif
 } br_md5sha1_context;
 
@@ -1054,7 +1054,7 @@ void br_md5sha1_out(const br_md5sha1_context *ctx, void *out);
  * \param out   destination buffer for the running state.
  * \return  the injected total byte length.
  */
-uint64_t br_md5sha1_state(const br_md5sha1_context *ctx, void *out);
+br_ssl_u64 br_md5sha1_state(const br_md5sha1_context *ctx, void *out);
 
 /**
  * \brief Restore MD5+SHA-1 running state.
@@ -1066,7 +1066,7 @@ uint64_t br_md5sha1_state(const br_md5sha1_context *ctx, void *out);
  * \param count   the injected total byte length.
  */
 void br_md5sha1_set_state(br_md5sha1_context *ctx,
-	const void *stb, uint64_t count);
+	const void *stb, br_ssl_u64 count);
 
 /**
  * \brief Aggregate context for configurable hash function support.
@@ -1107,9 +1107,9 @@ typedef union {
 typedef struct {
 #ifndef BR_DOXYGEN_IGNORE
 	unsigned char buf[128];
-	uint64_t count;
-	uint32_t val_32[25];
-	uint64_t val_64[16];
+	br_ssl_u64 count;
+	br_ssl_u32 val_32[25];
+	br_ssl_u64 val_64[16];
 	const br_hash_class *impl[6];
 #endif
 } br_multihash_context;

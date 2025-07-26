@@ -26,7 +26,7 @@
 #define BR_BEARSSL_RAND_H__
 
 #include <stddef.h>
-#include <stdint.h>
+#include "bearssl_int.h"
 
 #include "bearssl_block.h"
 #include "bearssl_hash.h"
@@ -332,7 +332,7 @@ typedef struct {
 	const br_prng_class *vtable;
 #ifndef BR_DOXYGEN_IGNORE
 	br_aes_gen_ctr_keys sk;
-	uint32_t cc;
+	br_ssl_u32 cc;
 #endif
 } br_aesctr_drbg_context;
 

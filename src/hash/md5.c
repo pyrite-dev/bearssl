@@ -32,11 +32,11 @@
 #define ROTL(x, n)    (((x) << (n)) | ((x) >> (32 - (n))))
 
 /* see inner.h */
-const uint32_t br_md5_IV[4] = {
+const br_ssl_u32 br_md5_IV[4] = {
 	0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476
 };
 
-static const uint32_t K[64] = {
+static const br_ssl_u32 K[64] = {
 	0xD76AA478, 0xE8C7B756, 0x242070DB, 0xC1BDCEEE,
 	0xF57C0FAF, 0x4787C62A, 0xA8304613, 0xFD469501,
 	0x698098D8, 0x8B44F7AF, 0xFFFF5BB1, 0x895CD7BE,
@@ -66,10 +66,10 @@ static const unsigned char MP[48] = {
 
 /* see inner.h */
 void
-br_md5_round(const unsigned char *buf, uint32_t *val)
+br_md5_round(const unsigned char *buf, br_ssl_u32 *val)
 {
-	uint32_t m[16];
-	uint32_t a, b, c, d;
+	br_ssl_u32 m[16];
+	br_ssl_u32 a, b, c, d;
 	int i;
 
 	a = val[0];
@@ -143,7 +143,7 @@ br_md5_update(br_md5_context *cc, const void *data, size_t len)
 		ptr += clen;
 		buf += clen;
 		len -= clen;
-		cc->count += (uint64_t)clen;
+		cc->count += (br_ssl_u64)clen;
 		if (ptr == 64) {
 			br_md5_round(cc->buf, cc->val);
 			ptr = 0;
@@ -156,7 +156,7 @@ void
 br_md5_out(const br_md5_context *cc, void *dst)
 {
 	unsigned char buf[64];
-	uint32_t val[4];
+	br_ssl_u32 val[4];
 	size_t ptr;
 
 	ptr = (size_t)cc->count & 63;
@@ -176,7 +176,7 @@ br_md5_out(const br_md5_context *cc, void *dst)
 }
 
 /* see bearssl.h */
-uint64_t
+br_ssl_u64
 br_md5_state(const br_md5_context *cc, void *dst)
 {
 	br_range_enc32le(dst, cc->val, 4);
@@ -185,7 +185,7 @@ br_md5_state(const br_md5_context *cc, void *dst)
 
 /* see bearssl.h */
 void
-br_md5_set_state(br_md5_context *cc, const void *stb, uint64_t count)
+br_md5_set_state(br_md5_context *cc, const void *stb, br_ssl_u64 count)
 {
 	br_range_dec32le(cc->val, 4, stb);
 	cc->count = count;
@@ -202,7 +202,7 @@ const br_hash_class br_md5_vtable = {
 	(void (*)(const br_hash_class **))&br_md5_init,
 	(void (*)(const br_hash_class **, const void *, size_t))&br_md5_update,
 	(void (*)(const br_hash_class *const *, void *))&br_md5_out,
-	(uint64_t (*)(const br_hash_class *const *, void *))&br_md5_state,
-	(void (*)(const br_hash_class **, const void *, uint64_t))
+	(br_ssl_u64 (*)(const br_hash_class *const *, void *))&br_md5_state,
+	(void (*)(const br_hash_class **, const void *, br_ssl_u64))
 		&br_md5_set_state
 };

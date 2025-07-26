@@ -26,10 +26,10 @@
 
 /* see inner.h */
 void
-br_i31_mulacc(uint32_t *d, const uint32_t *a, const uint32_t *b)
+br_i31_mulacc(br_ssl_u32 *d, const br_ssl_u32 *a, const br_ssl_u32 *b)
 {
 	size_t alen, blen, u;
-	uint32_t dl, dh;
+	br_ssl_u32 dl, dh;
 
 	alen = (a[0] + 31) >> 5;
 	blen = (b[0] + 31) >> 5;
@@ -40,10 +40,10 @@ br_i31_mulacc(uint32_t *d, const uint32_t *a, const uint32_t *b)
 	 */
 	dl = (a[0] & 31) + (b[0] & 31);
 	dh = (a[0] >> 5) + (b[0] >> 5);
-	d[0] = (dh << 5) + dl + (~(uint32_t)(dl - 31) >> 31);
+	d[0] = (dh << 5) + dl + (~(br_ssl_u32)(dl - 31) >> 31);
 
 	for (u = 0; u < blen; u ++) {
-		uint32_t f;
+		br_ssl_u32 f;
 		size_t v;
 
 		/*
@@ -55,20 +55,20 @@ br_i31_mulacc(uint32_t *d, const uint32_t *a, const uint32_t *b)
 		 * the top register, which has negative or zero cost).
 		 */
 #if BR_64
-		uint64_t cc;
+		br_ssl_u64 cc;
 #else
-		uint32_t cc;
+		br_ssl_u32 cc;
 #endif
 
 		f = b[1 + u];
 		cc = 0;
 		for (v = 0; v < alen; v ++) {
-			uint64_t z;
+			br_ssl_u64 z;
 
-			z = (uint64_t)d[1 + u + v] + MUL31(f, a[1 + v]) + cc;
+			z = (br_ssl_u64)d[1 + u + v] + MUL31(f, a[1 + v]) + cc;
 			cc = z >> 31;
-			d[1 + u + v] = (uint32_t)z & 0x7FFFFFFF;
+			d[1 + u + v] = (br_ssl_u32)z & 0x7FFFFFFF;
 		}
-		d[1 + u + alen] = (uint32_t)cc;
+		d[1 + u + alen] = (br_ssl_u32)cc;
 	}
 }

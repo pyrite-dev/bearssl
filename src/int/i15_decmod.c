@@ -25,8 +25,8 @@
 #include "inner.h"
 
 /* see inner.h */
-uint32_t
-br_i15_decode_mod(uint16_t *x, const void *src, size_t len, const uint16_t *m)
+br_ssl_u32
+br_i15_decode_mod(br_ssl_u16 *x, const void *src, size_t len, const br_ssl_u16 *m)
 {
 	/*
 	 * Two-pass algorithm: in the first pass, we determine whether the
@@ -54,7 +54,7 @@ br_i15_decode_mod(uint16_t *x, const void *src, size_t len, const uint16_t *m)
 	const unsigned char *buf;
 	size_t mlen, tlen;
 	int pass;
-	uint32_t r;
+	br_ssl_u32 r;
 
 	buf = src;
 	mlen = (m[0] + 15) >> 4;
@@ -66,14 +66,14 @@ br_i15_decode_mod(uint16_t *x, const void *src, size_t len, const uint16_t *m)
 	r = 0;
 	for (pass = 0; pass < 2; pass ++) {
 		size_t u, v;
-		uint32_t acc;
+		br_ssl_u32 acc;
 		int acc_len;
 
 		v = 1;
 		acc = 0;
 		acc_len = 0;
 		for (u = 0; u < tlen; u ++) {
-			uint32_t b;
+			br_ssl_u32 b;
 
 			if (u < len) {
 				b = buf[len - 1 - u];
@@ -83,18 +83,18 @@ br_i15_decode_mod(uint16_t *x, const void *src, size_t len, const uint16_t *m)
 			acc |= (b << acc_len);
 			acc_len += 8;
 			if (acc_len >= 15) {
-				uint32_t xw;
+				br_ssl_u32 xw;
 
-				xw = acc & (uint32_t)0x7FFF;
+				xw = acc & (br_ssl_u32)0x7FFF;
 				acc_len -= 15;
 				acc = b >> (8 - acc_len);
 				if (v <= mlen) {
 					if (pass) {
 						x[v] = r & xw;
 					} else {
-						uint32_t cc;
+						br_ssl_u32 cc;
 
-						cc = (uint32_t)CMP(xw, m[v]);
+						cc = (br_ssl_u32)CMP(xw, m[v]);
 						r = MUX(EQ(cc, 0), r, cc);
 					}
 				} else {
@@ -120,5 +120,5 @@ br_i15_decode_mod(uint16_t *x, const void *src, size_t len, const uint16_t *m)
 	}
 
 	x[0] = m[0];
-	return r & (uint32_t)1;
+	return r & (br_ssl_u32)1;
 }

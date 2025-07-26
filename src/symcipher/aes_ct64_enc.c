@@ -25,7 +25,7 @@
 #include "inner.h"
 
 static inline void
-add_round_key(uint64_t *q, const uint64_t *sk)
+add_round_key(br_ssl_u64 *q, const br_ssl_u64 *sk)
 {
 	q[0] ^= sk[0];
 	q[1] ^= sk[1];
@@ -38,35 +38,35 @@ add_round_key(uint64_t *q, const uint64_t *sk)
 }
 
 static inline void
-shift_rows(uint64_t *q)
+shift_rows(br_ssl_u64 *q)
 {
 	int i;
 
 	for (i = 0; i < 8; i ++) {
-		uint64_t x;
+		br_ssl_u64 x;
 
 		x = q[i];
-		q[i] = (x & (uint64_t)0x000000000000FFFF)
-			| ((x & (uint64_t)0x00000000FFF00000) >> 4)
-			| ((x & (uint64_t)0x00000000000F0000) << 12)
-			| ((x & (uint64_t)0x0000FF0000000000) >> 8)
-			| ((x & (uint64_t)0x000000FF00000000) << 8)
-			| ((x & (uint64_t)0xF000000000000000) >> 12)
-			| ((x & (uint64_t)0x0FFF000000000000) << 4);
+		q[i] = (x & (br_ssl_u64)0x000000000000FFFF)
+			| ((x & (br_ssl_u64)0x00000000FFF00000) >> 4)
+			| ((x & (br_ssl_u64)0x00000000000F0000) << 12)
+			| ((x & (br_ssl_u64)0x0000FF0000000000) >> 8)
+			| ((x & (br_ssl_u64)0x000000FF00000000) << 8)
+			| ((x & (br_ssl_u64)0xF000000000000000) >> 12)
+			| ((x & (br_ssl_u64)0x0FFF000000000000) << 4);
 	}
 }
 
-static inline uint64_t
-rotr32(uint64_t x)
+static inline br_ssl_u64
+rotr32(br_ssl_u64 x)
 {
 	return (x << 32) | (x >> 32);
 }
 
 static inline void
-mix_columns(uint64_t *q)
+mix_columns(br_ssl_u64 *q)
 {
-	uint64_t q0, q1, q2, q3, q4, q5, q6, q7;
-	uint64_t r0, r1, r2, r3, r4, r5, r6, r7;
+	br_ssl_u64 q0, q1, q2, q3, q4, q5, q6, q7;
+	br_ssl_u64 r0, r1, r2, r3, r4, r5, r6, r7;
 
 	q0 = q[0];
 	q1 = q[1];
@@ -98,7 +98,7 @@ mix_columns(uint64_t *q)
 /* see inner.h */
 void
 br_aes_ct64_bitslice_encrypt(unsigned num_rounds,
-	const uint64_t *skey, uint64_t *q)
+	const br_ssl_u64 *skey, br_ssl_u64 *q)
 {
 	unsigned u;
 

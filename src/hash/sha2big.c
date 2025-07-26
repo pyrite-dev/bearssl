@@ -27,28 +27,28 @@
 #define CH(X, Y, Z)    ((((Y) ^ (Z)) & (X)) ^ (Z))
 #define MAJ(X, Y, Z)   (((Y) & (Z)) | (((Y) | (Z)) & (X)))
 
-#define ROTR(x, n)    (((uint64_t)(x) << (64 - (n))) | ((uint64_t)(x) >> (n)))
+#define ROTR(x, n)    (((br_ssl_u64)(x) << (64 - (n))) | ((br_ssl_u64)(x) >> (n)))
 
 #define BSG5_0(x)      (ROTR(x, 28) ^ ROTR(x, 34) ^ ROTR(x, 39))
 #define BSG5_1(x)      (ROTR(x, 14) ^ ROTR(x, 18) ^ ROTR(x, 41))
-#define SSG5_0(x)      (ROTR(x, 1) ^ ROTR(x, 8) ^ (uint64_t)((x) >> 7))
-#define SSG5_1(x)      (ROTR(x, 19) ^ ROTR(x, 61) ^ (uint64_t)((x) >> 6))
+#define SSG5_0(x)      (ROTR(x, 1) ^ ROTR(x, 8) ^ (br_ssl_u64)((x) >> 7))
+#define SSG5_1(x)      (ROTR(x, 19) ^ ROTR(x, 61) ^ (br_ssl_u64)((x) >> 6))
 
-static const uint64_t IV384[8] = {
+static const br_ssl_u64 IV384[8] = {
 	0xCBBB9D5DC1059ED8, 0x629A292A367CD507,
 	0x9159015A3070DD17, 0x152FECD8F70E5939,
 	0x67332667FFC00B31, 0x8EB44A8768581511,
 	0xDB0C2E0D64F98FA7, 0x47B5481DBEFA4FA4
 };
 
-static const uint64_t IV512[8] = {
+static const br_ssl_u64 IV512[8] = {
 	0x6A09E667F3BCC908, 0xBB67AE8584CAA73B,
 	0x3C6EF372FE94F82B, 0xA54FF53A5F1D36F1,
 	0x510E527FADE682D1, 0x9B05688C2B3E6C1F,
 	0x1F83D9ABFB41BD6B, 0x5BE0CD19137E2179
 };
 
-static const uint64_t K[80] = {
+static const br_ssl_u64 K[80] = {
 	0x428A2F98D728AE22, 0x7137449123EF65CD,
 	0xB5C0FBCFEC4D3B2F, 0xE9B5DBA58189DBBC,
 	0x3956C25BF348B538, 0x59F111F1B605D019,
@@ -92,11 +92,11 @@ static const uint64_t K[80] = {
 };
 
 static void
-sha2big_round(const unsigned char *buf, uint64_t *val)
+sha2big_round(const unsigned char *buf, br_ssl_u64 *val)
 {
 
 #define SHA2BIG_STEP(A, B, C, D, E, F, G, H, j)   do { \
-		uint64_t T1, T2; \
+		br_ssl_u64 T1, T2; \
 		T1 = H + BSG5_1(E) + CH(E, F, G) + K[j] + w[j]; \
 		T2 = BSG5_0(A) + MAJ(A, B, C); \
 		D += T1; \
@@ -104,8 +104,8 @@ sha2big_round(const unsigned char *buf, uint64_t *val)
 	} while (0)
 
 	int i;
-	uint64_t a, b, c, d, e, f, g, h;
-	uint64_t w[80];
+	br_ssl_u64 a, b, c, d, e, f, g, h;
+	br_ssl_u64 w[80];
 
 	br_range_dec64be(w, 16, buf);
 	for (i = 16; i < 80; i ++) {
@@ -148,7 +148,7 @@ sha2big_update(br_sha384_context *cc, const void *data, size_t len)
 
 	buf = data;
 	ptr = (size_t)cc->count & 127;
-	cc->count += (uint64_t)len;
+	cc->count += (br_ssl_u64)len;
 	while (len > 0) {
 		size_t clen;
 
@@ -171,7 +171,7 @@ static void
 sha2big_out(const br_sha384_context *cc, void *dst, int num)
 {
 	unsigned char buf[128];
-	uint64_t val[8];
+	br_ssl_u64 val[8];
 	size_t ptr;
 
 	ptr = (size_t)cc->count & 127;
@@ -215,7 +215,7 @@ br_sha384_out(const br_sha384_context *cc, void *dst)
 }
 
 /* see bearssl.h */
-uint64_t
+br_ssl_u64
 br_sha384_state(const br_sha384_context *cc, void *dst)
 {
 	br_range_enc64be(dst, cc->val, 8);
@@ -224,7 +224,7 @@ br_sha384_state(const br_sha384_context *cc, void *dst)
 
 /* see bearssl.h */
 void
-br_sha384_set_state(br_sha384_context *cc, const void *stb, uint64_t count)
+br_sha384_set_state(br_sha384_context *cc, const void *stb, br_ssl_u64 count)
 {
 	br_range_dec64be(cc->val, 8, stb);
 	cc->count = count;
@@ -260,8 +260,8 @@ const br_hash_class br_sha384_vtable = {
 	(void (*)(const br_hash_class **, const void *, size_t))
 		&br_sha384_update,
 	(void (*)(const br_hash_class *const *, void *))&br_sha384_out,
-	(uint64_t (*)(const br_hash_class *const *, void *))&br_sha384_state,
-	(void (*)(const br_hash_class **, const void *, uint64_t))
+	(br_ssl_u64 (*)(const br_hash_class *const *, void *))&br_sha384_state,
+	(void (*)(const br_hash_class **, const void *, br_ssl_u64))
 		&br_sha384_set_state
 };
 
@@ -279,7 +279,7 @@ const br_hash_class br_sha512_vtable = {
 	(void (*)(const br_hash_class **, const void *, size_t))
 		&br_sha512_update,
 	(void (*)(const br_hash_class *const *, void *))&br_sha512_out,
-	(uint64_t (*)(const br_hash_class *const *, void *))&br_sha512_state,
-	(void (*)(const br_hash_class **, const void *, uint64_t))
+	(br_ssl_u64 (*)(const br_hash_class *const *, void *))&br_sha512_state,
+	(void (*)(const br_hash_class **, const void *, br_ssl_u64))
 		&br_sha512_set_state
 };

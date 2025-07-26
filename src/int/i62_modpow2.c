@@ -36,8 +36,8 @@
 		unsigned __int128 fmaz; \
 		fmaz = (unsigned __int128)(x) * (unsigned __int128)(y) \
 			+ (unsigned __int128)(v1) + (unsigned __int128)(v2); \
-		(hi) = (uint64_t)(fmaz >> 64); \
-		(lo) = (uint64_t)fmaz; \
+		(hi) = (br_ssl_u64)(fmaz >> 64); \
+		(lo) = (br_ssl_u64)fmaz; \
 	} while (0)
 
 /*
@@ -53,8 +53,8 @@
 		fmaz = (unsigned __int128)(x1) * (unsigned __int128)(y1) \
 			+ (unsigned __int128)(x2) * (unsigned __int128)(y2) \
 			+ (unsigned __int128)(v1) + (unsigned __int128)(v2); \
-		(hi) = (uint64_t)(fmaz >> 64); \
-		(lo) = (uint64_t)fmaz; \
+		(hi) = (br_ssl_u64)(fmaz >> 64); \
+		(lo) = (br_ssl_u64)fmaz; \
 	} while (0)
 
 #elif BR_UMUL128
@@ -62,7 +62,7 @@
 #include <intrin.h>
 
 #define FMA1(hi, lo, x, y, v1, v2)   do { \
-		uint64_t fmahi, fmalo; \
+		br_ssl_u64 fmahi, fmalo; \
 		unsigned char fmacc; \
 		fmalo = _umul128((x), (y), &fmahi); \
 		fmacc = _addcarry_u64(0, fmalo, (v1), &fmalo); \
@@ -78,9 +78,9 @@
  * This is unfortunately slower.
  */
 #define FMA2(hi, lo, x1, y1, x2, y2, v1, v2)   do { \
-		uint64_t fma1hi, fma1lo; \
-		uint64_t fma2hi, fma2lo; \
-		uint64_t fmatt; \
+		br_ssl_u64 fma1hi, fma1lo; \
+		br_ssl_u64 fma2hi, fma2lo; \
+		br_ssl_u64 fmatt; \
 		fma1lo = _umul128((x1), (y1), &fma1hi); \
 		fma2lo = _umul128((x2), (y2), &fma2hi); \
 		fmatt = (fma1lo >> 2) + (fma2lo >> 2) \
@@ -94,8 +94,8 @@
  * an internal compiler error in Visual Studio 2015.
  *
 #define FMA2(hi, lo, x1, y1, x2, y2, v1, v2)   do { \
-		uint64_t fma1hi, fma1lo; \
-		uint64_t fma2hi, fma2lo; \
+		br_ssl_u64 fma1hi, fma1lo; \
+		br_ssl_u64 fma2hi, fma2lo; \
 		unsigned char fmacc; \
 		fma1lo = _umul128((x1), (y1), &fma1hi); \
 		fma2lo = _umul128((x2), (y2), &fma2hi); \
@@ -110,25 +110,25 @@
 
 #endif
 
-#define MASK62           ((uint64_t)0x3FFFFFFFFFFFFFFF)
-#define MUL62_lo(x, y)   (((uint64_t)(x) * (uint64_t)(y)) & MASK62)
+#define MASK62           ((br_ssl_u64)0x3FFFFFFFFFFFFFFF)
+#define MUL62_lo(x, y)   (((br_ssl_u64)(x) * (br_ssl_u64)(y)) & MASK62)
 
 /*
  * Subtract b from a, and return the final carry. If 'ctl32' is 0, then
  * a[] is kept unmodified, but the final carry is still computed and
  * returned.
  */
-static uint32_t
-i62_sub(uint64_t *a, const uint64_t *b, size_t num, uint32_t ctl32)
+static br_ssl_u32
+i62_sub(br_ssl_u64 *a, const br_ssl_u64 *b, size_t num, br_ssl_u32 ctl32)
 {
-	uint64_t cc, mask;
+	br_ssl_u64 cc, mask;
 	size_t u;
 
 	cc = 0;
 	ctl32 = -ctl32;
-	mask = (uint64_t)ctl32 | ((uint64_t)ctl32 << 32);
+	mask = (br_ssl_u64)ctl32 | ((br_ssl_u64)ctl32 << 32);
 	for (u = 0; u < num; u ++) {
-		uint64_t aw, bw, dw;
+		br_ssl_u64 aw, bw, dw;
 
 		aw = a[u];
 		bw = b[u];
@@ -137,7 +137,7 @@ i62_sub(uint64_t *a, const uint64_t *b, size_t num, uint32_t ctl32)
 		dw &= MASK62;
 		a[u] = aw ^ (mask & (dw ^ aw));
 	}
-	return (uint32_t)cc;
+	return (br_ssl_u32)cc;
 }
 
 /*
@@ -147,10 +147,10 @@ i62_sub(uint64_t *a, const uint64_t *b, size_t num, uint32_t ctl32)
  * significant word comes first) over 'num' words.
  */
 static void
-montymul(uint64_t *d, const uint64_t *x, const uint64_t *y,
-	const uint64_t *m, size_t num, uint64_t m0i)
+montymul(br_ssl_u64 *d, const br_ssl_u64 *x, const br_ssl_u64 *y,
+	const br_ssl_u64 *m, size_t num, br_ssl_u64 m0i)
 {
-	uint64_t dh;
+	br_ssl_u64 dh;
 	size_t u, num4;
 
 	num4 = 1 + ((num - 1) & ~(size_t)3);
@@ -158,9 +158,9 @@ montymul(uint64_t *d, const uint64_t *x, const uint64_t *y,
 	dh = 0;
 	for (u = 0; u < num; u ++) {
 		size_t v;
-		uint64_t f, xu;
-		uint64_t r, zh;
-		uint64_t hi, lo;
+		br_ssl_u64 f, xu;
+		br_ssl_u64 r, zh;
+		br_ssl_u64 hi, lo;
 
 		xu = x[u] << 2;
 		f = MUL62_lo(d[0] + MUL62_lo(x[u], y[0]), m0i) << 2;
@@ -196,24 +196,24 @@ montymul(uint64_t *d, const uint64_t *x, const uint64_t *y,
 		d[num - 1] = zh & MASK62;
 		dh = zh >> 62;
 	}
-	i62_sub(d, m, num, (uint32_t)dh | NOT(i62_sub(d, m, num, 0)));
+	i62_sub(d, m, num, (br_ssl_u32)dh | NOT(i62_sub(d, m, num, 0)));
 }
 
 /*
  * Conversion back from Montgomery representation.
  */
 static void
-frommonty(uint64_t *x, const uint64_t *m, size_t num, uint64_t m0i)
+frommonty(br_ssl_u64 *x, const br_ssl_u64 *m, size_t num, br_ssl_u64 m0i)
 {
 	size_t u, v;
 
 	for (u = 0; u < num; u ++) {
-		uint64_t f, cc;
+		br_ssl_u64 f, cc;
 
 		f = MUL62_lo(x[0], m0i) << 2;
 		cc = 0;
 		for (v = 0; v < num; v ++) {
-			uint64_t hi, lo;
+			br_ssl_u64 hi, lo;
 
 			FMA1(hi, lo, f, m[v], x[v] << 2, cc);
 			cc = hi << 2;
@@ -227,14 +227,14 @@ frommonty(uint64_t *x, const uint64_t *m, size_t num, uint64_t m0i)
 }
 
 /* see inner.h */
-uint32_t
-br_i62_modpow_opt(uint32_t *x31, const unsigned char *e, size_t elen,
-	const uint32_t *m31, uint32_t m0i31, uint64_t *tmp, size_t twlen)
+br_ssl_u32
+br_i62_modpow_opt(br_ssl_u32 *x31, const unsigned char *e, size_t elen,
+	const br_ssl_u32 *m31, br_ssl_u32 m0i31, br_ssl_u64 *tmp, size_t twlen)
 {
 	size_t u, mw31num, mw62num;
-	uint64_t *x, *m, *t1, *t2;
-	uint64_t m0i;
-	uint32_t acc;
+	br_ssl_u64 *x, *m, *t1, *t2;
+	br_ssl_u64 m0i;
+	br_ssl_u32 acc;
 	int win_len, acc_len;
 
 	/*
@@ -252,8 +252,8 @@ br_i62_modpow_opt(uint32_t *x31, const unsigned char *e, size_t elen,
 	 */
 	if (mw31num < 4 || (mw62num << 2) > twlen) {
 		/*
-		 * We assume here that we can split an aligned uint64_t
-		 * into two properly aligned uint32_t. Since both types
+		 * We assume here that we can split an aligned br_ssl_u64
+		 * into two properly aligned br_ssl_u32. Since both types
 		 * are supposed to have an exact width with no padding,
 		 * then this property must hold.
 		 */
@@ -264,7 +264,7 @@ br_i62_modpow_opt(uint32_t *x31, const unsigned char *e, size_t elen,
 			return 0;
 		}
 		br_i31_modpow(x31, e, elen, m31, m0i31,
-			(uint32_t *)tmp, (uint32_t *)tmp + txlen);
+			(br_ssl_u32 *)tmp, (br_ssl_u32 *)tmp + txlen);
 		return 1;
 	}
 
@@ -297,13 +297,13 @@ br_i62_modpow_opt(uint32_t *x31, const unsigned char *e, size_t elen,
 
 		v = u >> 1;
 		if ((u + 1) == mw31num) {
-			m[v] = (uint64_t)m31[u + 1];
-			x[v] = (uint64_t)x31[u + 1];
+			m[v] = (br_ssl_u64)m31[u + 1];
+			x[v] = (br_ssl_u64)x31[u + 1];
 		} else {
-			m[v] = (uint64_t)m31[u + 1]
-				+ ((uint64_t)m31[u + 2] << 31);
-			x[v] = (uint64_t)x31[u + 1]
-				+ ((uint64_t)x31[u + 2] << 31);
+			m[v] = (br_ssl_u64)m31[u + 1]
+				+ ((br_ssl_u64)m31[u + 2] << 31);
+			x[v] = (br_ssl_u64)x31[u + 1]
+				+ ((br_ssl_u64)x31[u + 2] << 31);
 		}
 	}
 
@@ -313,7 +313,7 @@ br_i62_modpow_opt(uint32_t *x31, const unsigned char *e, size_t elen,
 	 * we use special code that uses only 2 temporaries).
 	 */
 	for (win_len = 5; win_len > 1; win_len --) {
-		if ((((uint32_t)1 << win_len) + 1) * mw62num <= twlen) {
+		if ((((br_ssl_u32)1 << win_len) + 1) * mw62num <= twlen) {
 			break;
 		}
 	}
@@ -326,8 +326,8 @@ br_i62_modpow_opt(uint32_t *x31, const unsigned char *e, size_t elen,
 	 * provided with m0i31, which already fulfills this property
 	 * modulo 2^31; the single expression below is then sufficient.
 	 */
-	m0i = (uint64_t)m0i31;
-	m0i = MUL62_lo(m0i, (uint64_t)2 + MUL62_lo(m0i, m[0]));
+	m0i = (br_ssl_u64)m0i31;
+	m0i = MUL62_lo(m0i, (br_ssl_u64)2 + MUL62_lo(m0i, m[0]));
 
 	/*
 	 * Compute window contents. If the window has size one bit only,
@@ -337,7 +337,7 @@ br_i62_modpow_opt(uint32_t *x31, const unsigned char *e, size_t elen,
 	if (win_len == 1) {
 		memcpy(t2, x, mw62num * sizeof *x);
 	} else {
-		uint64_t *base;
+		br_ssl_u64 *base;
 
 		memcpy(t2 + mw62num, x, mw62num * sizeof *x);
 		base = t2 + mw62num;
@@ -362,10 +362,10 @@ br_i62_modpow_opt(uint32_t *x31, const unsigned char *e, size_t elen,
 
 		v = u >> 1;
 		if ((u + 1) == mw31num) {
-			x[v] = (uint64_t)x31[u + 1];
+			x[v] = (br_ssl_u64)x31[u + 1];
 		} else {
-			x[v] = (uint64_t)x31[u + 1]
-				+ ((uint64_t)x31[u + 2] << 31);
+			x[v] = (br_ssl_u64)x31[u + 1]
+				+ ((br_ssl_u64)x31[u + 2] << 31);
 		}
 	}
 
@@ -377,8 +377,8 @@ br_i62_modpow_opt(uint32_t *x31, const unsigned char *e, size_t elen,
 	acc_len = 0;
 	while (acc_len > 0 || elen > 0) {
 		int i, k;
-		uint32_t bits;
-		uint64_t mask1, mask2;
+		br_ssl_u32 bits;
+		br_ssl_u64 mask1, mask2;
 
 		/*
 		 * Get the next bits.
@@ -393,7 +393,7 @@ br_i62_modpow_opt(uint32_t *x31, const unsigned char *e, size_t elen,
 				k = acc_len;
 			}
 		}
-		bits = (acc >> (acc_len - k)) & (((uint32_t)1 << k) - 1);
+		bits = (acc >> (acc_len - k)) & (((br_ssl_u32)1 << k) - 1);
 		acc_len -= k;
 
 		/*
@@ -411,15 +411,15 @@ br_i62_modpow_opt(uint32_t *x31, const unsigned char *e, size_t elen,
 		 * already set; otherwise, we do a constant-time lookup.
 		 */
 		if (win_len > 1) {
-			uint64_t *base;
+			br_ssl_u64 *base;
 
 			memset(t2, 0, mw62num * sizeof *t2);
 			base = t2 + mw62num;
-			for (u = 1; u < ((uint32_t)1 << k); u ++) {
-				uint64_t mask;
+			for (u = 1; u < ((br_ssl_u32)1 << k); u ++) {
+				br_ssl_u64 mask;
 				size_t v;
 
-				mask = -(uint64_t)EQ(u, bits);
+				mask = -(br_ssl_u64)EQ(u, bits);
 				for (v = 0; v < mw62num; v ++) {
 					t2[v] |= mask & base[v];
 				}
@@ -432,7 +432,7 @@ br_i62_modpow_opt(uint32_t *x31, const unsigned char *e, size_t elen,
 		 * only if the exponent bits are not all-zero.
 		 */
 		montymul(t1, x, t2, m, mw62num, m0i);
-		mask1 = -(uint64_t)EQ(bits, 0);
+		mask1 = -(br_ssl_u64)EQ(bits, 0);
 		mask2 = ~mask1;
 		for (u = 0; u < mw62num; u ++) {
 			x[u] = (mask1 & x[u]) | (mask2 & t1[u]);
@@ -448,12 +448,12 @@ br_i62_modpow_opt(uint32_t *x31, const unsigned char *e, size_t elen,
 	 * Convert result into 31-bit words.
 	 */
 	for (u = 0; u < mw31num; u += 2) {
-		uint64_t zw;
+		br_ssl_u64 zw;
 
 		zw = x[u >> 1];
-		x31[u + 1] = (uint32_t)zw & 0x7FFFFFFF;
+		x31[u + 1] = (br_ssl_u32)zw & 0x7FFFFFFF;
 		if ((u + 1) < mw31num) {
-			x31[u + 2] = (uint32_t)(zw >> 31);
+			x31[u + 2] = (br_ssl_u32)(zw >> 31);
 		}
 	}
 	return 1;
@@ -462,9 +462,9 @@ br_i62_modpow_opt(uint32_t *x31, const unsigned char *e, size_t elen,
 #else
 
 /* see inner.h */
-uint32_t
-br_i62_modpow_opt(uint32_t *x31, const unsigned char *e, size_t elen,
-	const uint32_t *m31, uint32_t m0i31, uint64_t *tmp, size_t twlen)
+br_ssl_u32
+br_i62_modpow_opt(br_ssl_u32 *x31, const unsigned char *e, size_t elen,
+	const br_ssl_u32 *m31, br_ssl_u32 m0i31, br_ssl_u64 *tmp, size_t twlen)
 {
 	size_t mwlen;
 
@@ -473,15 +473,15 @@ br_i62_modpow_opt(uint32_t *x31, const unsigned char *e, size_t elen,
 		return 0;
 	}
 	return br_i31_modpow_opt(x31, e, elen, m31, m0i31,
-		(uint32_t *)tmp, twlen << 1);
+		(br_ssl_u32 *)tmp, twlen << 1);
 }
 
 #endif
 
 /* see inner.h */
-uint32_t
-br_i62_modpow_opt_as_i31(uint32_t *x31, const unsigned char *e, size_t elen,
-	const uint32_t *m31, uint32_t m0i31, uint32_t *tmp, size_t twlen)
+br_ssl_u32
+br_i62_modpow_opt_as_i31(br_ssl_u32 *x31, const unsigned char *e, size_t elen,
+	const br_ssl_u32 *m31, br_ssl_u32 m0i31, br_ssl_u32 *tmp, size_t twlen)
 {
 	/*
 	 * As documented, this function expects the 'tmp' argument to be
@@ -489,5 +489,5 @@ br_i62_modpow_opt_as_i31(uint32_t *x31, const unsigned char *e, size_t elen,
 	 * is not part of BearSSL's public API).
 	 */
 	return br_i62_modpow_opt(x31, e, elen, m31, m0i31,
-		(uint64_t *)tmp, twlen >> 1);
+		(br_ssl_u64 *)tmp, twlen >> 1);
 }

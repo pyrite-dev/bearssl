@@ -25,11 +25,11 @@
 #include "inner.h"
 
 /* see inner.h */
-uint32_t
+br_ssl_u32
 br_rsa_pss_sig_pad(const br_prng_class **rng,
 	const br_hash_class *hf_data, const br_hash_class *hf_mgf1,
 	const unsigned char *hash, size_t salt_len,
-	uint32_t n_bitlen, unsigned char *x)
+	br_ssl_u32 n_bitlen, unsigned char *x)
 {
 	size_t xlen, hash_len;
 	br_hash_compat_context hc;
@@ -94,7 +94,7 @@ br_rsa_pss_sig_pad(const br_prng_class **rng,
 	 * Clear the top bits to ensure the value is lower than the
 	 * modulus.
 	 */
-	x[0] &= 0xFF >> (((uint32_t)xlen << 3) - n_bitlen);
+	x[0] &= 0xFF >> (((br_ssl_u32)xlen << 3) - n_bitlen);
 
 	/*
 	 * The seed (H) is already in the right place. We just set the

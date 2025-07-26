@@ -47,7 +47,7 @@ br_ssl_server_init_full_ec(br_ssl_server_context *cc,
 	 * Note that for ECDH suites, the list will be automatically
 	 * filtered based on the issuing CA key type.
 	 */
-	static const uint16_t suites[] = {
+	static const br_ssl_u16 suites[] = {
 		BR_TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
 		BR_TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
 		BR_TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,

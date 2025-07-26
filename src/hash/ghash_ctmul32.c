@@ -45,41 +45,41 @@
 /*
  * Multiplication in GF(2)[X], truncated to its low 32 bits.
  */
-static inline uint32_t
-bmul32(uint32_t x, uint32_t y)
+static inline br_ssl_u32
+bmul32(br_ssl_u32 x, br_ssl_u32 y)
 {
-	uint32_t x0, x1, x2, x3;
-	uint32_t y0, y1, y2, y3;
-	uint32_t z0, z1, z2, z3;
+	br_ssl_u32 x0, x1, x2, x3;
+	br_ssl_u32 y0, y1, y2, y3;
+	br_ssl_u32 z0, z1, z2, z3;
 
-	x0 = x & (uint32_t)0x11111111;
-	x1 = x & (uint32_t)0x22222222;
-	x2 = x & (uint32_t)0x44444444;
-	x3 = x & (uint32_t)0x88888888;
-	y0 = y & (uint32_t)0x11111111;
-	y1 = y & (uint32_t)0x22222222;
-	y2 = y & (uint32_t)0x44444444;
-	y3 = y & (uint32_t)0x88888888;
+	x0 = x & (br_ssl_u32)0x11111111;
+	x1 = x & (br_ssl_u32)0x22222222;
+	x2 = x & (br_ssl_u32)0x44444444;
+	x3 = x & (br_ssl_u32)0x88888888;
+	y0 = y & (br_ssl_u32)0x11111111;
+	y1 = y & (br_ssl_u32)0x22222222;
+	y2 = y & (br_ssl_u32)0x44444444;
+	y3 = y & (br_ssl_u32)0x88888888;
 	z0 = (x0 * y0) ^ (x1 * y3) ^ (x2 * y2) ^ (x3 * y1);
 	z1 = (x0 * y1) ^ (x1 * y0) ^ (x2 * y3) ^ (x3 * y2);
 	z2 = (x0 * y2) ^ (x1 * y1) ^ (x2 * y0) ^ (x3 * y3);
 	z3 = (x0 * y3) ^ (x1 * y2) ^ (x2 * y1) ^ (x3 * y0);
-	z0 &= (uint32_t)0x11111111;
-	z1 &= (uint32_t)0x22222222;
-	z2 &= (uint32_t)0x44444444;
-	z3 &= (uint32_t)0x88888888;
+	z0 &= (br_ssl_u32)0x11111111;
+	z1 &= (br_ssl_u32)0x22222222;
+	z2 &= (br_ssl_u32)0x44444444;
+	z3 &= (br_ssl_u32)0x88888888;
 	return z0 | z1 | z2 | z3;
 }
 
 /*
  * Bit-reverse a 32-bit word.
  */
-static uint32_t
-rev32(uint32_t x)
+static br_ssl_u32
+rev32(br_ssl_u32 x)
 {
 #define RMS(m, s)   do { \
-		x = ((x & (uint32_t)(m)) << (s)) \
-			| ((x >> (s)) & (uint32_t)(m)); \
+		x = ((x & (br_ssl_u32)(m)) << (s)) \
+			| ((x >> (s)) & (br_ssl_u32)(m)); \
 	} while (0)
 
 	RMS(0x55555555, 1);
@@ -104,8 +104,8 @@ br_ghash_ctmul32(void *y, const void *h, const void *data, size_t len)
 
 	const unsigned char *buf, *hb;
 	unsigned char *yb;
-	uint32_t yw[4];
-	uint32_t hw[4], hwr[4];
+	br_ssl_u32 yw[4];
+	br_ssl_u32 hw[4], hwr[4];
 
 	buf = data;
 	yb = y;
@@ -126,9 +126,9 @@ br_ghash_ctmul32(void *y, const void *h, const void *data, size_t len)
 		const unsigned char *src;
 		unsigned char tmp[16];
 		int i;
-		uint32_t a[18], b[18], c[18];
-		uint32_t d0, d1, d2, d3, d4, d5, d6, d7;
-		uint32_t zw[8];
+		br_ssl_u32 a[18], b[18], c[18];
+		br_ssl_u32 d0, d1, d2, d3, d4, d5, d6, d7;
+		br_ssl_u32 zw[8];
 
 		if (len >= 16) {
 			src = buf;
@@ -236,7 +236,7 @@ br_ghash_ctmul32(void *y, const void *h, const void *data, size_t len)
 		zw[7] = (d7 << 1) | (d6 >> 31);
 
 		for (i = 0; i < 4; i ++) {
-			uint32_t lw;
+			br_ssl_u32 lw;
 
 			lw = zw[i];
 			zw[i + 4] ^= lw ^ (lw >> 1) ^ (lw >> 2) ^ (lw >> 7);

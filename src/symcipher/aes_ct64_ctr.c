@@ -47,23 +47,23 @@ xorbuf(void *dst, const void *src, size_t len)
 }
 
 /* see bearssl_block.h */
-uint32_t
+br_ssl_u32
 br_aes_ct64_ctr_run(const br_aes_ct64_ctr_keys *ctx,
-	const void *iv, uint32_t cc, void *data, size_t len)
+	const void *iv, br_ssl_u32 cc, void *data, size_t len)
 {
 	unsigned char *buf;
-	uint32_t ivw[16];
-	uint64_t sk_exp[120];
+	br_ssl_u32 ivw[16];
+	br_ssl_u64 sk_exp[120];
 
 	br_aes_ct64_skey_expand(sk_exp, ctx->num_rounds, ctx->skey);
 	br_range_dec32le(ivw, 3, iv);
-	memcpy(ivw + 4, ivw, 3 * sizeof(uint32_t));
-	memcpy(ivw + 8, ivw, 3 * sizeof(uint32_t));
-	memcpy(ivw + 12, ivw, 3 * sizeof(uint32_t));
+	memcpy(ivw + 4, ivw, 3 * sizeof(br_ssl_u32));
+	memcpy(ivw + 8, ivw, 3 * sizeof(br_ssl_u32));
+	memcpy(ivw + 12, ivw, 3 * sizeof(br_ssl_u32));
 	buf = data;
 	while (len > 0) {
-		uint64_t q[8];
-		uint32_t w[16];
+		br_ssl_u64 q[8];
+		br_ssl_u32 w[16];
 		unsigned char tmp[64];
 		int i;
 
@@ -90,7 +90,7 @@ br_aes_ct64_ctr_run(const br_aes_ct64_ctr_keys *ctx,
 		br_range_enc32le(tmp, w, 16);
 		if (len <= 64) {
 			xorbuf(buf, tmp, len);
-			cc += (uint32_t)len >> 4;
+			cc += (br_ssl_u32)len >> 4;
 			break;
 		}
 		xorbuf(buf, tmp, 64);
@@ -108,7 +108,7 @@ const br_block_ctr_class br_aes_ct64_ctr_vtable = {
 	4,
 	(void (*)(const br_block_ctr_class **, const void *, size_t))
 		&br_aes_ct64_ctr_init,
-	(uint32_t (*)(const br_block_ctr_class *const *,
-		const void *, uint32_t, void *, size_t))
+	(br_ssl_u32 (*)(const br_block_ctr_class *const *,
+		const void *, br_ssl_u32, void *, size_t))
 		&br_aes_ct64_ctr_run
 };

@@ -25,10 +25,10 @@
 #include "inner.h"
 
 /* see inner.h */
-uint32_t
-br_i31_iszero(const uint32_t *x)
+br_ssl_u32
+br_i31_iszero(const br_ssl_u32 *x)
 {
-	uint32_t z;
+	br_ssl_u32 z;
 	size_t u;
 
 	z = 0;

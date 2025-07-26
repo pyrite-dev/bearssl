@@ -35,10 +35,10 @@
  * arithmetic right shift opcode that could not be used otherwise.
  */
 #if BR_NO_ARITH_SHIFT
-#define ARSH(x, n)   (((uint32_t)(x) >> (n)) \
-                    | ((-((uint32_t)(x) >> 31)) << (32 - (n))))
+#define ARSH(x, n)   (((br_ssl_u32)(x) >> (n)) \
+                    | ((-((br_ssl_u32)(x) >> 31)) << (32 - (n))))
 #else
-#define ARSH(x, n)   ((*(int32_t *)&(x)) >> (n))
+#define ARSH(x, n)   ((*(br_ssl_i32 *)&(x)) >> (n))
 #endif
 
 /*
@@ -46,16 +46,16 @@
  * 13-bit words in little-endian order. The final "partial" word is
  * returned.
  */
-static uint32_t
-be8_to_le13(uint32_t *dst, const unsigned char *src, size_t len)
+static br_ssl_u32
+be8_to_le13(br_ssl_u32 *dst, const unsigned char *src, size_t len)
 {
-	uint32_t acc;
+	br_ssl_u32 acc;
 	int acc_len;
 
 	acc = 0;
 	acc_len = 0;
 	while (len -- > 0) {
-		acc |= (uint32_t)src[len] << acc_len;
+		acc |= (br_ssl_u32)src[len] << acc_len;
 		acc_len += 8;
 		if (acc_len >= 13) {
 			*dst ++ = acc & 0x1FFF;
@@ -72,9 +72,9 @@ be8_to_le13(uint32_t *dst, const unsigned char *src, size_t len)
  * the destination bytes will be filled.
  */
 static void
-le13_to_be8(unsigned char *dst, size_t len, const uint32_t *src)
+le13_to_be8(unsigned char *dst, size_t len, const br_ssl_u32 *src)
 {
-	uint32_t acc;
+	br_ssl_u32 acc;
 	int acc_len;
 
 	acc = 0;
@@ -95,15 +95,15 @@ le13_to_be8(unsigned char *dst, size_t len, const uint32_t *src)
  * value is the resulting carry. The source (w) and destination (d)
  * arrays may be identical, but shall not overlap partially.
  */
-static inline uint32_t
-norm13(uint32_t *d, const uint32_t *w, size_t len)
+static inline br_ssl_u32
+norm13(br_ssl_u32 *d, const br_ssl_u32 *w, size_t len)
 {
 	size_t u;
-	uint32_t cc;
+	br_ssl_u32 cc;
 
 	cc = 0;
 	for (u = 0; u < len; u ++) {
-		int32_t z;
+		br_ssl_i32 z;
 
 		z = w[u] + cc;
 		d[u] = z & 0x1FFF;
@@ -125,7 +125,7 @@ norm13(uint32_t *d, const uint32_t *w, size_t len)
 #if BR_SLOW_MUL15
 
 static void
-mul20(uint32_t *d, const uint32_t *a, const uint32_t *b)
+mul20(br_ssl_u32 *d, const br_ssl_u32 *a, const br_ssl_u32 *b)
 {
 	/*
 	 * Two-level Karatsuba: turns a 20x20 multiplication into
@@ -145,8 +145,8 @@ mul20(uint32_t *d, const uint32_t *a, const uint32_t *b)
 	 * Highest word value is 8191, 16382 or 32764, for 13-bit, 14-bit
 	 * or 15-bit words, respectively.
 	 */
-	uint32_t u[45], v[45], w[90];
-	uint32_t cc;
+	br_ssl_u32 u[45], v[45], w[90];
+	br_ssl_u32 cc;
 	int i;
 
 #define ZADD(dw, d_off, s1w, s1_off, s2w, s2_off)   do { \
@@ -184,13 +184,13 @@ mul20(uint32_t *d, const uint32_t *a, const uint32_t *b)
 	} while (0)
 
 #define CPR1(w, cprcc)   do { \
-		uint32_t cprz = (w) + cprcc; \
+		br_ssl_u32 cprz = (w) + cprcc; \
 		(w) = cprz & 0x1FFF; \
 		cprcc = cprz >> 13; \
 	} while (0)
 
 #define CPR(dw, d_off)   do { \
-		uint32_t cprcc; \
+		br_ssl_u32 cprcc; \
 		cprcc = 0; \
 		CPR1((dw)[(d_off) + 0], cprcc); \
 		CPR1((dw)[(d_off) + 1], cprcc); \
@@ -351,7 +351,7 @@ mul20(uint32_t *d, const uint32_t *a, const uint32_t *b)
 }
 
 static inline void
-square20(uint32_t *d, const uint32_t *a)
+square20(br_ssl_u32 *d, const br_ssl_u32 *a)
 {
 	mul20(d, a, a);
 }
@@ -359,9 +359,9 @@ square20(uint32_t *d, const uint32_t *a)
 #else
 
 static void
-mul20(uint32_t *d, const uint32_t *a, const uint32_t *b)
+mul20(br_ssl_u32 *d, const br_ssl_u32 *a, const br_ssl_u32 *b)
 {
-	uint32_t t[39];
+	br_ssl_u32 t[39];
 
 	t[ 0] = MUL15(a[ 0], b[ 0]);
 	t[ 1] = MUL15(a[ 0], b[ 1])
@@ -767,9 +767,9 @@ mul20(uint32_t *d, const uint32_t *a, const uint32_t *b)
 }
 
 static void
-square20(uint32_t *d, const uint32_t *a)
+square20(br_ssl_u32 *d, const br_ssl_u32 *a)
 {
-	uint32_t t[39];
+	br_ssl_u32 t[39];
 
 	t[ 0] = MUL15(a[ 0], a[ 0]);
 	t[ 1] = ((MUL15(a[ 0], a[ 1])) << 1);
@@ -989,7 +989,7 @@ square20(uint32_t *d, const uint32_t *a)
 /*
  * Modulus for field F256 (field for point coordinates in curve P-256).
  */
-static const uint32_t F256[] = {
+static const br_ssl_u32 F256[] = {
 	0x1FFF, 0x1FFF, 0x1FFF, 0x1FFF, 0x1FFF, 0x1FFF, 0x1FFF, 0x001F,
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0400, 0x0000,
 	0x0000, 0x1FF8, 0x1FFF, 0x01FF
@@ -998,7 +998,7 @@ static const uint32_t F256[] = {
 /*
  * The 'b' curve equation coefficient for P-256.
  */
-static const uint32_t P256_B[] = {
+static const br_ssl_u32 P256_B[] = {
 	0x004B, 0x1E93, 0x0F89, 0x1C78, 0x03BC, 0x187B, 0x114E, 0x1619,
 	0x1D06, 0x0328, 0x01AF, 0x0D31, 0x1557, 0x15DE, 0x1ECF, 0x127C,
 	0x0A3A, 0x0EC5, 0x118D, 0x00B5
@@ -1010,9 +1010,9 @@ static const uint32_t P256_B[] = {
  * be at most 257 bits, and less than twice the modulus.
  */
 static void
-reduce_f256(uint32_t *d)
+reduce_f256(br_ssl_u32 *d)
 {
-	uint32_t x;
+	br_ssl_u32 x;
 
 	x = d[19] >> 9;
 	d[19] &= 0x01FF;
@@ -1030,17 +1030,17 @@ reduce_f256(uint32_t *d)
  * this function returns 1; otherwise, it leaves it untouched and it
  * returns 0.
  */
-static uint32_t
-reduce_final_f256(uint32_t *d)
+static br_ssl_u32
+reduce_final_f256(br_ssl_u32 *d)
 {
-	uint32_t t[20];
-	uint32_t cc;
+	br_ssl_u32 t[20];
+	br_ssl_u32 cc;
 	int i;
 
 	memcpy(t, d, sizeof t);
 	cc = 0;
 	for (i = 0; i < 20; i ++) {
-		uint32_t w;
+		br_ssl_u32 w;
 
 		w = t[i] - F256[i] - cc;
 		cc = w >> 31;
@@ -1059,9 +1059,9 @@ reduce_final_f256(uint32_t *d)
  * on output, value fits on 257 bits and is lower than twice the modulus.
  */
 static void
-mul_f256(uint32_t *d, const uint32_t *a, const uint32_t *b)
+mul_f256(br_ssl_u32 *d, const br_ssl_u32 *a, const br_ssl_u32 *b)
 {
-	uint32_t t[40], cc;
+	br_ssl_u32 t[40], cc;
 	int i;
 
 	/*
@@ -1087,7 +1087,7 @@ mul_f256(uint32_t *d, const uint32_t *a, const uint32_t *b)
 	 * proper emplacements.
 	 */
 	for (i = 39; i >= 20; i --) {
-		uint32_t x;
+		br_ssl_u32 x;
 
 		x = t[i];
 		t[i - 2] += ARSH(x, 6);
@@ -1149,9 +1149,9 @@ mul_f256(uint32_t *d, const uint32_t *a, const uint32_t *b)
  * and is lower than twice the modulus.
  */
 static void
-square_f256(uint32_t *d, const uint32_t *a)
+square_f256(br_ssl_u32 *d, const br_ssl_u32 *a)
 {
-	uint32_t t[40], cc;
+	br_ssl_u32 t[40], cc;
 	int i;
 
 	/*
@@ -1176,7 +1176,7 @@ square_f256(uint32_t *d, const uint32_t *a)
 	 * proper emplacements.
 	 */
 	for (i = 39; i >= 20; i --) {
-		uint32_t x;
+		br_ssl_u32 x;
 
 		x = t[i];
 		t[i - 2] += ARSH(x, 6);
@@ -1243,9 +1243,9 @@ square_f256(uint32_t *d, const uint32_t *a)
  * but they will always be lower than twice the modulus.
  */
 typedef struct {
-	uint32_t x[20];
-	uint32_t y[20];
-	uint32_t z[20];
+	br_ssl_u32 x[20];
+	br_ssl_u32 y[20];
+	br_ssl_u32 z[20];
 } p256_jacobian;
 
 /*
@@ -1259,7 +1259,7 @@ typedef struct {
 static void
 p256_to_affine(p256_jacobian *P)
 {
-	uint32_t t1[20], t2[20];
+	br_ssl_u32 t1[20], t2[20];
 	int i;
 
 	/*
@@ -1354,7 +1354,7 @@ p256_double(p256_jacobian *Q)
 	 *     anyway.
 	 *   - If z = 0 then z' = 0.
 	 */
-	uint32_t t1[20], t2[20], t3[20], t4[20];
+	br_ssl_u32 t1[20], t2[20], t3[20], t4[20];
 	int i;
 
 	/*
@@ -1464,7 +1464,7 @@ p256_double(p256_jacobian *Q)
  *   - Otherwise, P1 == P2, so a "double" operation should have been
  *     performed.
  */
-static uint32_t
+static br_ssl_u32
 p256_add(p256_jacobian *P1, const p256_jacobian *P2)
 {
 	/*
@@ -1480,8 +1480,8 @@ p256_add(p256_jacobian *P1, const p256_jacobian *P2)
 	 *   y3 = r * (u1 * h^2 - x3) - s1 * h^3
 	 *   z3 = h * z1 * z2
 	 */
-	uint32_t t1[20], t2[20], t3[20], t4[20], t5[20], t6[20], t7[20];
-	uint32_t ret;
+	br_ssl_u32 t1[20], t2[20], t3[20], t4[20], t5[20], t6[20], t7[20];
+	br_ssl_u32 ret;
 	int i;
 
 	/*
@@ -1589,7 +1589,7 @@ p256_add(p256_jacobian *P1, const p256_jacobian *P2)
  *   - Otherwise, P1 == P2, so a "double" operation should have been
  *     performed.
  */
-static uint32_t
+static br_ssl_u32
 p256_add_mixed(p256_jacobian *P1, const p256_jacobian *P2)
 {
 	/*
@@ -1605,8 +1605,8 @@ p256_add_mixed(p256_jacobian *P1, const p256_jacobian *P2)
 	 *   y3 = r * (u1 * h^2 - x3) - s1 * h^3
 	 *   z3 = h * z1
 	 */
-	uint32_t t1[20], t2[20], t3[20], t4[20], t5[20], t6[20], t7[20];
-	uint32_t ret;
+	br_ssl_u32 t1[20], t2[20], t3[20], t4[20], t5[20], t6[20], t7[20];
+	br_ssl_u32 ret;
 	int i;
 
 	/*
@@ -1686,12 +1686,12 @@ p256_add_mixed(p256_jacobian *P1, const p256_jacobian *P2)
  * Decode a P-256 point. This function does not support the point at
  * infinity. Returned value is 0 if the point is invalid, 1 otherwise.
  */
-static uint32_t
+static br_ssl_u32
 p256_decode(p256_jacobian *P, const void *src, size_t len)
 {
 	const unsigned char *buf;
-	uint32_t tx[20], ty[20], t1[20], t2[20];
-	uint32_t bad;
+	br_ssl_u32 tx[20], ty[20], t1[20], t2[20];
+	br_ssl_u32 bad;
 	int i;
 
 	if (len != 65) {
@@ -1772,7 +1772,7 @@ p256_mul(p256_jacobian *P, const unsigned char *x, size_t xlen)
 	 * We use a 2-bit window to handle multiplier bits by pairs.
 	 * The precomputed window really is the points P2 and P3.
 	 */
-	uint32_t qz;
+	br_ssl_u32 qz;
 	p256_jacobian P2, P3, Q, T, U;
 
 	/*
@@ -1792,14 +1792,14 @@ p256_mul(p256_jacobian *P, const unsigned char *x, size_t xlen)
 		int k;
 
 		for (k = 6; k >= 0; k -= 2) {
-			uint32_t bits;
-			uint32_t bnz;
+			br_ssl_u32 bits;
+			br_ssl_u32 bnz;
 
 			p256_double(&Q);
 			p256_double(&Q);
 			T = *P;
 			U = Q;
-			bits = (*x >> k) & (uint32_t)3;
+			bits = (*x >> k) & (br_ssl_u32)3;
 			bnz = NEQ(bits, 0);
 			CCOPY(EQ(bits, 2), &T, &P2, sizeof T);
 			CCOPY(EQ(bits, 3), &T, &P3, sizeof T);
@@ -1820,7 +1820,7 @@ p256_mul(p256_jacobian *P, const unsigned char *x, size_t xlen)
  * order); 13-bit words are then grouped 2-by-2 into 32-bit words
  * (little-endian order within each word).
  */
-static const uint32_t Gwin[15][20] = {
+static const br_ssl_u32 Gwin[15][20] = {
 
 	{ 0x04C60296, 0x02721176, 0x19D00F4A, 0x102517AC,
 	  0x13B8037D, 0x0748103C, 0x1E730E56, 0x08481FE2,
@@ -1917,15 +1917,15 @@ static const uint32_t Gwin[15][20] = {
  * Lookup one of the Gwin[] values, by index. This is constant-time.
  */
 static void
-lookup_Gwin(p256_jacobian *T, uint32_t idx)
+lookup_Gwin(p256_jacobian *T, br_ssl_u32 idx)
 {
-	uint32_t xy[20];
-	uint32_t k;
+	br_ssl_u32 xy[20];
+	br_ssl_u32 k;
 	size_t u;
 
 	memset(xy, 0, sizeof xy);
 	for (k = 0; k < 15; k ++) {
-		uint32_t m;
+		br_ssl_u32 m;
 
 		m = -EQ(idx, k + 1);
 		for (u = 0; u < 20; u ++) {
@@ -1958,7 +1958,7 @@ p256_mulgen(p256_jacobian *P, const unsigned char *x, size_t xlen)
 	 * points in affine coordinates; we use a constant-time lookup.
 	 */
 	p256_jacobian Q;
-	uint32_t qz;
+	br_ssl_u32 qz;
 
 	memset(&Q, 0, sizeof Q);
 	qz = 1;
@@ -1968,8 +1968,8 @@ p256_mulgen(p256_jacobian *P, const unsigned char *x, size_t xlen)
 
 		bx = *x ++;
 		for (k = 0; k < 2; k ++) {
-			uint32_t bits;
-			uint32_t bnz;
+			br_ssl_u32 bits;
+			br_ssl_u32 bnz;
 			p256_jacobian T, U;
 
 			p256_double(&Q);
@@ -2031,11 +2031,11 @@ api_xoff(int curve, size_t *len)
 	return 1;
 }
 
-static uint32_t
+static br_ssl_u32
 api_mul(unsigned char *G, size_t Glen,
 	const unsigned char *x, size_t xlen, int curve)
 {
-	uint32_t r;
+	br_ssl_u32 r;
 	p256_jacobian P;
 
 	(void)curve;
@@ -2062,13 +2062,13 @@ api_mulgen(unsigned char *R,
 	return 65;
 }
 
-static uint32_t
+static br_ssl_u32
 api_muladd(unsigned char *A, const unsigned char *B, size_t len,
 	const unsigned char *x, size_t xlen,
 	const unsigned char *y, size_t ylen, int curve)
 {
 	p256_jacobian P, Q;
-	uint32_t r, t, z;
+	br_ssl_u32 r, t, z;
 	int i;
 
 	(void)curve;
@@ -2114,7 +2114,7 @@ api_muladd(unsigned char *A, const unsigned char *B, size_t len,
 
 /* see bearssl_ec.h */
 const br_ec_impl br_ec_p256_m15 = {
-	(uint32_t)0x00800000,
+	(br_ssl_u32)0x00800000,
 	&api_generator,
 	&api_order,
 	&api_xoff,

@@ -26,20 +26,20 @@
 
 /* see inner.h */
 void
-br_i15_from_monty(uint16_t *x, const uint16_t *m, uint16_t m0i)
+br_i15_from_monty(br_ssl_u16 *x, const br_ssl_u16 *m, br_ssl_u16 m0i)
 {
 	size_t len, u, v;
 
 	len = (m[0] + 15) >> 4;
 	for (u = 0; u < len; u ++) {
-		uint32_t f, cc;
+		br_ssl_u32 f, cc;
 
 		f = MUL15(x[1], m0i) & 0x7FFF;
 		cc = 0;
 		for (v = 0; v < len; v ++) {
-			uint32_t z;
+			br_ssl_u32 z;
 
-			z = (uint32_t)x[v + 1] + MUL15(f, m[v + 1]) + cc;
+			z = (br_ssl_u32)x[v + 1] + MUL15(f, m[v + 1]) + cc;
 			cc = z >> 15;
 			if (v != 0) {
 				x[v] = z & 0x7FFF;

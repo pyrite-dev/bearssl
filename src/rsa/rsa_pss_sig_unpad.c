@@ -25,7 +25,7 @@
 #include "inner.h"
 
 /* see inner.h */
-uint32_t
+br_ssl_u32
 br_rsa_pss_sig_unpad(const br_hash_class *hf_data,
 	const br_hash_class *hf_mgf1,
 	const unsigned char *hash, size_t salt_len,
@@ -35,7 +35,7 @@ br_rsa_pss_sig_unpad(const br_hash_class *hf_data,
 	br_hash_compat_context hc;
 	unsigned char *seed, *salt;
 	unsigned char tmp[64];
-	uint32_t r, n_bitlen;
+	br_ssl_u32 r, n_bitlen;
 
 	hash_len = br_digest_size(hf_data);
 
@@ -56,7 +56,7 @@ br_rsa_pss_sig_unpad(const br_hash_class *hf_data,
 	if (u == pk->nlen) {
 		return 0;
 	}
-	n_bitlen = BIT_LENGTH(pk->n[u]) + ((uint32_t)(pk->nlen - u - 1) << 3);
+	n_bitlen = BIT_LENGTH(pk->n[u]) + ((br_ssl_u32)(pk->nlen - u - 1) << 3);
 	n_bitlen --;
 	if ((n_bitlen & 7) == 0) {
 		r |= *x ++;

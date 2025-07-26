@@ -27,12 +27,12 @@
 #define S   br_aes_S
 
 static void
-add_round_key(unsigned *state, const uint32_t *skeys)
+add_round_key(unsigned *state, const br_ssl_u32 *skeys)
 {
 	int i;
 
 	for (i = 0; i < 16; i += 4) {
-		uint32_t k;
+		br_ssl_u32 k;
 
 		k = *skeys ++;
 		state[i + 0] ^= (unsigned)(k >> 24);
@@ -103,7 +103,7 @@ mix_columns(unsigned *state)
 
 /* see inner.h */
 void
-br_aes_small_encrypt(unsigned num_rounds, const uint32_t *skey, void *data)
+br_aes_small_encrypt(unsigned num_rounds, const br_ssl_u32 *skey, void *data)
 {
 	unsigned char *buf;
 	unsigned state[16];

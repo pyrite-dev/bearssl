@@ -42,13 +42,13 @@ br_ecdsa_i15_sign_raw(const br_ec_impl *impl,
 	 * from 0 and 1.
 	 */
 	const br_ec_curve_def *cd;
-	uint16_t n[I15_LEN], r[I15_LEN], s[I15_LEN], x[I15_LEN];
-	uint16_t m[I15_LEN], k[I15_LEN], t1[I15_LEN], t2[I15_LEN];
+	br_ssl_u16 n[I15_LEN], r[I15_LEN], s[I15_LEN], x[I15_LEN];
+	br_ssl_u16 m[I15_LEN], k[I15_LEN], t1[I15_LEN], t2[I15_LEN];
 	unsigned char tt[ORDER_LEN << 1];
 	unsigned char eU[POINT_LEN];
 	size_t hash_len, nlen, ulen;
-	uint16_t n0i;
-	uint32_t ctl;
+	br_ssl_u16 n0i;
+	br_ssl_u32 ctl;
 	br_hmac_drbg_context drbg;
 
 	/*

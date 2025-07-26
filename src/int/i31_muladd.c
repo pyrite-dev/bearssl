@@ -26,14 +26,14 @@
 
 /* see inner.h */
 void
-br_i31_muladd_small(uint32_t *x, uint32_t z, const uint32_t *m)
+br_i31_muladd_small(br_ssl_u32 *x, br_ssl_u32 z, const br_ssl_u32 *m)
 {
-	uint32_t m_bitlen;
+	br_ssl_u32 m_bitlen;
 	unsigned mblr;
 	size_t u, mlen;
-	uint32_t a0, a1, b0, hi, g, q, tb;
-	uint32_t under, over;
-	uint32_t cc;
+	br_ssl_u32 a0, a1, b0, hi, g, q, tb;
+	br_ssl_u32 under, over;
+	br_ssl_u32 cc;
 
 	/*
 	 * We can test on the modulus bit length since we accept to
@@ -44,7 +44,7 @@ br_i31_muladd_small(uint32_t *x, uint32_t z, const uint32_t *m)
 		return;
 	}
 	if (m_bitlen <= 31) {
-		uint32_t lo;
+		br_ssl_u32 lo;
 
 		hi = x[1] >> 1;
 		lo = (x[1] << 31) | z;
@@ -126,13 +126,13 @@ br_i31_muladd_small(uint32_t *x, uint32_t z, const uint32_t *m)
 	cc = 0;
 	tb = 1;
 	for (u = 1; u <= mlen; u ++) {
-		uint32_t mw, zw, xw, nxw;
-		uint64_t zl;
+		br_ssl_u32 mw, zw, xw, nxw;
+		br_ssl_u64 zl;
 
 		mw = m[u];
 		zl = MUL31(mw, q) + cc;
-		cc = (uint32_t)(zl >> 31);
-		zw = (uint32_t)zl & (uint32_t)0x7FFFFFFF;
+		cc = (br_ssl_u32)(zl >> 31);
+		zw = (br_ssl_u32)zl & (br_ssl_u32)0x7FFFFFFF;
 		xw = x[u];
 		nxw = xw - zw;
 		cc += nxw >> 31;

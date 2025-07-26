@@ -74,17 +74,17 @@ api_xoff(int curve, size_t *len)
  * 2^255+37.
  */
 
-#define MASK63   (((uint64_t)1 << 63) - (uint64_t)1)
+#define MASK63   (((br_ssl_u64)1 << 63) - (br_ssl_u64)1)
 
 /*
  * Swap two field elements, conditionally on a flag.
  */
 static inline void
-f255_cswap(uint64_t *a, uint64_t *b, uint32_t ctl)
+f255_cswap(br_ssl_u64 *a, br_ssl_u64 *b, br_ssl_u32 ctl)
 {
-	uint64_t m, w;
+	br_ssl_u64 m, w;
 
-	m = -(uint64_t)ctl;
+	m = -(br_ssl_u64)ctl;
 	w = m & (a[0] ^ b[0]); a[0] ^= w; b[0] ^= w;
 	w = m & (a[1] ^ b[1]); a[1] ^= w; b[1] ^= w;
 	w = m & (a[2] ^ b[2]); a[2] ^= w; b[2] ^= w;
@@ -95,22 +95,22 @@ f255_cswap(uint64_t *a, uint64_t *b, uint32_t ctl)
  * Addition in the field.
  */
 static inline void
-f255_add(uint64_t *d, const uint64_t *a, const uint64_t *b)
+f255_add(br_ssl_u64 *d, const br_ssl_u64 *a, const br_ssl_u64 *b)
 {
 #if BR_INT128
 
-	uint64_t t0, t1, t2, t3, cc;
+	br_ssl_u64 t0, t1, t2, t3, cc;
 	unsigned __int128 z;
 
 	z = (unsigned __int128)a[0] + (unsigned __int128)b[0];
-	t0 = (uint64_t)z;
+	t0 = (br_ssl_u64)z;
 	z = (unsigned __int128)a[1] + (unsigned __int128)b[1] + (z >> 64);
-	t1 = (uint64_t)z;
+	t1 = (br_ssl_u64)z;
 	z = (unsigned __int128)a[2] + (unsigned __int128)b[2] + (z >> 64);
-	t2 = (uint64_t)z;
+	t2 = (br_ssl_u64)z;
 	z = (unsigned __int128)a[3] + (unsigned __int128)b[3] + (z >> 64);
-	t3 = (uint64_t)z & MASK63;
-	cc = (uint64_t)(z >> 63);
+	t3 = (br_ssl_u64)z & MASK63;
+	cc = (br_ssl_u64)(z >> 63);
 
 	/*
 	 * Since operands are at most 2^255+37, the sum is at most
@@ -121,16 +121,16 @@ f255_add(uint64_t *d, const uint64_t *a, const uint64_t *b)
 	 * the result is at most 2^255+37.
 	 */
 	z = (unsigned __int128)t0 + (unsigned __int128)(19 * cc);
-	d[0] = (uint64_t)z;
+	d[0] = (br_ssl_u64)z;
 	z = (unsigned __int128)t1 + (z >> 64);
-	d[1] = (uint64_t)z;
+	d[1] = (br_ssl_u64)z;
 	z = (unsigned __int128)t2 + (z >> 64);
-	d[2] = (uint64_t)z;
-	d[3] = t3 + (uint64_t)(z >> 64);
+	d[2] = (br_ssl_u64)z;
+	d[3] = t3 + (br_ssl_u64)(z >> 64);
 
 #elif BR_UMUL128
 
-	uint64_t t0, t1, t2, t3, cc;
+	br_ssl_u64 t0, t1, t2, t3, cc;
 	unsigned char k;
 
 	k = _addcarry_u64(0, a[0], b[0], &t0);
@@ -160,7 +160,7 @@ f255_add(uint64_t *d, const uint64_t *a, const uint64_t *b)
  * Subtraction.
  */
 static inline void
-f255_sub(uint64_t *d, const uint64_t *a, const uint64_t *b)
+f255_sub(br_ssl_u64 *d, const br_ssl_u64 *a, const br_ssl_u64 *b)
 {
 #if BR_INT128
 
@@ -171,24 +171,24 @@ f255_sub(uint64_t *d, const uint64_t *a, const uint64_t *b)
 	 * on the two upper bits of t (bits 255 and 256).
 	 */
 
-	uint64_t t0, t1, t2, t3, t4, cc;
+	br_ssl_u64 t0, t1, t2, t3, t4, cc;
 	unsigned __int128 z;
 
 	z = (unsigned __int128)a[0] - (unsigned __int128)b[0] - 38;
-	t0 = (uint64_t)z;
-	cc = -(uint64_t)(z >> 64);
+	t0 = (br_ssl_u64)z;
+	cc = -(br_ssl_u64)(z >> 64);
 	z = (unsigned __int128)a[1] - (unsigned __int128)b[1]
 		- (unsigned __int128)cc;
-	t1 = (uint64_t)z;
-	cc = -(uint64_t)(z >> 64);
+	t1 = (br_ssl_u64)z;
+	cc = -(br_ssl_u64)(z >> 64);
 	z = (unsigned __int128)a[2] - (unsigned __int128)b[2]
 		- (unsigned __int128)cc;
-	t2 = (uint64_t)z;
-	cc = -(uint64_t)(z >> 64);
+	t2 = (br_ssl_u64)z;
+	cc = -(br_ssl_u64)(z >> 64);
 	z = (unsigned __int128)a[3] - (unsigned __int128)b[3]
 		- (unsigned __int128)cc;
-	t3 = (uint64_t)z;
-	t4 = 1 + (uint64_t)(z >> 64);
+	t3 = (br_ssl_u64)z;
+	t4 = 1 + (br_ssl_u64)(z >> 64);
 
 	/*
 	 * We have a 257-bit result. The two top bits can be 00, 01 or 10,
@@ -199,12 +199,12 @@ f255_sub(uint64_t *d, const uint64_t *a, const uint64_t *b)
 	cc = (38 & -t4) + (19 & -(t3 >> 63));
 	t3 &= MASK63;
 	z = (unsigned __int128)t0 + (unsigned __int128)cc;
-	d[0] = (uint64_t)z;
+	d[0] = (br_ssl_u64)z;
 	z = (unsigned __int128)t1 + (z >> 64);
-	d[1] = (uint64_t)z;
+	d[1] = (br_ssl_u64)z;
 	z = (unsigned __int128)t2 + (z >> 64);
-	d[2] = (uint64_t)z;
-	d[3] = t3 + (uint64_t)(z >> 64);
+	d[2] = (br_ssl_u64)z;
+	d[3] = t3 + (br_ssl_u64)(z >> 64);
 
 #elif BR_UMUL128
 
@@ -215,7 +215,7 @@ f255_sub(uint64_t *d, const uint64_t *a, const uint64_t *b)
 	 * on the two upper bits of t (bits 255 and 256).
 	 */
 
-	uint64_t t0, t1, t2, t3, t4;
+	br_ssl_u64 t0, t1, t2, t3, t4;
 	unsigned char k;
 
 	k = _subborrow_u64(0, a[0], b[0], &t0);
@@ -250,67 +250,67 @@ f255_sub(uint64_t *d, const uint64_t *a, const uint64_t *b)
  * Multiplication.
  */
 static inline void
-f255_mul(uint64_t *d, uint64_t *a, uint64_t *b)
+f255_mul(br_ssl_u64 *d, br_ssl_u64 *a, br_ssl_u64 *b)
 {
 #if BR_INT128
 
 	unsigned __int128 z;
-	uint64_t t0, t1, t2, t3, t4, t5, t6, t7, th;
+	br_ssl_u64 t0, t1, t2, t3, t4, t5, t6, t7, th;
 
 	/*
 	 * Compute the product a*b over plain integers.
 	 */
 	z = (unsigned __int128)a[0] * (unsigned __int128)b[0];
-	t0 = (uint64_t)z;
+	t0 = (br_ssl_u64)z;
 	z = (unsigned __int128)a[0] * (unsigned __int128)b[1] + (z >> 64);
-	t1 = (uint64_t)z;
+	t1 = (br_ssl_u64)z;
 	z = (unsigned __int128)a[0] * (unsigned __int128)b[2] + (z >> 64);
-	t2 = (uint64_t)z;
+	t2 = (br_ssl_u64)z;
 	z = (unsigned __int128)a[0] * (unsigned __int128)b[3] + (z >> 64);
-	t3 = (uint64_t)z;
-	t4 = (uint64_t)(z >> 64);
+	t3 = (br_ssl_u64)z;
+	t4 = (br_ssl_u64)(z >> 64);
 
 	z = (unsigned __int128)a[1] * (unsigned __int128)b[0]
 		+ (unsigned __int128)t1;
-	t1 = (uint64_t)z;
+	t1 = (br_ssl_u64)z;
 	z = (unsigned __int128)a[1] * (unsigned __int128)b[1]
 		+ (unsigned __int128)t2 + (z >> 64);
-	t2 = (uint64_t)z;
+	t2 = (br_ssl_u64)z;
 	z = (unsigned __int128)a[1] * (unsigned __int128)b[2]
 		+ (unsigned __int128)t3 + (z >> 64);
-	t3 = (uint64_t)z;
+	t3 = (br_ssl_u64)z;
 	z = (unsigned __int128)a[1] * (unsigned __int128)b[3]
 		+ (unsigned __int128)t4 + (z >> 64);
-	t4 = (uint64_t)z;
-	t5 = (uint64_t)(z >> 64);
+	t4 = (br_ssl_u64)z;
+	t5 = (br_ssl_u64)(z >> 64);
 
 	z = (unsigned __int128)a[2] * (unsigned __int128)b[0]
 		+ (unsigned __int128)t2;
-	t2 = (uint64_t)z;
+	t2 = (br_ssl_u64)z;
 	z = (unsigned __int128)a[2] * (unsigned __int128)b[1]
 		+ (unsigned __int128)t3 + (z >> 64);
-	t3 = (uint64_t)z;
+	t3 = (br_ssl_u64)z;
 	z = (unsigned __int128)a[2] * (unsigned __int128)b[2]
 		+ (unsigned __int128)t4 + (z >> 64);
-	t4 = (uint64_t)z;
+	t4 = (br_ssl_u64)z;
 	z = (unsigned __int128)a[2] * (unsigned __int128)b[3]
 		+ (unsigned __int128)t5 + (z >> 64);
-	t5 = (uint64_t)z;
-	t6 = (uint64_t)(z >> 64);
+	t5 = (br_ssl_u64)z;
+	t6 = (br_ssl_u64)(z >> 64);
 
 	z = (unsigned __int128)a[3] * (unsigned __int128)b[0]
 		+ (unsigned __int128)t3;
-	t3 = (uint64_t)z;
+	t3 = (br_ssl_u64)z;
 	z = (unsigned __int128)a[3] * (unsigned __int128)b[1]
 		+ (unsigned __int128)t4 + (z >> 64);
-	t4 = (uint64_t)z;
+	t4 = (br_ssl_u64)z;
 	z = (unsigned __int128)a[3] * (unsigned __int128)b[2]
 		+ (unsigned __int128)t5 + (z >> 64);
-	t5 = (uint64_t)z;
+	t5 = (br_ssl_u64)z;
 	z = (unsigned __int128)a[3] * (unsigned __int128)b[3]
 		+ (unsigned __int128)t6 + (z >> 64);
-	t6 = (uint64_t)z;
-	t7 = (uint64_t)(z >> 64);
+	t6 = (br_ssl_u64)z;
+	t7 = (br_ssl_u64)(z >> 64);
 
 	/*
 	 * Modulo p, we have:
@@ -335,15 +335,15 @@ f255_mul(uint64_t *d, uint64_t *a, uint64_t *b)
 	 * 255 bits; the extra bits will go along with th.
 	 */
 	z = (unsigned __int128)t4 * 19;
-	t4 = (uint64_t)z;
+	t4 = (br_ssl_u64)z;
 	z = (unsigned __int128)t5 * 19 + (z >> 64);
-	t5 = (uint64_t)z;
+	t5 = (br_ssl_u64)z;
 	z = (unsigned __int128)t6 * 19 + (z >> 64);
-	t6 = (uint64_t)z;
+	t6 = (br_ssl_u64)z;
 	z = (unsigned __int128)t7 * 19 + (z >> 64);
-	t7 = (uint64_t)z & MASK63;
+	t7 = (br_ssl_u64)z & MASK63;
 
-	th = (361 & -th) + (19 * (uint64_t)(z >> 63));
+	th = (361 & -th) + (19 * (br_ssl_u64)(z >> 63));
 
 	/*
 	 * Add elements together.
@@ -354,14 +354,14 @@ f255_mul(uint64_t *d, uint64_t *a, uint64_t *b)
 	 */
 	z = (unsigned __int128)t0 + (unsigned __int128)t4
 		+ (unsigned __int128)th;
-	t0 = (uint64_t)z;
+	t0 = (br_ssl_u64)z;
 	z = (unsigned __int128)t1 + (unsigned __int128)t5 + (z >> 64);
-	t1 = (uint64_t)z;
+	t1 = (br_ssl_u64)z;
 	z = (unsigned __int128)t2 + (unsigned __int128)t6 + (z >> 64);
-	t2 = (uint64_t)z;
+	t2 = (br_ssl_u64)z;
 	z = (unsigned __int128)t3 + (unsigned __int128)t7 + (z >> 64);
-	t3 = (uint64_t)z & MASK63;
-	th = (uint64_t)(z >> 63);
+	t3 = (br_ssl_u64)z & MASK63;
+	th = (br_ssl_u64)(z >> 63);
 
 	/*
 	 * Since the sum is at most 2^256 + 703, the two upper bits, in th,
@@ -369,17 +369,17 @@ f255_mul(uint64_t *d, uint64_t *a, uint64_t *b)
 	 * guarantees a result of at most 2^255+37.
 	 */
 	z = (unsigned __int128)t0 + (19 * th);
-	d[0] = (uint64_t)z;
+	d[0] = (br_ssl_u64)z;
 	z = (unsigned __int128)t1 + (z >> 64);
-	d[1] = (uint64_t)z;
+	d[1] = (br_ssl_u64)z;
 	z = (unsigned __int128)t2 + (z >> 64);
-	d[2] = (uint64_t)z;
-	d[3] = t3 + (uint64_t)(z >> 64);
+	d[2] = (br_ssl_u64)z;
+	d[3] = t3 + (br_ssl_u64)(z >> 64);
 
 #elif BR_UMUL128
 
-	uint64_t t0, t1, t2, t3, t4, t5, t6, t7, th;
-	uint64_t h0, h1, h2, h3;
+	br_ssl_u64 t0, t1, t2, t3, t4, t5, t6, t7, th;
+	br_ssl_u64 h0, h1, h2, h3;
 	unsigned char k;
 
 	/*
@@ -495,41 +495,41 @@ f255_mul(uint64_t *d, uint64_t *a, uint64_t *b)
  * Multiplication by A24 = 121665.
  */
 static inline void
-f255_mul_a24(uint64_t *d, const uint64_t *a)
+f255_mul_a24(br_ssl_u64 *d, const br_ssl_u64 *a)
 {
 #if BR_INT128
 
-	uint64_t t0, t1, t2, t3;
+	br_ssl_u64 t0, t1, t2, t3;
 	unsigned __int128 z;
 
 	z = (unsigned __int128)a[0] * 121665;
-	t0 = (uint64_t)z;
+	t0 = (br_ssl_u64)z;
 	z = (unsigned __int128)a[1] * 121665 + (z >> 64);
-	t1 = (uint64_t)z;
+	t1 = (br_ssl_u64)z;
 	z = (unsigned __int128)a[2] * 121665 + (z >> 64);
-	t2 = (uint64_t)z;
+	t2 = (br_ssl_u64)z;
 	z = (unsigned __int128)a[3] * 121665 + (z >> 64);
-	t3 = (uint64_t)z & MASK63;
+	t3 = (br_ssl_u64)z & MASK63;
 
-	z = (unsigned __int128)t0 + (19 * (uint64_t)(z >> 63));
-	t0 = (uint64_t)z;
+	z = (unsigned __int128)t0 + (19 * (br_ssl_u64)(z >> 63));
+	t0 = (br_ssl_u64)z;
 	z = (unsigned __int128)t1 + (z >> 64);
-	t1 = (uint64_t)z;
+	t1 = (br_ssl_u64)z;
 	z = (unsigned __int128)t2 + (z >> 64);
-	t2 = (uint64_t)z;
-	t3 = t3 + (uint64_t)(z >> 64);
+	t2 = (br_ssl_u64)z;
+	t3 = t3 + (br_ssl_u64)(z >> 64);
 
 	z = (unsigned __int128)t0 + (19 & -(t3 >> 63));
-	d[0] = (uint64_t)z;
+	d[0] = (br_ssl_u64)z;
 	z = (unsigned __int128)t1 + (z >> 64);
-	d[1] = (uint64_t)z;
+	d[1] = (br_ssl_u64)z;
 	z = (unsigned __int128)t2 + (z >> 64);
-	d[2] = (uint64_t)z;
-	d[3] = (t3 & MASK63) + (uint64_t)(z >> 64);
+	d[2] = (br_ssl_u64)z;
+	d[3] = (t3 & MASK63) + (br_ssl_u64)(z >> 64);
 
 #elif BR_UMUL128
 
-	uint64_t t0, t1, t2, t3, t4, h0, h1, h2, h3;
+	br_ssl_u64 t0, t1, t2, t3, t4, h0, h1, h2, h3;
 	unsigned char k;
 
 	t0 = _umul128(a[0], 121665, &h0);
@@ -562,11 +562,11 @@ f255_mul_a24(uint64_t *d, const uint64_t *a)
  * Finalize reduction.
  */
 static inline void
-f255_final_reduce(uint64_t *a)
+f255_final_reduce(br_ssl_u64 *a)
 {
 #if BR_INT128
 
-	uint64_t t0, t1, t2, t3, m;
+	br_ssl_u64 t0, t1, t2, t3, m;
 	unsigned __int128 z;
 
 	/*
@@ -576,12 +576,12 @@ f255_final_reduce(uint64_t *a)
 	 * have t = a - (2^255-19), and that's our result.
 	 */
 	z = (unsigned __int128)a[0] + 19;
-	t0 = (uint64_t)z;
+	t0 = (br_ssl_u64)z;
 	z = (unsigned __int128)a[1] + (z >> 64);
-	t1 = (uint64_t)z;
+	t1 = (br_ssl_u64)z;
 	z = (unsigned __int128)a[2] + (z >> 64);
-	t2 = (uint64_t)z;
-	t3 = a[3] + (uint64_t)(z >> 64);
+	t2 = (br_ssl_u64)z;
+	t3 = a[3] + (br_ssl_u64)(z >> 64);
 
 	m = -(t3 >> 63);
 	t3 &= MASK63;
@@ -592,7 +592,7 @@ f255_final_reduce(uint64_t *a)
 
 #elif BR_UMUL128
 
-	uint64_t t0, t1, t2, t3, m;
+	br_ssl_u64 t0, t1, t2, t3, m;
 	unsigned char k;
 
 	/*
@@ -616,13 +616,13 @@ f255_final_reduce(uint64_t *a)
 #endif
 }
 
-static uint32_t
+static br_ssl_u32
 api_mul(unsigned char *G, size_t Glen,
 	const unsigned char *kb, size_t kblen, int curve)
 {
 	unsigned char k[32];
-	uint64_t x1[4], x2[4], z2[4], x3[4], z3[4];
-	uint32_t swap;
+	br_ssl_u64 x1[4], x2[4], z2[4], x3[4], z3[4];
+	br_ssl_u32 swap;
 	int i;
 
 	(void)curve;
@@ -646,7 +646,7 @@ api_mul(unsigned char *G, size_t Glen,
 
 	/*
 	 * We can use memset() to clear values, because exact-width types
-	 * like uint64_t are guaranteed to have no padding bits or
+	 * like br_ssl_u64 are guaranteed to have no padding bits or
 	 * trap representations.
 	 */
 	memset(x2, 0, sizeof x2);
@@ -668,9 +668,9 @@ api_mul(unsigned char *G, size_t Glen,
 	swap = 0;
 
 	for (i = 254; i >= 0; i --) {
-		uint64_t a[4], aa[4], b[4], bb[4], e[4];
-		uint64_t c[4], d[4], da[4], cb[4];
-		uint32_t kt;
+		br_ssl_u64 a[4], aa[4], b[4], bb[4], e[4];
+		br_ssl_u64 c[4], d[4], da[4], cb[4];
+		br_ssl_u32 kt;
 
 		kt = (k[31 - (i >> 3)] >> (i & 7)) & 1;
 		swap ^= kt;
@@ -780,7 +780,7 @@ api_mulgen(unsigned char *R,
 	return Glen;
 }
 
-static uint32_t
+static br_ssl_u32
 api_muladd(unsigned char *A, const unsigned char *B, size_t len,
 	const unsigned char *x, size_t xlen,
 	const unsigned char *y, size_t ylen, int curve)
@@ -803,7 +803,7 @@ api_muladd(unsigned char *A, const unsigned char *B, size_t len,
 
 /* see bearssl_ec.h */
 const br_ec_impl br_ec_c25519_m64 = {
-	(uint32_t)0x20000000,
+	(br_ssl_u32)0x20000000,
 	&api_generator,
 	&api_order,
 	&api_xoff,
