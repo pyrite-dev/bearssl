@@ -142,9 +142,10 @@
  * When BR_USE_URANDOM is enabled, the SSL engine will use /dev/urandom
  * to automatically obtain quality randomness for seeding its internal
  * PRNG.
- *
-#define BR_USE_URANDOM   1
  */
+#ifndef _WIN32
+#define BR_USE_URANDOM   0
+#endif
 
 /*
  * When BR_USE_WIN32_RAND is enabled, the SSL engine will use the Win32
