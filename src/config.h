@@ -153,9 +153,8 @@
  *
  * Note: if both BR_USE_URANDOM and BR_USE_WIN32_RAND are defined, the
  * former takes precedence.
- *
-#define BR_USE_WIN32_RAND   1
  */
+#define BR_USE_WIN32_RAND   0
 
 /*
  * When BR_USE_UNIX_TIME is enabled, the X.509 validation engine obtains
@@ -188,9 +187,10 @@
  * This is meant for the low-end cores (Cortex M0, M0+, M1, M3).
  * Note: if BR_LOMUL is not explicitly enabled or disabled, then
  * enabling BR_ARMEL_CORTEXM_GCC also enables BR_LOMUL.
- *
-#define BR_ARMEL_CORTEXM_GCC   1
  */
+#if defined(BE_PORTABLE)
+#define BR_ARMEL_CORTEXM_GCC   0
+#endif
 
 /*
  * When BR_AES_X86NI is enabled, the AES implementation using the x86 "NI"
